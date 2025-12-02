@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quanthex/views/create_account_view.dart';
+import 'package:quanthex/views/import_wallet_view.dart';
 import 'package:quanthex/views/landing_view.dart';
 import 'package:quanthex/views/login_view.dart';
+import 'package:quanthex/views/seed_phrase_view.dart';
+import 'package:quanthex/views/set_pin_view.dart';
+import 'package:quanthex/views/setup_wallet_view.dart';
 import 'package:quanthex/views/splash_screen.dart';
 import 'package:quanthex/views/verify_view.dart';
 
@@ -31,6 +35,10 @@ class MyApp extends StatelessWidget {
           '/loginview': (context) => const LoginView(),
           '/createaccountview': (context) => const CreateAccountView(),
           '/verifyview': (context) => const VerifyView(),
+          '/setupwalletview': (context) => const SetupWalletView(),
+          '/importwalletview': (context) => const ImportWalletView(),
+          '/seedphraseview': (context) => const SeedPhraseView(),
+          '/setpinview': (context) => const SetPinView(),
         },
       ),
     );

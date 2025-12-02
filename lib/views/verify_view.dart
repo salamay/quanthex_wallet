@@ -178,6 +178,7 @@ class VerifyView extends StatelessWidget {
 
                   // activeFillColor: Color(0xffD4D4D4),
                   inactiveFillColor: Color(0xffF5F5F5),
+                  activeFillColor: Color(0xffF5F5F5),
 
                   selectedFillColor: Color(0xffF5F5F5),
                   activeColor: Color(0xffD4D4D4),
@@ -241,7 +242,7 @@ class VerifyView extends StatelessWidget {
                 textColor: Colors.white,
                 color: Color(0xFFB5B5B5),
                 onTap: () {
-                  // Navigate.toNamed(context, name: '/verifyview');
+                  Navigate.toNamed(context, name: '/setupwalletview');
                 },
               ),
               10.sp.verticalSpace,
