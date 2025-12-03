@@ -377,8 +377,8 @@ class SuccessModal extends StatelessWidget {
             color: const Color(0xFF792A90),
             onTap: () {
               // Navigate to main app/home screen
-              // Navigate.toNamed(context, name: '/home');
-              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigate.toNamed(context, name: '/homeview');
+              // Navigator.of(context).popUntil((route) => route.isFirst);
             },
           ),
           10.sp.verticalSpace,

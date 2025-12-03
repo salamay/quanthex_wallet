@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quanthex/views/create_account_view.dart';
+import 'package:quanthex/views/ethereum_detail_view.dart';
+import 'package:quanthex/views/home_view.dart';
 import 'package:quanthex/views/import_wallet_view.dart';
 import 'package:quanthex/views/landing_view.dart';
 import 'package:quanthex/views/login_view.dart';
+import 'package:quanthex/views/qr_scan_view.dart';
+import 'package:quanthex/views/receipt_view.dart';
 import 'package:quanthex/views/seed_phrase_view.dart';
 import 'package:quanthex/views/set_pin_view.dart';
 import 'package:quanthex/views/setup_wallet_view.dart';
 import 'package:quanthex/views/splash_screen.dart';
+import 'package:quanthex/views/swap_token_view.dart';
+import 'package:quanthex/views/transaction_history_view.dart';
+import 'package:quanthex/views/transactions_records_view.dart';
 import 'package:quanthex/views/verify_view.dart';
 
 void main() {
@@ -39,6 +46,15 @@ class MyApp extends StatelessWidget {
           '/importwalletview': (context) => const ImportWalletView(),
           '/seedphraseview': (context) => const SeedPhraseView(),
           '/setpinview': (context) => const SetPinView(),
+          '/homeview': (context) => const HomeView(),
+          '/transactionhistoryview': (context) =>
+              const TransactionHistoryView(),
+          '/transactionsrecordsview': (context) =>
+              const TransactionsRecordsView(),
+          '/receiptview': (context) => const ReceiptView(),
+          '/qrscanview': (context) => const QRScanView(),
+          '/swaptokenview': (context) => const SwapTokenView(),
+          '/ethereumdetailview': (context) => const EthereumDetailView(),
         },
       ),
     );

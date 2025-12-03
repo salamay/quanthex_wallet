@@ -8,11 +8,13 @@ class AppButton extends StatefulWidget {
     this.onTap,
     this.color,
     this.textColor,
+    this.padding,
   });
 
   final String text;
   final void Function()? onTap;
   final Color? color, textColor;
+  final EdgeInsetsGeometry? padding;
 
   @override
   State<AppButton> createState() => _AppButtonState();
@@ -28,7 +30,9 @@ class _AppButtonState extends State<AppButton> {
       child: Container(
         width: 333.sp,
         height: 50.sp,
-        padding: const EdgeInsets.symmetric(horizontal: 117, vertical: 9),
+        padding:
+            widget.padding ??
+            const EdgeInsets.symmetric(horizontal: 117, vertical: 9),
         decoration: ShapeDecoration(
           color: widget.color ?? Colors.white,
           shape: RoundedRectangleBorder(
