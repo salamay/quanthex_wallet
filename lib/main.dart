@@ -11,6 +11,8 @@ import 'package:quanthex/views/receipt_view.dart';
 import 'package:quanthex/views/seed_phrase_view.dart';
 import 'package:quanthex/views/set_pin_view.dart';
 import 'package:quanthex/views/setup_wallet_view.dart';
+import 'package:quanthex/views/receive_view.dart';
+import 'package:quanthex/views/send_token_view.dart';
 import 'package:quanthex/views/splash_screen.dart';
 import 'package:quanthex/views/swap_token_view.dart';
 import 'package:quanthex/views/transaction_history_view.dart';
@@ -55,6 +57,8 @@ class MyApp extends StatelessWidget {
           '/qrscanview': (context) => const QRScanView(),
           '/swaptokenview': (context) => const SwapTokenView(),
           '/ethereumdetailview': (context) => const EthereumDetailView(),
+          '/sendtokenview': (context) => const SendTokenView(),
+          '/receiveview': (context) => const ReceiveView(),
         },
       ),
     );

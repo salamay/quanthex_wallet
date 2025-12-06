@@ -336,25 +336,32 @@ class _EthereumDetailViewState extends State<EthereumDetailView> {
                         textColor: Colors.white,
                         padding: EdgeInsets.all(5),
                         color: const Color(0xFF792A90),
-                        onTap: () {},
+                        onTap: () {
+                          Navigate.toNamed(context, name: '/sendtokenview');
+                        },
                       ),
                     ),
                     15.horizontalSpace,
                     Expanded(
-                      child: Container(
-                        height: 50.sp,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF9E6FF),
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Receive',
-                            style: TextStyle(
-                              color: const Color(0xFF792A90),
-                              fontSize: 15.sp,
-                              fontFamily: 'Satoshi',
-                              fontWeight: FontWeight.w700,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigate.toNamed(context, name: '/receiveview');
+                        },
+                        child: Container(
+                          height: 50.sp,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9E6FF),
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Receive',
+                              style: TextStyle(
+                                color: const Color(0xFF792A90),
+                                fontSize: 15.sp,
+                                fontFamily: 'Satoshi',
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),

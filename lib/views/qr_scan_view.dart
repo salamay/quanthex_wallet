@@ -259,17 +259,17 @@ class _QRScanViewState extends State<QRScanView> {
                         Row(
                           children: [
                             Expanded(
-                              child: AppButton(
-                                text: 'Confirm',
-                                textColor: Colors.white,
-                                color: const Color(0xFF792A90),
-                                padding: EdgeInsets.all(5),
-
-                                onTap: () {
-                                  // Handle confirm
-                                  Navigate.back(context);
-                                },
-                              ),
+                               child: AppButton(
+                                 text: 'Confirm',
+                                 textColor: Colors.white,
+                                 color: const Color(0xFF792A90),
+                                 padding: EdgeInsets.all(5),
+ 
+                                 onTap: () {
+                                   // Handle confirm - return scanned address
+                                   Navigator.pop(context, _scannedAddress);
+                                 },
+                               ),
                             ),
                             15.horizontalSpace,
                             Expanded(

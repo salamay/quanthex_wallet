@@ -209,12 +209,16 @@ class _HomeViewState extends State<HomeView> {
                           _buildQuickAction(
                             icon: Icons.arrow_downward,
                             label: 'Deposit',
-                            onTap: () {},
+                            onTap: () {
+                              Navigate.toNamed(context, name: '/receiveview');
+                            },
                           ),
                           _buildQuickAction(
                             icon: Icons.arrow_upward,
                             label: 'Send',
-                            onTap: () {},
+                            onTap: () {
+                              Navigate.toNamed(context, name: '/sendtokenview');
+                            },
                           ),
                           _buildQuickAction(
                             icon: Icons.swap_horiz,
