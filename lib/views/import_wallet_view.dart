@@ -24,10 +24,11 @@ class _ImportWalletViewState extends State<ImportWalletView> {
   }
 
   void _validateSeedPhrase(String value) {
-    // Basic validation - check if it's approximately 16 words
+    // Basic validation - check if it's approximately 12 words
     final words = value.trim().split(RegExp(r'\s+'));
-    final isValid = words.length == 16 && words.every((word) => word.isNotEmpty);
-    
+    final isValid =
+        words.length == 12 && words.every((word) => word.isNotEmpty);
+
     setState(() {
       _hasError = !isValid && value.isNotEmpty;
       _isValid = isValid;
@@ -156,7 +157,7 @@ class _ImportWalletViewState extends State<ImportWalletView> {
               ),
               10.sp.verticalSpace,
               Text(
-                'Enter your exact 16-word recovery phrase to gain access to your wallet.',
+                'Enter your exact 12-word recovery phrase to gain access to your wallet.',
                 style: TextStyle(
                   color: const Color(0xFF757575),
                   fontSize: 14,
@@ -167,7 +168,10 @@ class _ImportWalletViewState extends State<ImportWalletView> {
               20.sp.verticalSpace,
               if (_hasError)
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 10.sp),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.sp,
+                    vertical: 10.sp,
+                  ),
                   margin: EdgeInsets.only(bottom: 15.sp),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFEBEE),
@@ -211,7 +215,7 @@ class _ImportWalletViewState extends State<ImportWalletView> {
               10.sp.verticalSpace,
               AppTextfield(
                 controller: _seedPhraseController,
-                hintText: 'Enter your 16 - Digit seed phrase',
+                hintText: 'Enter your 12 - Digit seed phrase',
                 maxLines: 4,
                 borderColor: _hasError
                     ? const Color(0xFFFF5252)
@@ -281,7 +285,8 @@ class _ImportWalletViewState extends State<ImportWalletView> {
                         // Navigate to PIN setup with import flag
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
-                            builder: (context) => const SetPinView(isImport: true),
+                            builder: (context) =>
+                                const SetPinView(isImport: true),
                           ),
                         );
                       }
@@ -295,4 +300,3 @@ class _ImportWalletViewState extends State<ImportWalletView> {
     );
   }
 }
-
