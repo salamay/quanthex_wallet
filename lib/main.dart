@@ -15,6 +15,8 @@ import 'package:quanthex/views/send_token_view.dart';
 import 'package:quanthex/views/set_pin_view.dart';
 import 'package:quanthex/views/setup_wallet_view.dart';
 import 'package:quanthex/views/splash_screen.dart';
+import 'package:quanthex/views/staking_view.dart';
+import 'package:quanthex/views/subscribe_staking_view.dart';
 import 'package:quanthex/views/subscribe_view.dart';
 import 'package:quanthex/views/swap_token_view.dart';
 import 'package:quanthex/views/transaction_history_view.dart';
@@ -63,6 +65,8 @@ class MyApp extends StatelessWidget {
           '/receiveview': (context) => const ReceiveView(),
           '/miningview': (context) => const MiningView(),
           '/subscribeview': (context) => const SubscribeView(),
+          '/stakingview': (context) => const StakingView(),
+          '/subscribestakingview': (context) => const SubscribeStakingView(),
         },
       ),
     );

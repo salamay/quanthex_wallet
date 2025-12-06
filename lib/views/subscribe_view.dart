@@ -391,20 +391,25 @@ class _SubscribeViewState extends State<SubscribeView> {
                                   width: 32.sp,
                                   height: 32.sp,
                                   decoration: BoxDecoration(
-                                    color: Colors.green.withOpacity(0.2),
+                                    // color: Colors.green.withOpacity(0.2),
                                     shape: BoxShape.circle,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'T',
-                                      style: TextStyle(
-                                        color: Colors.green,
-                                        fontSize: 18.sp,
-                                        fontFamily: 'Satoshi',
-                                        fontWeight: FontWeight.w700,
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                        'assets/images/usdt_image.png',
                                       ),
                                     ),
                                   ),
+                                  // child: Center(
+                                  //   child: Text(
+                                  //     'T',
+                                  //     style: TextStyle(
+                                  //       color: Colors.green,
+                                  //       fontSize: 18.sp,
+                                  //       fontFamily: 'Satoshi',
+                                  //       fontWeight: FontWeight.w700,
+                                  //     ),
+                                  //   ),
+                                  // ),
                                 ),
                                 10.horizontalSpace,
                                 Text(
@@ -931,21 +936,28 @@ class PaymentSuccessModal extends StatelessWidget {
                     Container(
                       width: 60.sp,
                       height: 60.sp,
+                      // decoration: BoxDecoration(
+                      //   color: Colors.green.withOpacity(0.2),
+                      //   shape: BoxShape.circle,
+                      // ),
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.2),
+                        // color: Colors.green.withOpacity(0.2),
                         shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          'T',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 30.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w700,
-                          ),
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/usdt_image.png'),
                         ),
                       ),
+                      // child: Center(
+                      //   child: Text(
+                      //     'T',
+                      //     style: TextStyle(
+                      //       color: Colors.green,
+                      //       fontSize: 30.sp,
+                      //       fontFamily: 'Satoshi',
+                      //       fontWeight: FontWeight.w700,
+                      //     ),
+                      //   ),
+                      // ),
                     ),
                     Positioned(
                       left: -40.sp,

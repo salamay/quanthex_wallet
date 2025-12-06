@@ -90,6 +90,9 @@ class BottomNavBar extends StatelessWidget {
             case 2:
               Navigate.toNamed(context, name: '/miningview');
               break;
+            case 3:
+              Navigate.toNamed(context, name: '/stakingview');
+              break;
             // Add other routes as needed
           }
         }
