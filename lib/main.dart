@@ -6,14 +6,16 @@ import 'package:quanthex/views/home_view.dart';
 import 'package:quanthex/views/import_wallet_view.dart';
 import 'package:quanthex/views/landing_view.dart';
 import 'package:quanthex/views/login_view.dart';
+import 'package:quanthex/views/mining_view.dart';
 import 'package:quanthex/views/qr_scan_view.dart';
 import 'package:quanthex/views/receipt_view.dart';
+import 'package:quanthex/views/receive_view.dart';
 import 'package:quanthex/views/seed_phrase_view.dart';
+import 'package:quanthex/views/send_token_view.dart';
 import 'package:quanthex/views/set_pin_view.dart';
 import 'package:quanthex/views/setup_wallet_view.dart';
-import 'package:quanthex/views/receive_view.dart';
-import 'package:quanthex/views/send_token_view.dart';
 import 'package:quanthex/views/splash_screen.dart';
+import 'package:quanthex/views/subscribe_view.dart';
 import 'package:quanthex/views/swap_token_view.dart';
 import 'package:quanthex/views/transaction_history_view.dart';
 import 'package:quanthex/views/transactions_records_view.dart';
@@ -59,6 +61,8 @@ class MyApp extends StatelessWidget {
           '/ethereumdetailview': (context) => const EthereumDetailView(),
           '/sendtokenview': (context) => const SendTokenView(),
           '/receiveview': (context) => const ReceiveView(),
+          '/miningview': (context) => const MiningView(),
+          '/subscribeview': (context) => const SubscribeView(),
         },
       ),
     );

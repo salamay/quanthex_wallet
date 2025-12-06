@@ -13,8 +13,8 @@ class Navigate {
   //   Navigator.of(context).pop();
   // }
 
-  static void toNamed(BuildContext context, {name}) {
-    Navigator.of(context).pushNamed(name);
+  static toNamed(BuildContext context, {name}) async {
+    return await Navigator.of(context).pushNamed(name);
   }
 
   static void back(BuildContext context, {name}) {

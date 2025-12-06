@@ -4,6 +4,8 @@ import 'package:quanthex/utils/navigator.dart';
 import 'package:quanthex/views/qr_scan_view.dart';
 import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/widgets/app_textfield.dart';
+import 'package:quanthex/widgets/confirm_pin_modal.dart';
+import 'package:quanthex/widgets/transfer_success_modal.dart';
 
 class SendTokenView extends StatefulWidget {
   const SendTokenView({super.key});
@@ -84,6 +86,27 @@ class _SendTokenViewState extends State<SendTokenView> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => ConfirmTransactionModal(
+        token: _selectedToken,
+        chain: _selectedChain,
+        amount: _amount,
+        recipientAddress: _recipientAddress,
+        onConfirm: () {
+          // Navigator.pop(context);
+          // print("object");
+          Future.delayed(Duration(milliseconds: 200), () {
+            _showSuccessModal();
+          });
+        },
+      ),
+    );
+  }
+
+  void _showSuccessModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => TransferSuccessModal(
         token: _selectedToken,
         chain: _selectedChain,
         amount: _amount,
@@ -841,6 +864,7 @@ class ConfirmTransactionModal extends StatefulWidget {
   final String chain;
   final double amount;
   final String recipientAddress;
+  final VoidCallback onConfirm;
 
   const ConfirmTransactionModal({
     super.key,
@@ -848,6 +872,7 @@ class ConfirmTransactionModal extends StatefulWidget {
     required this.chain,
     required this.amount,
     required this.recipientAddress,
+    required this.onConfirm,
   });
 
   @override
@@ -972,6 +997,7 @@ class _ConfirmTransactionModalState extends State<ConfirmTransactionModal> {
           25.sp.verticalSpace,
           Container(
             padding: EdgeInsets.all(16.sp),
+            width: MediaQuery.sizeOf(context).width,
             decoration: BoxDecoration(
               color: const Color(0xFFF5F5F5),
               borderRadius: BorderRadius.circular(12),
@@ -999,25 +1025,31 @@ class _ConfirmTransactionModalState extends State<ConfirmTransactionModal> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    Row(
-                      children: [
-                        // if (isPolygon)
-                        Image.asset(
-                          'assets/images/matic_logo.png',
-                          width: 20.sp,
-                          height: 20.sp,
-                        ),
-                        8.horizontalSpace,
-                        Text(
-                          widget.chain,
-                          style: TextStyle(
-                            color: const Color(0xFF792A90),
-                            fontSize: 14.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w600,
+                    10.sp.horizontalSpace,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          // if (isPolygon)
+                          Image.asset(
+                            'assets/images/matic_logo.png',
+                            width: 20.sp,
+                            height: 20.sp,
                           ),
-                        ),
-                      ],
+                          8.horizontalSpace,
+                          Expanded(
+                            child: Text(
+                              widget.chain,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: const Color(0xFF792A90),
+                                fontSize: 14.sp,
+                                fontFamily: 'Satoshi',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -1078,6 +1110,7 @@ class _ConfirmTransactionModalState extends State<ConfirmTransactionModal> {
             color: Color(0xff792A90),
             textColor: Color(0xffffffff),
             onTap: () {
+              Navigator.pop(context);
               showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
@@ -1085,11 +1118,14 @@ class _ConfirmTransactionModalState extends State<ConfirmTransactionModal> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                 ),
-                builder: (context) => ConfirmSwap(
-                  amount: widget.amount,
-                  chain: widget.chain,
-                  recipientAddress: widget.recipientAddress,
-                  token: widget.token,
+                builder: (context) => ConfirmPinModal(
+                  title: 'Confirm Swap',
+                  pinLength: 6,
+                  onPinComplete: (pin) {
+                    // Navigator.pop(context);
+                    print("widget.onConfirm called");
+                    widget.onConfirm();
+                  },
                 ),
               );
             },
@@ -1145,382 +1181,6 @@ class _ConfirmTransactionModalState extends State<ConfirmTransactionModal> {
           ),
         ),
       ],
-    );
-  }
-}
-
-// Transfer Success Modal
-class TransferSuccessModal extends StatelessWidget {
-  final String token;
-  final String chain;
-  final double amount;
-  final String recipientAddress;
-
-  const TransferSuccessModal({
-    super.key,
-    required this.token,
-    required this.chain,
-    required this.amount,
-    required this.recipientAddress,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isPolygon = chain.contains('Polygon');
-    final truncatedAddress = recipientAddress.length > 20
-        ? '${recipientAddress.substring(0, 10)}...${recipientAddress.substring(recipientAddress.length - 10)}'
-        : recipientAddress;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.all(24.sp),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40.sp,
-            height: 4.sp,
-            margin: EdgeInsets.only(bottom: 20.sp),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE0E0E0),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // 15.horizontalSpace,
-              Padding(
-                padding: EdgeInsetsGeometry.only(left: 30),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Image.asset(
-                      'assets/images/eth_logo.png',
-                      width: 60.sp,
-                      height: 60.sp,
-                    ),
-                    Positioned(
-                      left: -40,
-                      child: Container(
-                        width: 60.sp,
-                        height: 60.sp,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF792A90),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.check,
-                          size: 30.sp,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              15.horizontalSpace,
-              Text(
-                '-$amount ETH',
-                style: TextStyle(
-                  color: const Color(0xFF2D2D2D),
-                  fontSize: 20.sp,
-                  fontFamily: 'Satoshi',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          20.sp.verticalSpace,
-          Text(
-            'Transfer of $amount ETH to $truncatedAddress is successfully completed',
-            textAlign: TextAlign.start,
-            style: TextStyle(
-              color: const Color(0xFF2D2D2D),
-              fontSize: 16.sp,
-              fontFamily: 'Satoshi',
-              fontWeight: FontWeight.w600,
-              height: 1.4,
-            ),
-          ),
-          10.sp.verticalSpace,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // if (isPolygon)
-              Image.asset(
-                'assets/images/matic_logo.png',
-                width: 20.sp,
-                height: 20.sp,
-              ),
-              8.horizontalSpace,
-              Text(
-                chain,
-                style: TextStyle(
-                  color: const Color(0xFF757575),
-                  fontSize: 14.sp,
-                  fontFamily: 'Satoshi',
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
-          30.sp.verticalSpace,
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 50.sp,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF9E6FF),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Receipt',
-                      style: TextStyle(
-                        color: const Color(0xFF792A90),
-                        fontSize: 15.sp,
-                        fontFamily: 'Satoshi',
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              15.horizontalSpace,
-              Expanded(
-                child: AppButton(
-                  text: 'Done',
-                  textColor: Colors.white,
-                  color: const Color(0xFF792A90),
-                  padding: EdgeInsets.all(5),
-                  onTap: () {
-                    Navigate.back(context);
-                    // Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
-                ),
-              ),
-            ],
-          ),
-          20.sp.verticalSpace,
-        ],
-      ),
-    );
-  }
-}
-
-class ConfirmSwap extends StatefulWidget {
-  final String token;
-  final String chain;
-  final double amount;
-  final String recipientAddress;
-
-  const ConfirmSwap({
-    super.key,
-    required this.amount,
-    required this.chain,
-    required this.recipientAddress,
-    required this.token,
-  });
-
-  @override
-  State<ConfirmSwap> createState() => _ConfirmSwapState();
-}
-
-class _ConfirmSwapState extends State<ConfirmSwap> {
-  String _pin = '';
-
-  void _onNumberPressed(String number) {
-    if (_pin.length < 6) {
-      setState(() {
-        _pin += number;
-      });
-
-      if (_pin.length == 6) {
-        Future.delayed(Duration(milliseconds: 300), () {
-          Navigator.pop(context);
-          _showSuccessModal();
-        });
-      }
-    }
-  }
-
-  void _onBackspace() {
-    if (_pin.isNotEmpty) {
-      setState(() {
-        _pin = _pin.substring(0, _pin.length - 1);
-      });
-    }
-  }
-
-  void _showSuccessModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => TransferSuccessModal(
-        token: widget.token,
-        chain: widget.chain,
-        amount: widget.amount,
-        recipientAddress: widget.recipientAddress,
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 550.sp,
-      child: Column(
-        children: [
-          10.sp.verticalSpace,
-          Container(
-            width: 40.sp,
-            height: 4.sp,
-            margin: EdgeInsets.only(bottom: 20.sp),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE0E0E0),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          2.sp.verticalSpace,
-
-          Text(
-            'Confirm Swap',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: const Color(0xFF595959),
-              fontSize: 15,
-              fontFamily: 'Satoshi',
-              fontWeight: FontWeight.w700,
-              height: 1.47,
-              letterSpacing: -0.41,
-            ),
-          ),
-          20.sp.verticalSpace,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(6, (index) {
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 8.sp),
-                width: 16.sp,
-                height: 16.sp,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFF2D2D2D), width: 2),
-                  color: index < _pin.length
-                      ? const Color(0xFF2D2D2D)
-                      : Colors.transparent,
-                ),
-              );
-            }),
-          ),
-          15.sp.verticalSpace,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.face, size: 18.sp, color: const Color(0xFF792A90)),
-              8.horizontalSpace,
-              Text(
-                'Use Face ID Instead',
-                style: TextStyle(
-                  color: const Color(0xFF792A90),
-                  fontSize: 14.sp,
-                  fontFamily: 'Satoshi',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          30.sp.verticalSpace,
-          // Keypad
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKeypadButton('1'),
-                  _buildKeypadButton('2'),
-                  _buildKeypadButton('3'),
-                ],
-              ),
-              15.sp.verticalSpace,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKeypadButton('4'),
-                  _buildKeypadButton('5'),
-                  _buildKeypadButton('6'),
-                ],
-              ),
-              15.sp.verticalSpace,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKeypadButton('7'),
-                  _buildKeypadButton('8'),
-                  _buildKeypadButton('9'),
-                ],
-              ),
-              15.sp.verticalSpace,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKeypadButton('*', isSpecial: true),
-                  _buildKeypadButton('0'),
-                  _buildKeypadButton('', isBackspace: true),
-                ],
-              ),
-            ],
-          ),
-          20.sp.verticalSpace,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKeypadButton(
-    String text, {
-    bool isSpecial = false,
-    bool isBackspace = false,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        if (isBackspace) {
-          _onBackspace();
-        } else if (text.isNotEmpty) {
-          _onNumberPressed(text);
-        }
-      },
-      child: Container(
-        width: 70.sp,
-        height: 70.sp,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Center(
-          child: isBackspace
-              ? Icon(
-                  Icons.backspace_outlined,
-                  color: const Color(0xFF2D2D2D),
-                  size: 24.sp,
-                )
-              : Text(
-                  text,
-                  style: TextStyle(
-                    color: const Color(0xFF2D2D2D),
-                    fontSize: 24.sp,
-                    fontFamily: 'Satoshi',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-        ),
-      ),
     );
   }
 }
