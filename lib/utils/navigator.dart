@@ -20,4 +20,9 @@ class Navigate {
   static void back(BuildContext context, {name}) {
     Navigator.pop(context);
   }
+
+  static void backAll(BuildContext context, {name}) {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    // Navigat
+  }
 }
