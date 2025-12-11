@@ -397,71 +397,86 @@ class _StakingViewState extends State<StakingView> {
 
   Widget _buildEarningItem(String date, String amount) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.sp),
-      padding: EdgeInsets.all(16.sp),
+      // margin: EdgeInsets.only(bottom: 1.sp),
+      padding: EdgeInsets.only(
+        left: 16.sp,
+        right: 16.sp,
+        bottom: 10.sp,
+        top: 10.sp,
+      ),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        // color: const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            width: 40.sp,
-            height: 40.sp,
-            decoration: BoxDecoration(
-              // color: Colors.green.withOpacity(0.2),
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: AssetImage('assets/images/usdt_image.png'),
+          Row(
+            children: [
+              Container(
+                width: 40.sp,
+                height: 40.sp,
+                decoration: BoxDecoration(
+                  // color: Colors.green.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/usdt_image.png'),
+                  ),
+                ),
+                // child: Center(
+                //   child: Text(
+                //     'T',
+                //     style: TextStyle(
+                //       color: Colors.green,
+                //       fontSize: 20.sp,
+                //       fontFamily: 'Satoshi',
+                //       fontWeight: FontWeight.w700,
+                //     ),
+                //   ),
+                // ),
               ),
-            ),
-            // child: Center(
-            //   child: Text(
-            //     'T',
-            //     style: TextStyle(
-            //       color: Colors.green,
-            //       fontSize: 20.sp,
-            //       fontFamily: 'Satoshi',
-            //       fontWeight: FontWeight.w700,
-            //     ),
-            //   ),
-            // ),
-          ),
-          15.horizontalSpace,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Earnings',
-                  style: TextStyle(
-                    color: const Color(0xFF2D2D2D),
-                    fontSize: 16.sp,
-                    fontFamily: 'Satoshi',
-                    fontWeight: FontWeight.w700,
-                  ),
+              15.horizontalSpace,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Earnings',
+                      style: TextStyle(
+                        color: const Color(0xFF2D2D2D),
+                        fontSize: 16.sp,
+                        fontFamily: 'Satoshi',
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    4.sp.verticalSpace,
+                    Text(
+                      date,
+                      style: TextStyle(
+                        color: const Color(0xFF757575),
+                        fontSize: 12.sp,
+                        fontFamily: 'Satoshi',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
                 ),
-                4.sp.verticalSpace,
-                Text(
-                  date,
-                  style: TextStyle(
-                    color: const Color(0xFF757575),
-                    fontSize: 12.sp,
-                    fontFamily: 'Satoshi',
-                    fontWeight: FontWeight.w400,
-                  ),
+              ),
+              Text(
+                'Received $amount USDT',
+                style: TextStyle(
+                  color: const Color(0xFF2D2D2D),
+                  fontSize: 16.sp,
+                  fontFamily: 'Satoshi',
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Text(
-            'Received $amount USDT',
-            style: TextStyle(
-              color: const Color(0xFF2D2D2D),
-              fontSize: 16.sp,
-              fontFamily: 'Satoshi',
-              fontWeight: FontWeight.w700,
-            ),
+          10.sp.verticalSpace,
+          Container(
+            height: 1,
+            width: MediaQuery.sizeOf(context).width,
+            color: Color(0xffEEEEEE),
           ),
         ],
       ),
@@ -627,6 +642,7 @@ class ConfirmWithdrawalModal extends StatelessWidget {
             text: 'Confirm Withdraw',
             textColor: Colors.white,
             color: const Color(0xFF792A90),
+            padding: EdgeInsets.zero,
             onTap: () {
               // Navigator.pop(context);
               showModalBottomSheet(

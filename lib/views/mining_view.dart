@@ -14,7 +14,7 @@ class MiningView extends StatefulWidget {
 
 class _MiningViewState extends State<MiningView> {
   final double _miningProgress = 0.63; // 63%
-  final String _earnedAmount = '18553.53';
+  final String _earnedAmount = '1,127,393.22';
   final String _referralLink = 'https://quanthex.io/r/QUX4837';
   bool subScribed = false;
 
@@ -129,60 +129,75 @@ class _MiningViewState extends State<MiningView> {
                                       ),
                                     ),
                                   ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Mining',
-                                        style: TextStyle(
-                                          color: const Color(0xFF757575),
-                                          fontSize: 14.sp,
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      5.verticalSpace,
-                                      Text(
-                                        '${(_miningProgress * 100).toInt()}%',
-                                        style: TextStyle(
-                                          color: const Color(0xFF2D2D2D),
-                                          fontSize: 32.sp,
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  // Column(
+                                  //   mainAxisAlignment: MainAxisAlignment.center,
+                                  //   children: [
+                                  //     Text(
+                                  //       'Mining',
+                                  //       style: TextStyle(
+                                  //         color: const Color(0xFF757575),
+                                  //         fontSize: 14.sp,
+                                  //         fontFamily: 'Satoshi',
+                                  //         fontWeight: FontWeight.w500,
+                                  //       ),
+                                  //     ),
+                                  //     5.verticalSpace,
+                                  //     Text(
+                                  //       '${(_miningProgress * 100).toInt()}%',
+                                  //       style: TextStyle(
+                                  //         color: const Color(0xFF2D2D2D),
+                                  //         fontSize: 32.sp,
+                                  //         fontFamily: 'Satoshi',
+                                  //         fontWeight: FontWeight.w700,
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
                                 ],
                               ),
                             ),
                           ),
                           30.sp.verticalSpace,
                           // Earned Amount
-                          Center(
-                            child: Text(
-                              '$_earnedAmount STB',
-                              style: TextStyle(
-                                color: const Color(0xFF2D2D2D),
-                                fontSize: 32.sp,
-                                fontFamily: 'Satoshi',
-                                fontWeight: FontWeight.w700,
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 6.sp,
+                              vertical: 4.sp,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 240, 42, 243),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '$_earnedAmount Hex MH/s',
+                                style: TextStyle(
+                                  color: const Color.fromARGB(
+                                    255,
+                                    255,
+                                    255,
+                                    255,
+                                  ),
+                                  fontSize: 32.sp,
+                                  fontFamily: 'Satoshi',
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ),
-                          8.sp.verticalSpace,
-                          Center(
-                            child: Text(
-                              'Earned STB',
-                              style: TextStyle(
-                                color: const Color(0xFF792A90),
-                                fontSize: 14.sp,
-                                fontFamily: 'Satoshi',
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          40.sp.verticalSpace,
+                          // 8.sp.verticalSpace,
+                          // Center(
+                          //   child: Text(
+                          //     'Earned STB',
+                          //     style: TextStyle(
+                          //       color: const Color(0xFF792A90),
+                          //       fontSize: 14.sp,
+                          //       fontFamily: 'Satoshi',
+                          //       fontWeight: FontWeight.w500,
+                          //     ),
+                          //   ),
+                          // ),
+                          30.sp.verticalSpace,
                           // Referral Link
                           Container(
                             padding: EdgeInsets.all(16.sp),
@@ -248,10 +263,24 @@ class _MiningViewState extends State<MiningView> {
                             ],
                           ),
                           15.sp.verticalSpace,
-                          _buildStatCard(
-                            label: 'Current Mining Speed',
-                            value: '0.03 /hr',
-                            isFullWidth: true,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStatCard(
+                                  label: 'Current Mining Speed',
+                                  value: '0.03 /hr',
+                                  isFullWidth: true,
+                                ),
+                              ),
+                              15.horizontalSpace,
+                              Expanded(
+                                child: _buildStatCard(
+                                  label: 'STB',
+                                  value: '38153.9651',
+                                  isFullWidth: true,
+                                ),
+                              ),
+                            ],
                           ),
                           40.sp.verticalSpace,
                         ],

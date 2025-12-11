@@ -122,7 +122,7 @@ class _NotificationsViewState extends State<NotificationsView> {
       margin: EdgeInsets.only(bottom: 16.sp),
       padding: EdgeInsets.all(16.sp),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        // color: const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -140,11 +140,10 @@ class _NotificationsViewState extends State<NotificationsView> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFF792A90),
+            activeThumbColor: const Color(0xFF792A90),
           ),
         ],
       ),
     );
   }
 }
-

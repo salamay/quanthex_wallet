@@ -30,7 +30,7 @@ class _SubscribeViewState extends State<SubscribeView> {
         {
           'name': 'Starter Mining Package',
           'price': 50.0,
-          'duration': '365 Days',
+          'duration': '', //365 Days
           'icon': Icons.bolt,
         };
     _amount = _package['price'] ?? 50.0;
@@ -480,31 +480,43 @@ class _SubscribeViewState extends State<SubscribeView> {
                       ),
                       15.horizontalSpace,
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _package['name'] ?? 'Starter Mining Package',
-                              style: TextStyle(
-                                color: const Color(0xFF2D2D2D),
-                                fontSize: 16.sp,
-                                fontFamily: 'Satoshi',
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            5.sp.verticalSpace,
-                            Text(
-                              _package['duration'] ?? '365 Days',
-                              style: TextStyle(
-                                color: const Color(0xFF757575),
-                                fontSize: 14.sp,
-                                fontFamily: 'Satoshi',
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          _package['name'] ?? 'Starter Mining Package',
+                          style: TextStyle(
+                            color: const Color(0xFF2D2D2D),
+                            fontSize: 16.sp,
+                            fontFamily: 'Satoshi',
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
+                      // Expanded(
+                      //   child: Column(
+                      //     crossAxisAlignment: CrossAxisAlignment.start,
+                      //     children: [
+                      //       Text(
+                      //         _package['name'] ?? 'Starter Mining Package',
+                      //         style: TextStyle(
+                      //           color: const Color(0xFF2D2D2D),
+                      //           fontSize: 16.sp,
+                      //           fontFamily: 'Satoshi',
+                      //           fontWeight: FontWeight.w700,
+                      //         ),
+                      //       ),
+                      //       5.sp.verticalSpace,
+                      //       Text(
+                      //         _package['duration'] ?? '365 Days',
+                      //         style: TextStyle(
+                      //           color: const Color(0xFF757575),
+                      //           fontSize: 14.sp,
+                      //           fontFamily: 'Satoshi',
+                      //           fontWeight: FontWeight.w400,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      5.sp.horizontalSpace,
                       Text(
                         '$_amount USDT',
                         style: TextStyle(

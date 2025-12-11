@@ -10,12 +10,14 @@ class LandingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: Colors.red,
       body: Container(
         height: MediaQuery.sizeOf(context).height,
         width: MediaQuery.sizeOf(context).width,
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/images/landingbgimage.png'), //
+            fit: BoxFit.fill,
           ),
         ),
 

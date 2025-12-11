@@ -149,61 +149,76 @@ class _WalletsViewState extends State<WalletsView> {
     final isSelected = wallet['isSelected'] as bool;
 
     return Container(
-      margin: EdgeInsets.only(bottom: 12.sp),
-      padding: EdgeInsets.all(16.sp),
+      // margin: EdgeInsets.only(bottom: 12.sp),
+      padding: EdgeInsets.only(
+        left: 16.sp,
+        right: 16.sp,
+        top: 12.sp,
+        bottom: 12.sp,
+      ),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        // color: const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Wallet Icon
+          Row(
+            children: [
+              // Wallet Icon
+              Container(
+                width: 48.sp,
+                height: 48.sp,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: gradient,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              15.horizontalSpace,
+              Expanded(
+                child: Text(
+                  wallet['name'],
+                  style: TextStyle(
+                    color: const Color(0xFF2D2D2D),
+                    fontSize: 16.sp,
+                    fontFamily: 'Satoshi',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Container(
+                  width: 24.sp,
+                  height: 24.sp,
+                  margin: EdgeInsets.only(right: 10.sp),
+                  decoration: BoxDecoration(
+                    // color: const Color(0xFF792A90),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.check_circle_outline,
+                    size: 20.sp,
+                    color: Color(0xFF792A90),
+                  ),
+                ),
+              GestureDetector(
+                onTap: () => _showWalletMenu(wallet['id']),
+                child: Icon(
+                  Icons.more_vert_rounded,
+                  size: 24.sp,
+                  color: const Color(0xFF757575),
+                ),
+              ),
+            ],
+          ),
+          12.sp.verticalSpace,
           Container(
-            width: 48.sp,
-            height: 48.sp,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: gradient,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              shape: BoxShape.circle,
-            ),
-          ),
-          15.horizontalSpace,
-          Expanded(
-            child: Text(
-              wallet['name'],
-              style: TextStyle(
-                color: const Color(0xFF2D2D2D),
-                fontSize: 16.sp,
-                fontFamily: 'Satoshi',
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          if (isSelected)
-            Container(
-              width: 24.sp,
-              height: 24.sp,
-              margin: EdgeInsets.only(right: 10.sp),
-              decoration: BoxDecoration(
-                // color: const Color(0xFF792A90),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check_circle_outline,
-                size: 20.sp,
-                color: Color(0xFF792A90),
-              ),
-            ),
-          GestureDetector(
-            onTap: () => _showWalletMenu(wallet['id']),
-            child: Icon(
-              Icons.more_vert_rounded,
-              size: 24.sp,
-              color: const Color(0xFF757575),
-            ),
+            height: 1,
+            width: MediaQuery.sizeOf(context).width,
+            color: Color(0xffEEEEEE),
           ),
         ],
       ),

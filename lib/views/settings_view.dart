@@ -67,6 +67,7 @@ class SettingsView extends StatelessWidget {
                       onTap: () {
                         Navigate.toNamed(context, name: '/walletsview');
                       },
+                      context: context,
                     ),
                     _buildSettingItem(
                       icon: Icons.grid_view,
@@ -75,6 +76,7 @@ class SettingsView extends StatelessWidget {
                       onTap: () {
                         Navigate.toNamed(context, name: '/generalsettingsview');
                       },
+                      context: context,
                     ),
                     _buildSettingItem(
                       icon: Icons.security,
@@ -83,6 +85,7 @@ class SettingsView extends StatelessWidget {
                       onTap: () {
                         Navigate.toNamed(context, name: '/securityprivacyview');
                       },
+                      context: context,
                     ),
                     _buildSettingItem(
                       icon: Icons.lightbulb_outline,
@@ -93,6 +96,7 @@ class SettingsView extends StatelessWidget {
                       onToggle: (value) {
                         // Handle dark mode toggle
                       },
+                      context: context,
                     ),
                     _buildSettingItem(
                       icon: Icons.notifications_outlined,
@@ -101,6 +105,7 @@ class SettingsView extends StatelessWidget {
                       onTap: () {
                         Navigate.toNamed(context, name: '/notificationsview');
                       },
+                      context: context,
                     ),
                     _buildSettingItem(
                       icon: Icons.help_outline,
@@ -109,6 +114,7 @@ class SettingsView extends StatelessWidget {
                       onTap: () {
                         // Navigate to help center
                       },
+                      context: context,
                     ),
                     _buildSettingItem(
                       icon: Icons.share,
@@ -117,6 +123,7 @@ class SettingsView extends StatelessWidget {
                       onTap: () {
                         Navigate.toNamed(context, name: '/referearnview');
                       },
+                      context: context,
                     ),
                     40.sp.verticalSpace,
                     // Log Out Button
@@ -164,52 +171,68 @@ class SettingsView extends StatelessWidget {
     bool hasToggle = false,
     bool toggleValue = false,
     Function(bool)? onToggle,
+    context,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: 16.sp),
-        padding: EdgeInsets.all(16.sp),
+        // margin: EdgeInsets.only(bottom: 16.sp),
+        padding: EdgeInsets.only(
+          left: 16.sp,
+          top: 12.sp,
+          bottom: 12.sp,
+          right: 16.sp,
+        ),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
+          // color: const Color(0xFFF5F5F5),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Row(
+        child: Column(
           children: [
-            Container(
-              width: 40.sp,
-              height: 40.sp,
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: iconColor, size: 24.sp),
-            ),
-            15.horizontalSpace,
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: const Color(0xFF2D2D2D),
-                  fontSize: 16.sp,
-                  fontFamily: 'Satoshi',
-                  fontWeight: FontWeight.w600,
+            Row(
+              children: [
+                Container(
+                  width: 40.sp,
+                  height: 40.sp,
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: iconColor, size: 24.sp),
                 ),
-              ),
+                15.horizontalSpace,
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: const Color(0xFF2D2D2D),
+                      fontSize: 16.sp,
+                      fontFamily: 'Satoshi',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                if (hasToggle)
+                  Switch(
+                    value: toggleValue,
+                    onChanged: onToggle,
+                    activeTrackColor: const Color(0xFF792A90),
+                    activeThumbColor: const Color(0xFF792A90),
+                  )
+                else
+                  Icon(
+                    Icons.chevron_right,
+                    color: const Color(0xFF757575),
+                    size: 24.sp,
+                  ),
+              ],
             ),
-            if (hasToggle)
-              Switch(
-                value: toggleValue,
-                onChanged: onToggle,
-                activeTrackColor: const Color(0xFF792A90),
-                activeThumbColor: const Color(0xFF792A90),
-              )
-            else
-              Icon(
-                Icons.chevron_right,
-                color: const Color(0xFF757575),
-                size: 24.sp,
-              ),
+            12.sp.verticalSpace,
+            Container(
+              height: 1,
+              width: MediaQuery.sizeOf(context).width,
+              color: Color(0xffEEEEEE),
+            ),
           ],
         ),
       ),
