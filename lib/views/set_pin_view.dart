@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loader_overlay/loader_overlay.dart';
+import 'package:quanthex/data/repository/secure_storage.dart';
+import 'package:quanthex/routes/app_routes.dart';
+import 'package:quanthex/utils/logger.dart';
 import 'package:quanthex/utils/navigator.dart';
 import 'package:quanthex/widgets/app_button.dart';
 
 class SetPinView extends StatefulWidget {
   final bool isImport; // To determine which success modal to show
 
-  const SetPinView({super.key, this.isImport = false});
+  SetPinView({super.key, this.isImport = false});
 
   @override
   State<SetPinView> createState() => _SetPinViewState();
@@ -15,17 +19,25 @@ class SetPinView extends StatefulWidget {
 class _SetPinViewState extends State<SetPinView> {
   String _pin = '';
 
-  void _onNumberPressed(String number) {
-    if (_pin.length < 5) {
+  void _onNumberPressed(String number)async {
+    if (_pin.length < 4) {
       setState(() {
         _pin += number;
       });
-
       // Auto-navigate when PIN is complete
-      if (_pin.length == 5) {
-        Future.delayed(Duration(milliseconds: 300), () {
-          _showSuccessModal();
-        });
+      if (_pin.length == 4) {
+        try{
+          context.loaderOverlay.show();
+          await SecureStorage.getInstance().savePin(_pin);
+          context.loaderOverlay.hide();
+          await _showSuccessModal();
+          Navigate.go(context, name: AppRoutes.homepage);
+
+        }catch(e){
+          context.loaderOverlay.hide();
+          logger("", runtimeType.toString());
+        }
+
       }
     }
   }
@@ -38,10 +50,10 @@ class _SetPinViewState extends State<SetPinView> {
     }
   }
 
-  void _showSuccessModal() {
-    showModalBottomSheet(
+  Future<void> _showSuccessModal()async {
+    await showModalBottomSheet(
       context: context,
-      isDismissible: true,
+      isDismissible: false,
       enableDrag: false,
       backgroundColor: Colors.transparent,
       builder: (context) => SuccessModal(isImport: widget.isImport),
@@ -183,7 +195,7 @@ class _SetPinViewState extends State<SetPinView> {
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) {
+                  children: List.generate(4, (index) {
                     return Container(
                       margin: EdgeInsets.symmetric(horizontal: 8.sp),
                       width: 16.sp,
@@ -377,7 +389,7 @@ class SuccessModal extends StatelessWidget {
             color: const Color(0xFF792A90),
             onTap: () {
               // Navigate to main app/home screen
-              Navigate.toNamed(context, name: '/homeview');
+              Navigate.go(context, name: AppRoutes.homepage);
               // Navigator.of(context).popUntil((route) => route.isFirst);
             },
           ),

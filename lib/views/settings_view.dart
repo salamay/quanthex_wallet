@@ -8,158 +8,152 @@ class SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigate.back(context);
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.arrow_back, size: 20.sp),
-                        5.horizontalSpace,
-                        Text(
-                          'Back',
-                          style: TextStyle(
-                            color: const Color(0xFF2D2D2D),
-                            fontSize: 16.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Spacer(),
-                  Text(
-                    'Settings',
-                    style: TextStyle(
-                      color: const Color(0xFF2D2D2D),
-                      fontSize: 22.sp,
-                      fontFamily: 'Satoshi',
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Spacer(),
-                  SizedBox(width: 60.sp),
-                ],
-              ),
-            ),
-            30.sp.verticalSpace,
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
+    return Column(
+      children: [
+        // Header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigate.back(context);
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildSettingItem(
-                      icon: Icons.account_balance_wallet,
-                      iconColor: Colors.green,
-                      title: 'Wallets',
-                      onTap: () {
-                        Navigate.toNamed(context, name: '/walletsview');
-                      },
-                      context: context,
-                    ),
-                    _buildSettingItem(
-                      icon: Icons.grid_view,
-                      iconColor: Colors.orange,
-                      title: 'General',
-                      onTap: () {
-                        Navigate.toNamed(context, name: '/generalsettingsview');
-                      },
-                      context: context,
-                    ),
-                    _buildSettingItem(
-                      icon: Icons.security,
-                      iconColor: const Color(0xFF792A90),
-                      title: 'Security & Privacy',
-                      onTap: () {
-                        Navigate.toNamed(context, name: '/securityprivacyview');
-                      },
-                      context: context,
-                    ),
-                    _buildSettingItem(
-                      icon: Icons.lightbulb_outline,
-                      iconColor: Colors.red,
-                      title: 'Dark Mode',
-                      hasToggle: true,
-                      toggleValue: false,
-                      onToggle: (value) {
-                        // Handle dark mode toggle
-                      },
-                      context: context,
-                    ),
-                    _buildSettingItem(
-                      icon: Icons.notifications_outlined,
-                      iconColor: const Color(0xFF792A90),
-                      title: 'Notification',
-                      onTap: () {
-                        Navigate.toNamed(context, name: '/notificationsview');
-                      },
-                      context: context,
-                    ),
-                    _buildSettingItem(
-                      icon: Icons.help_outline,
-                      iconColor: Colors.red,
-                      title: 'Help Center',
-                      onTap: () {
-                        // Navigate to help center
-                      },
-                      context: context,
-                    ),
-                    _buildSettingItem(
-                      icon: Icons.share,
-                      iconColor: Colors.green,
-                      title: 'Refer and Earn',
-                      onTap: () {
-                        Navigate.toNamed(context, name: '/referearnview');
-                      },
-                      context: context,
-                    ),
-                    40.sp.verticalSpace,
-                    // Log Out Button
-                    GestureDetector(
-                      onTap: () {
-                        Navigate.backAll(context);
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        height: 50.sp,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.red, width: 1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Log Out',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 16.sp,
-                              fontFamily: 'Satoshi',
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
+                    Icon(Icons.arrow_back, size: 20.sp),
+                    5.horizontalSpace,
+                    Text(
+                      'Back',
+                      style: TextStyle(
+                        color: const Color(0xFF2D2D2D),
+                        fontSize: 16.sp,
+                        fontFamily: 'Satoshi',
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    40.sp.verticalSpace,
                   ],
                 ),
               ),
-            ),
-            BottomNavBar(currentIndex: 4),
-          ],
+              Spacer(),
+              Text(
+                'Settings',
+                style: TextStyle(
+                  color: const Color(0xFF2D2D2D),
+                  fontSize: 22.sp,
+                  fontFamily: 'Satoshi',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Spacer(),
+              SizedBox(width: 60.sp),
+            ],
+          ),
         ),
-      ),
+        30.sp.verticalSpace,
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                _buildSettingItem(
+                  icon: Icons.account_balance_wallet,
+                  iconColor: Colors.green,
+                  title: 'Wallets',
+                  onTap: () {
+                    Navigate.toNamed(context, name: '/walletsview');
+                  },
+                  context: context,
+                ),
+                _buildSettingItem(
+                  icon: Icons.grid_view,
+                  iconColor: Colors.orange,
+                  title: 'General',
+                  onTap: () {
+                    Navigate.toNamed(context, name: '/generalsettingsview');
+                  },
+                  context: context,
+                ),
+                _buildSettingItem(
+                  icon: Icons.security,
+                  iconColor: const Color(0xFF792A90),
+                  title: 'Security & Privacy',
+                  onTap: () {
+                    Navigate.toNamed(context, name: '/securityprivacyview');
+                  },
+                  context: context,
+                ),
+                _buildSettingItem(
+                  icon: Icons.lightbulb_outline,
+                  iconColor: Colors.red,
+                  title: 'Dark Mode',
+                  hasToggle: true,
+                  toggleValue: false,
+                  onToggle: (value) {
+                    // Handle dark mode toggle
+                  },
+                  context: context,
+                ),
+                _buildSettingItem(
+                  icon: Icons.notifications_outlined,
+                  iconColor: const Color(0xFF792A90),
+                  title: 'Notification',
+                  onTap: () {
+                    Navigate.toNamed(context, name: '/notificationsview');
+                  },
+                  context: context,
+                ),
+                _buildSettingItem(
+                  icon: Icons.help_outline,
+                  iconColor: Colors.red,
+                  title: 'Help Center',
+                  onTap: () {
+                    // Navigate to help center
+                  },
+                  context: context,
+                ),
+                _buildSettingItem(
+                  icon: Icons.share,
+                  iconColor: Colors.green,
+                  title: 'Refer and Earn',
+                  onTap: () {
+                    Navigate.toNamed(context, name: '/referearnview');
+                  },
+                  context: context,
+                ),
+                40.sp.verticalSpace,
+                // Log Out Button
+                GestureDetector(
+                  onTap: () {
+                    // Navigate.backAll(context);
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: 50.sp,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red, width: 1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Log Out',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 16.sp,
+                          fontFamily: 'Satoshi',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                40.sp.verticalSpace,
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

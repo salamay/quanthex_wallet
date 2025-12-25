@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class Navigate {
   // static void push(BuildContext context, String routeName) {
@@ -13,16 +14,19 @@ class Navigate {
   //   Navigator.of(context).pop();
   // }
 
-  static toNamed(BuildContext context, {name}) async {
-    return await Navigator.of(context).pushNamed(name);
+  static go(BuildContext context, {name,args}) async {
+    context.go(name,extra: args);
+  }
+  static toNamed(BuildContext context, {name,args}) async {
+    context.push(name,extra: args);
   }
 
-  static void back(BuildContext context, {name}) {
-    Navigator.pop(context);
+  static void back(BuildContext context, {args}) {
+    context.pop(args);
   }
 
   static void backAll(BuildContext context, {name}) {
-    Navigator.of(context).popUntil((route) => route.isFirst);
+    // context.popUntil((route) => route.isFirst);
     // Navigat
   }
 }

@@ -37,22 +37,22 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
   }
 
   void _showChainNetworkModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-      ),
-      builder: (context) => ChainNetworkModal(
-        onChainSelected: (chain) {
-          setState(() {
-            _selectedChain = chain;
-          });
-          Navigator.pop(context);
-        },
-      ),
-    );
+    // showModalBottomSheet(
+    //   context: context,
+    //   isScrollControlled: true,
+    //   backgroundColor: Colors.white,
+    //   shape: RoundedRectangleBorder(
+    //     borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+    //   ),
+    //   builder: (context) => ChainNetworkModal(
+    //     onChainSelected: (chain) {
+    //       setState(() {
+    //         _selectedChain = chain;
+    //       });
+    //       Navigator.pop(context);
+    //     },
+    //   ),
+    // );
   }
 
   void _showPaymentModal() {
@@ -399,7 +399,11 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
                   color: canPay
                       ? const Color(0xFF792A90)
                       : const Color(0xFFB5B5B5),
-                  onTap: canPay ? _showPaymentModal : null,
+                  onTap: (){
+                    if(canPay){
+                      _showPaymentModal();
+                    }
+                  } ,
                 ),
                 20.sp.verticalSpace,
               ],

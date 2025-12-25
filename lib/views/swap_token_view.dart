@@ -19,23 +19,23 @@ class _SwapTokenViewState extends State<SwapTokenView> {
   final double _toAmount = 0.000002;
 
   void _showReceiverModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-      ),
-      builder: (context) => ReceiverModal(
-        onTokenSelected: (token) {
-          setState(() {
-            _toToken = token;
-          });
-          Navigator.pop(context);
-        },
-      ),
-    );
+    // showModalBottomSheet(
+    //   context: context,
+    //   isScrollControlled: true,
+    //   useSafeArea: true,
+    //   backgroundColor: Colors.white,
+    //   shape: RoundedRectangleBorder(
+    //     borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+    //   ),
+    //   builder: (context) => ReceiverModal(
+    //     onTokenSelected: (token) {
+    //       setState(() {
+    //         _toToken = token;
+    //       });
+    //       Navigator.pop(context);
+    //     },
+    //   ),
+    // );
   }
 
   void _showConfirmSwap() {
@@ -54,504 +54,498 @@ class _SwapTokenViewState extends State<SwapTokenView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigate.back(context);
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.arrow_back, size: 20.sp),
-                        5.horizontalSpace,
-                        Text(
-                          'Back',
-                          style: TextStyle(
-                            color: const Color(0xFF2D2D2D),
-                            fontSize: 16.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Spacer(),
-                  Text(
-                    'Swap Token',
-                    style: TextStyle(
-                      color: const Color(0xFF2D2D2D),
-                      fontSize: 18.sp,
-                      fontFamily: 'Satoshi',
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Spacer(),
-                  IconButton(
-                    icon: Container(
-                      width: 41,
-                      height: 41,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 2,
-                        vertical: 9,
-                      ),
-                      decoration: ShapeDecoration(
-                        color: const Color(0x7CDADADA),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.50),
-                        ),
-                      ),
-                      child: Image.asset(
-                        'assets/images/history.png',
-                        width: 19.sp,
-                        height: 19.sp,
-                      ),
-                    ),
-                    // Icon(
-                    //   Icons.description_outlined,
-                    //   size: 24.sp,
-                    //   color: const Color(0xFF2D2D2D),
-                    // ),
-                    onPressed: () {
-                      Navigate.toNamed(
-                        context,
-                        name: '/transactionhistoryview',
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            30.sp.verticalSpace,
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
+    return Column(
+      children: [
+        // Header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigate.back(context);
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // From Section
-                    Stack(
-                      alignment: AlignmentGeometry.center,
-                      children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(16.sp),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF5F5F5),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'From',
-                                        style: TextStyle(
-                                          color: const Color(0xFF757575),
-                                          fontSize: 14.sp,
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      Spacer(),
-                                      Text(
-                                        '$_fromAmount $_fromToken',
-                                        style: TextStyle(
-                                          color: const Color(0xFF757575),
-                                          fontSize: 12.sp,
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w400,
-                                        ),
-                                      ),
-                                      8.horizontalSpace,
-                                      Text(
-                                        'Max',
-                                        style: TextStyle(
-                                          color: Color(0xFF792A90),
-                                          fontSize: 13.sp,
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  10.sp.verticalSpace,
-                                  Row(
-                                    children: [
-                                      Container(
-                                        width: 32.sp,
-                                        height: 32.sp,
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue.withOpacity(0.2),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Image.asset(
-                                          'assets/images/eth_logo.png',
-                                          width: 24.sp,
-                                          height: 24.sp,
-                                        ),
-                                      ),
-                                      8.horizontalSpace,
-                                      Text(
-                                        _fromToken,
-                                        style: TextStyle(
-                                          color: const Color(0xFF2D2D2D),
-                                          fontSize: 16.sp,
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.keyboard_arrow_down,
-                                        size: 20.sp,
-                                        color: const Color(0xFF757575),
-                                      ),
-                                      Spacer(),
-                                      Text(
-                                        '0.48',
-                                        style: TextStyle(
-                                          color: const Color(0xFF2D2D2D),
-                                          fontSize: 28.sp,
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  10.sp.verticalSpace,
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(),
-                                      Text(
-                                        '\$1500.00',
-                                        style: TextStyle(
-                                          color: const Color(0xFF757575),
-                                          fontSize: 14.sp,
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            10.sp.verticalSpace,
-
-                            _toToken.isEmpty
-                                ? Container(
-                                    width: MediaQuery.sizeOf(context).width,
-                                    height: 67,
-                                    decoration: ShapeDecoration(
-                                      color: const Color(0xFFF0F0F0),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(19),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        10.horizontalSpace,
-
-                                        //GREY LOADER
-                                        SizedBox(
-                                          width: 116,
-                                          height: 25,
-                                          child: Stack(
-                                            children: [
-                                              Positioned(
-                                                left: 0,
-                                                top: 0,
-                                                child: Container(
-                                                  width: 25,
-                                                  height: 25,
-                                                  decoration: ShapeDecoration(
-                                                    color: const Color(
-                                                      0xFFDFDFDF,
-                                                    ),
-                                                    shape: OvalBorder(),
-                                                  ),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                left: 31,
-                                                top: 9,
-                                                child: Container(
-                                                  width: 85,
-                                                  height: 6,
-                                                  decoration: ShapeDecoration(
-                                                    color: const Color(
-                                                      0xFFDFDFDF,
-                                                    ),
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            30,
-                                                          ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Spacer(),
-                                        GestureDetector(
-                                          onTap: _showReceiverModal,
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 16.sp,
-                                              vertical: 8.sp,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFF792A90),
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            child: Text(
-                                              'Select Token',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12.sp,
-                                                fontFamily: 'Satoshi',
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        10.horizontalSpace,
-                                      ],
-                                    ),
-                                  )
-                                :
-                                  // To Section
-                                  Container(
-                                    padding: EdgeInsets.all(16.sp),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF5F5F5),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'To',
-                                              style: TextStyle(
-                                                color: const Color(0xFF757575),
-                                                fontSize: 14.sp,
-                                                fontFamily: 'Satoshi',
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Spacer(),
-                                            Text(
-                                              '$_toAmount',
-                                              style: TextStyle(
-                                                color: const Color(0xFF757575),
-                                                fontSize: 12.sp,
-                                                fontFamily: 'Satoshi',
-                                                fontWeight: FontWeight.w400,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        10.sp.verticalSpace,
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: _showReceiverModal,
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 32.sp,
-                                                    height: 32.sp,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.blue
-                                                          .withOpacity(0.2),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.circle,
-                                                      size: 20.sp,
-                                                      color: Colors.blue,
-                                                    ),
-                                                  ),
-                                                  8.horizontalSpace,
-                                                  Text(
-                                                    _toToken,
-                                                    style: TextStyle(
-                                                      color: const Color(
-                                                        0xFF2D2D2D,
-                                                      ),
-                                                      fontSize: 16.sp,
-                                                      fontFamily: 'Satoshi',
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                  Icon(
-                                                    Icons.keyboard_arrow_down,
-                                                    size: 20.sp,
-                                                    color: const Color(
-                                                      0xFF757575,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Text(
-                                              '3155.02',
-                                              style: TextStyle(
-                                                color: const Color(0xFF2D2D2D),
-                                                fontSize: 28.sp,
-                                                fontFamily: 'Satoshi',
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        5.sp.verticalSpace,
-                                      ],
-                                    ),
-                                  ),
-                          ],
-                        ),
-
-                        // Swap Direction Button
-                        Container(
-                          width: 30.sp,
-                          height: 30.sp,
-                          padding: const EdgeInsets.all(3),
-                          decoration: ShapeDecoration(
-                            color: const Color(0xFFD9D9D9),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(7),
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.swap_vert,
-                            size: 24.sp,
-                            color: const Color(0xFF2D2D2D),
-                          ),
-                        ),
-                      ],
+                    Icon(Icons.arrow_back, size: 20.sp),
+                    5.horizontalSpace,
+                    Text(
+                      'Back',
+                      style: TextStyle(
+                        color: const Color(0xFF2D2D2D),
+                        fontSize: 16.sp,
+                        fontFamily: 'Satoshi',
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                    30.sp.verticalSpace,
-                    // Swap Details
-                    Column(
-                      children: [
-                        _buildSwapDetail('Swap Rate', '1 ETH = 6572.96 ADA'),
-                        // Divider(height: 20.sp),
-                        15.sp.verticalSpace,
-                        _buildSwapDetail('Min Receive', '3025.32 ADA'),
-                        // Divider(height: 20.sp),
-                        15.sp.verticalSpace,
-                        _buildSwapDetail('Slippage Tolerance', '0.50%'),
-                        // Divider(height: 20.sp),
-                        15.sp.verticalSpace,
-                        _buildSwapDetail('Price Impact', '0%'),
-                        // Divider(height: 20.sp),
-                        15.sp.verticalSpace,
-                        _buildSwapDetail('Service Fees', '\$1.82 (0.18%)'),
-                        // Divider(height: 20.sp),
-                        15.sp.verticalSpace,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Route',
-                              style: TextStyle(
-                                color: const Color(0xFF757575),
-                                fontSize: 14.sp,
-                                fontFamily: 'Satoshi',
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                // Container(
-                                //   width: 24.sp,
-                                //   height: 24.sp,
-                                //   decoration: BoxDecoration(
-                                //     color: Colors.blue,
-                                //     shape: BoxShape.circle,
-                                //   ),
-                                //   child: Center(
-                                //     child: Text(
-                                //       'T',
-                                //       style: TextStyle(
-                                //         color: Colors.white,
-                                //         fontSize: 12.sp,
-                                //         fontFamily: 'Satoshi',
-                                //         fontWeight: FontWeight.w700,
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ),
-                                Container(
-                                  width: 21.sp,
-                                  height: 21.sp,
-                                  decoration: ShapeDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage(
-                                        "assets/images/transit_icon.png",
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(40),
-                                    ),
-                                  ),
-                                ),
-                                8.horizontalSpace,
-                                Text(
-                                  'Transit',
-                                  style: TextStyle(
-                                    color: const Color(0xFF2D2D2D),
-                                    fontSize: 14.sp,
-                                    fontFamily: 'Satoshi',
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    30.sp.verticalSpace,
-                    AppButton(
-                      text: 'Swap',
-                      textColor: Colors.white,
-                      color: const Color(0xFF792A90),
-                      onTap: _showConfirmSwap,
-                    ),
-                    20.sp.verticalSpace,
                   ],
                 ),
               ),
-            ),
-            BottomNavBar(currentIndex: 1),
-          ],
+              Spacer(),
+              Text(
+                'Swap Token',
+                style: TextStyle(
+                  color: const Color(0xFF2D2D2D),
+                  fontSize: 18.sp,
+                  fontFamily: 'Satoshi',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Spacer(),
+              IconButton(
+                icon: Container(
+                  width: 41,
+                  height: 41,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 2,
+                    vertical: 9,
+                  ),
+                  decoration: ShapeDecoration(
+                    color: const Color(0x7CDADADA),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.50),
+                    ),
+                  ),
+                  child: Image.asset(
+                    'assets/images/history.png',
+                    width: 19.sp,
+                    height: 19.sp,
+                  ),
+                ),
+                // Icon(
+                //   Icons.description_outlined,
+                //   size: 24.sp,
+                //   color: const Color(0xFF2D2D2D),
+                // ),
+                onPressed: () {
+                  Navigate.toNamed(
+                    context,
+                    name: '/transactionhistoryview',
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-      ),
+        30.sp.verticalSpace,
+        Expanded(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                // From Section
+                Stack(
+                  alignment: AlignmentGeometry.center,
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(16.sp),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'From',
+                                    style: TextStyle(
+                                      color: const Color(0xFF757575),
+                                      fontSize: 14.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    '$_fromAmount $_fromToken',
+                                    style: TextStyle(
+                                      color: const Color(0xFF757575),
+                                      fontSize: 12.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  8.horizontalSpace,
+                                  Text(
+                                    'Max',
+                                    style: TextStyle(
+                                      color: Color(0xFF792A90),
+                                      fontSize: 13.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              10.sp.verticalSpace,
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 32.sp,
+                                    height: 32.sp,
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue.withOpacity(0.2),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Image.asset(
+                                      'assets/images/eth_logo.png',
+                                      width: 24.sp,
+                                      height: 24.sp,
+                                    ),
+                                  ),
+                                  8.horizontalSpace,
+                                  Text(
+                                    _fromToken,
+                                    style: TextStyle(
+                                      color: const Color(0xFF2D2D2D),
+                                      fontSize: 16.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.keyboard_arrow_down,
+                                    size: 20.sp,
+                                    color: const Color(0xFF757575),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    '0.48',
+                                    style: TextStyle(
+                                      color: const Color(0xFF2D2D2D),
+                                      fontSize: 28.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              10.sp.verticalSpace,
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(),
+                                  Text(
+                                    '\$1500.00',
+                                    style: TextStyle(
+                                      color: const Color(0xFF757575),
+                                      fontSize: 14.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        10.sp.verticalSpace,
+
+                        _toToken.isEmpty
+                            ? Container(
+                          width: MediaQuery.sizeOf(context).width,
+                          height: 67,
+                          decoration: ShapeDecoration(
+                            color: const Color(0xFFF0F0F0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(19),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              10.horizontalSpace,
+
+                              //GREY LOADER
+                              SizedBox(
+                                width: 116,
+                                height: 25,
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      left: 0,
+                                      top: 0,
+                                      child: Container(
+                                        width: 25,
+                                        height: 25,
+                                        decoration: ShapeDecoration(
+                                          color: const Color(
+                                            0xFFDFDFDF,
+                                          ),
+                                          shape: OvalBorder(),
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      left: 31,
+                                      top: 9,
+                                      child: Container(
+                                        width: 85,
+                                        height: 6,
+                                        decoration: ShapeDecoration(
+                                          color: const Color(
+                                            0xFFDFDFDF,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                            BorderRadius.circular(
+                                              30,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Spacer(),
+                              GestureDetector(
+                                onTap: _showReceiverModal,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.sp,
+                                    vertical: 8.sp,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF792A90),
+                                    borderRadius:
+                                    BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    'Select Token',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              10.horizontalSpace,
+                            ],
+                          ),
+                        )
+                            :
+                        // To Section
+                        Container(
+                          padding: EdgeInsets.all(16.sp),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    'To',
+                                    style: TextStyle(
+                                      color: const Color(0xFF757575),
+                                      fontSize: 14.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    '$_toAmount',
+                                    style: TextStyle(
+                                      color: const Color(0xFF757575),
+                                      fontSize: 12.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              10.sp.verticalSpace,
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onTap: _showReceiverModal,
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 32.sp,
+                                          height: 32.sp,
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue
+                                                .withOpacity(0.2),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.circle,
+                                            size: 20.sp,
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                        8.horizontalSpace,
+                                        Text(
+                                          _toToken,
+                                          style: TextStyle(
+                                            color: const Color(
+                                              0xFF2D2D2D,
+                                            ),
+                                            fontSize: 16.sp,
+                                            fontFamily: 'Satoshi',
+                                            fontWeight:
+                                            FontWeight.w600,
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.keyboard_arrow_down,
+                                          size: 20.sp,
+                                          color: const Color(
+                                            0xFF757575,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    '3155.02',
+                                    style: TextStyle(
+                                      color: const Color(0xFF2D2D2D),
+                                      fontSize: 28.sp,
+                                      fontFamily: 'Satoshi',
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              5.sp.verticalSpace,
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Swap Direction Button
+                    Container(
+                      width: 30.sp,
+                      height: 30.sp,
+                      padding: const EdgeInsets.all(3),
+                      decoration: ShapeDecoration(
+                        color: const Color(0xFFD9D9D9),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.swap_vert,
+                        size: 24.sp,
+                        color: const Color(0xFF2D2D2D),
+                      ),
+                    ),
+                  ],
+                ),
+                30.sp.verticalSpace,
+                // Swap Details
+                Column(
+                  children: [
+                    _buildSwapDetail('Swap Rate', '1 ETH = 6572.96 ADA'),
+                    // Divider(height: 20.sp),
+                    15.sp.verticalSpace,
+                    _buildSwapDetail('Min Receive', '3025.32 ADA'),
+                    // Divider(height: 20.sp),
+                    15.sp.verticalSpace,
+                    _buildSwapDetail('Slippage Tolerance', '0.50%'),
+                    // Divider(height: 20.sp),
+                    15.sp.verticalSpace,
+                    _buildSwapDetail('Price Impact', '0%'),
+                    // Divider(height: 20.sp),
+                    15.sp.verticalSpace,
+                    _buildSwapDetail('Service Fees', '\$1.82 (0.18%)'),
+                    // Divider(height: 20.sp),
+                    15.sp.verticalSpace,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Route',
+                          style: TextStyle(
+                            color: const Color(0xFF757575),
+                            fontSize: 14.sp,
+                            fontFamily: 'Satoshi',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            // Container(
+                            //   width: 24.sp,
+                            //   height: 24.sp,
+                            //   decoration: BoxDecoration(
+                            //     color: Colors.blue,
+                            //     shape: BoxShape.circle,
+                            //   ),
+                            //   child: Center(
+                            //     child: Text(
+                            //       'T',
+                            //       style: TextStyle(
+                            //         color: Colors.white,
+                            //         fontSize: 12.sp,
+                            //         fontFamily: 'Satoshi',
+                            //         fontWeight: FontWeight.w700,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
+                            Container(
+                              width: 21.sp,
+                              height: 21.sp,
+                              decoration: ShapeDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(
+                                    "assets/images/transit_icon.png",
+                                  ),
+                                  fit: BoxFit.cover,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                              ),
+                            ),
+                            8.horizontalSpace,
+                            Text(
+                              'Transit',
+                              style: TextStyle(
+                                color: const Color(0xFF2D2D2D),
+                                fontSize: 14.sp,
+                                fontFamily: 'Satoshi',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                30.sp.verticalSpace,
+                AppButton(
+                  text: 'Swap',
+                  textColor: Colors.white,
+                  color: const Color(0xFF792A90),
+                  onTap: _showConfirmSwap,
+                ),
+                20.sp.verticalSpace,
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -582,189 +576,6 @@ class _SwapTokenViewState extends State<SwapTokenView> {
   }
 }
 
-// Receiver Modal
-class ReceiverModal extends StatefulWidget {
-  final Function(String) onTokenSelected;
-
-  const ReceiverModal({super.key, required this.onTokenSelected});
-
-  @override
-  State<ReceiverModal> createState() => _ReceiverModalState();
-}
-
-class _ReceiverModalState extends State<ReceiverModal> {
-  final TextEditingController _searchController = TextEditingController();
-
-  final List<Map<String, dynamic>> _tokens = [
-    {
-      'name': 'Tether',
-      'symbol': 'USDT',
-      'balance': '23.61',
-      'color': Colors.green,
-    },
-    {
-      'name': 'Bitcoin',
-      'symbol': 'BTC',
-      'balance': '0.00004273',
-      'color': Colors.orange,
-    },
-    {'name': 'Tron', 'symbol': 'TRX', 'balance': '527', 'color': Colors.red},
-    {'name': 'XRP', 'symbol': 'XRP', 'balance': '23.61', 'color': Colors.grey},
-    {
-      'name': 'BNB',
-      'symbol': 'BNB',
-      'balance': '2.6518',
-      'color': Colors.yellow,
-    },
-    {
-      'name': 'Solana',
-      'symbol': 'SOL',
-      'balance': '0.27341',
-      'color': Colors.purple,
-    },
-    {
-      'name': 'Dogecoin',
-      'symbol': 'DOGE',
-      'balance': '0.0000000',
-      'color': Colors.yellow,
-    },
-    {
-      'name': 'Cardano',
-      'symbol': 'ADA',
-      'balance': '0.000002',
-      'color': Colors.blue,
-    },
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(24.sp),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40.sp,
-              height: 4.sp,
-              margin: EdgeInsets.only(bottom: 20.sp),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE0E0E0),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          Center(
-            child: Text(
-              'Receiver',
-              style: TextStyle(
-                color: const Color(0xFF2D2D2D),
-                fontSize: 20.sp,
-                fontFamily: 'Satoshi',
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          20.sp.verticalSpace,
-          AppTextfield(
-            controller: _searchController,
-            hintText: 'Search token',
-            prefixIcon: Icon(
-              Icons.search,
-              size: 20.sp,
-              color: const Color(0xFF9E9E9E),
-            ),
-            filledColor: const Color(0xFFF5F5F5),
-            borderColor: const Color(0xFFF5F5F5),
-            radius: 25,
-          ),
-          20.sp.verticalSpace,
-          Text(
-            'Favorites',
-            style: TextStyle(
-              color: const Color(0xFF2D2D2D),
-              fontSize: 16.sp,
-              fontFamily: 'Satoshi',
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          15.sp.verticalSpace,
-          Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: _tokens.length,
-              itemBuilder: (context, index) {
-                final token = _tokens[index];
-                return GestureDetector(
-                  onTap: () {
-                    widget.onTokenSelected(token['symbol']);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 12.sp),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 40.sp,
-                          height: 40.sp,
-                          decoration: BoxDecoration(
-                            color: (token['color'] as Color).withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.circle,
-                            size: 24.sp,
-                            color: token['color'] as Color,
-                          ),
-                        ),
-                        15.horizontalSpace,
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                token['name'],
-                                style: TextStyle(
-                                  color: const Color(0xFF2D2D2D),
-                                  fontSize: 15.sp,
-                                  fontFamily: 'Satoshi',
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              4.verticalSpace,
-                              Text(
-                                token['symbol'],
-                                style: TextStyle(
-                                  color: const Color(0xFF757575),
-                                  fontSize: 12.sp,
-                                  fontFamily: 'Satoshi',
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          token['balance'],
-                          style: TextStyle(
-                            color: const Color(0xFF2D2D2D),
-                            fontSize: 15.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 // Confirm Swap Modal
 class ConfirmSwapModal extends StatefulWidget {

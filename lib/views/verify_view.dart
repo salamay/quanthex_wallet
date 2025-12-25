@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:quanthex/routes/app_routes.dart';
 import 'package:quanthex/utils/navigator.dart';
 import 'package:quanthex/widgets/app_button.dart';
 
@@ -242,7 +244,7 @@ class VerifyView extends StatelessWidget {
                 textColor: Colors.white,
                 color: Color(0xFFB5B5B5),
                 onTap: () {
-                  Navigate.toNamed(context, name: '/setupwalletview');
+                  Navigate.toNamed(context, name: AppRoutes.setupwalletview);
                 },
               ),
               10.sp.verticalSpace,

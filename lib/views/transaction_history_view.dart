@@ -202,7 +202,6 @@ class _TransactionHistoryViewState extends State<TransactionHistoryView> {
                 ],
               ),
             ),
-            BottomNavBar(currentIndex: 0),
           ],
         ),
       ),

@@ -5,14 +5,14 @@ class AppButton extends StatefulWidget {
   const AppButton({
     super.key,
     required this.text,
-    this.onTap,
+    required this.onTap,
     this.color,
     this.textColor,
     this.padding,
   });
 
   final String text;
-  final void Function()? onTap;
+  final Function onTap;
   final Color? color, textColor;
   final EdgeInsetsGeometry? padding;
 
@@ -26,7 +26,9 @@ class _AppButtonState extends State<AppButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: (){
+        widget.onTap();
+      },
       child: Container(
         width: 333.sp,
         height: 50.sp,

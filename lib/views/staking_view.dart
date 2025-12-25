@@ -53,117 +53,111 @@ class _StakingViewState extends State<StakingView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header with gradient background
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
+    return Column(
+      children: [
+        // Header with gradient background
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Stack(
                   children: [
-                    Stack(
-                      children: [
-                        Container(
-                          height: 160.sp,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                const Color(0xFF792A90),
-                                const Color(0xFF9B4DB0),
+                    Container(
+                      height: 160.sp,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            const Color(0xFF792A90),
+                            const Color(0xFF9B4DB0),
+                          ],
+                        ),
+                        image: DecorationImage(
+                          image: AssetImage(
+                            'assets/images/staking_backimage.png',
+                          ),
+                          colorFilter: ColorFilter.mode(
+                            Color(0xff792a901a),
+                            BlendMode.darken,
+                          ),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                      // child: Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                      //   child: Column(
+                      //     children: [
+                      //       15.sp.verticalSpace,
+
+                      //       20.sp.verticalSpace,
+                      //     ],
+                      //   ),
+                      // ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigate.back(context);
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.arrow_back,
+                                  size: 20.sp,
+                                  color: Colors.white,
+                                ),
+                                5.horizontalSpace,
+                                Text(
+                                  'Back',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16.sp,
+                                    fontFamily: 'Satoshi',
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ],
                             ),
-                            image: DecorationImage(
-                              image: AssetImage(
-                                'assets/images/staking_backimage.png',
-                              ),
-                              colorFilter: ColorFilter.mode(
-                                Color(0xff792a901a),
-                                BlendMode.darken,
-                              ),
-                              fit: BoxFit.fill,
+                          ),
+                          Spacer(),
+                          Text(
+                            'Staking',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.sp,
+                              fontFamily: 'Satoshi',
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          // child: Padding(
-                          //   padding: const EdgeInsets.symmetric(horizontal: 20),
-                          //   child: Column(
-                          //     children: [
-                          //       15.sp.verticalSpace,
-
-                          //       20.sp.verticalSpace,
-                          //     ],
-                          //   ),
-                          // ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigate.back(context);
-                                },
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.arrow_back,
-                                      size: 20.sp,
-                                      color: Colors.white,
-                                    ),
-                                    5.horizontalSpace,
-                                    Text(
-                                      'Back',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16.sp,
-                                        fontFamily: 'Satoshi',
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Spacer(),
-                              Text(
-                                'Staking',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18.sp,
-                                  fontFamily: 'Satoshi',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Spacer(),
-                              SizedBox(width: 60.sp), // Balance for back button
-                            ],
-                          ),
-                        ),
-                      ],
+                          Spacer(),
+                          SizedBox(width: 60.sp), // Balance for back button
+                        ],
+                      ),
                     ),
-                    _hasActiveStaking
-                        ? Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: _buildActiveStakingView(),
-                          )
-                        : Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: _buildEmptyStakingView(),
-                          ),
                   ],
                 ),
-              ),
+                _hasActiveStaking
+                    ? Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: _buildActiveStakingView(),
+                )
+                    : Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: _buildEmptyStakingView(),
+                ),
+              ],
             ),
-            BottomNavBar(currentIndex: 3),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 

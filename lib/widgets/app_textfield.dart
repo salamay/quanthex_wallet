@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppTextfield extends StatefulWidget {
   final String hintText;
+  final String? errorText;
   final bool obscurePassword;
   final Widget? suffixIcon;
   final double? radius;
@@ -28,6 +29,7 @@ class AppTextfield extends StatefulWidget {
   const AppTextfield({
     super.key,
     this.hintText = '',
+    this.errorText,
     this.obscurePassword = false,
     this.suffixIcon,
     this.radius,
@@ -74,6 +76,9 @@ class _AppTextfieldState extends State<AppTextfield> {
       readOnly: widget.readonly ?? false,
       // cursorColor: const Color(0xffAEACAC),
       onChanged: widget.onChanged,
+      onTapOutside: (val){
+        FocusScope.of(context).unfocus();
+      },
       obscureText: widget.isPassword ? showPassword : widget.obscurePassword,
       controller: widget.controller,
       keyboardType: widget.keyboardType,
@@ -84,12 +89,12 @@ class _AppTextfieldState extends State<AppTextfield> {
           ? 1
           : widget.maxLines,
       maxLength: widget.maxLength,
-
       decoration: InputDecoration(
         contentPadding: widget.contentPadding,
         isDense: widget.isdense,
         errorMaxLines: 3,
         hintText: widget.hintText,
+        errorText: widget.errorText,
         prefixIcon: widget.prefixIcon,
         filled: widget.useFill ?? true,
         fillColor: widget.filledColor != null
@@ -122,6 +127,12 @@ class _AppTextfieldState extends State<AppTextfield> {
               fontFamily: 'SF Pro',
               fontWeight: FontWeight.w400,
             ),
+        errorStyle:TextStyle(
+          color: Colors.red,
+          fontSize: 10.sp,
+          fontFamily: 'SF Pro',
+          fontWeight: FontWeight.w400,
+        ),
         focusedBorder:
             widget.border ??
             OutlineInputBorder(

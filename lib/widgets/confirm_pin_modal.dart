@@ -33,7 +33,7 @@ class _ConfirmPinModalState extends State<ConfirmPinModal> {
           if (widget.onPinComplete != null) {
             widget.onPinComplete!(_pin);
           }
-          Navigator.pop(context, _pin);
+          // Navigator.pop(context, _pin);
         });
       }
     }

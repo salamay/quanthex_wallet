@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quanthex/routes/app_routes.dart';
 import 'package:quanthex/utils/navigator.dart';
 import 'package:quanthex/widgets/app_button.dart';
 
@@ -61,7 +62,7 @@ class LandingView extends StatelessWidget {
               AppButton(
                 text: 'Get Started',
                 onTap: () {
-                  Navigate.toNamed(context, name: '/createaccountview');
+                  Navigate.toNamed(context, name: AppRoutes.createaccountview);
                 },
               ),
               15.sp.verticalSpace,
@@ -91,7 +92,7 @@ class LandingView extends StatelessWidget {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Navigate.toNamed(context, name: '/loginview');
+                          Navigate.toNamed(context, name: AppRoutes.loginview);
                         },
                     ),
                   ],
