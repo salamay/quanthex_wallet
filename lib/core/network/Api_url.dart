@@ -35,6 +35,8 @@ class ApiUrls{
   // //Router 2
   // static String baseUrl="http://192.168.0.175:5790/api";
 
+  static String loginOtp="$baseUrl/auth/loginOtp";
+  static String registerOtp="$baseUrl/auth/registerOtp";
   static String register="$baseUrl/auth/register";
   static String login="$baseUrl/auth/login";
   static String subscribe="$baseUrl/products/subscribe";

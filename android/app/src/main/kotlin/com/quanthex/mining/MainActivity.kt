@@ -1,4 +1,4 @@
-package com.wallet.quanthex
+package com.quanthex.mining
 
 import io.flutter.embedding.android.FlutterActivity
 

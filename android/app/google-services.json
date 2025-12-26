@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "700102855358",
-    "project_id": "quanthex-e686d",
-    "storage_bucket": "quanthex-e686d.firebasestorage.app"
+    "project_number": "881698135276",
+    "project_id": "quanthex-b1986",
+    "storage_bucket": "quanthex-b1986.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:700102855358:android:dfbd374eacbeb3297dacef",
+        "mobilesdk_app_id": "1:881698135276:android:ecd0db239d40df75c799c9",
         "android_client_info": {
-          "package_name": "com.wallet.quanthex"
+          "package_name": "com.quanthex.mining"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCiWspadmg9W4SYKob5e9Vi2rDQ8200oiU"
+          "current_key": "AIzaSyD1i0Y3JijkHib4Syjo7Ji_N21w3ABCQHQ"
         }
       ],
       "services": {

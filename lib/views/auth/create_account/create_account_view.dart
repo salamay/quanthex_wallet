@@ -16,17 +16,28 @@ import 'package:quanthex/widgets/checkbox.dart';
 import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 
 import '../../../core/constants/auth_constants.dart';
+import '../../otp/model/otp_args.dart';
 
-class CreateAccountView extends StatelessWidget {
+class CreateAccountView extends StatefulWidget {
   CreateAccountView({super.key});
 
+  @override
+  State<CreateAccountView> createState() => _CreateAccountViewState();
+}
 
+class _CreateAccountViewState extends State<CreateAccountView> {
    final _formKey=GlobalKey<FormState>();
+
   final TextEditingController emailAddress=TextEditingController();
+
   final password = TextEditingController();
+
   final TextEditingController confirmPasswordCtr = TextEditingController();
+
   final TextEditingController referralCode=TextEditingController();
+
   ValueNotifier<bool> formValidation=ValueNotifier<bool>(false);
+
   ValueNotifier<bool> agreement=ValueNotifier<bool>(false);
 
   @override
@@ -410,12 +421,26 @@ class CreateAccountView extends StatelessWidget {
                             String deviceName=DeviceUtils.getDeviceType();
                             String regVia=regBasic;
                             String deviceId=await DeviceUtils.getDeviceId()??"UNKNOWN_DEVICE_ID";
-                            showOverlay(context);
                             try{
-                              String token=await AuthService.getInstance().registerUser(email: email, password: pass, deviceId: deviceId, deviceName: deviceName, referralCode: refCode, regVia: regVia);
+                              showOverlay(context);
+                              await AuthService.getInstance().getRegOtp(email: email);
+                              hideOverlay(context);
+                              OtpArgs otpArgs=OtpArgs(
+                                  email: email,
+                                  initialCallBack: ()async{
+                                    await AuthService.getInstance().getRegOtp(email: email);
+                                  }
+                              );
+                              String? input=await Navigate.awaitToNamed(context,name: AppRoutes.verifyview,args: otpArgs);
+                              logger("Input: $input", runtimeType.toString());
+                              if(input==null){
+                                return;
+                              }
+                              showOverlay(context);
+                              String token=await AuthService.getInstance().registerUser(email: email, password: pass, deviceId: deviceId, deviceName: deviceName, referralCode: refCode, regVia: regVia,otp: input);
                               await SecureStorage.getInstance().saveAuthToken(token);
                               hideOverlay(context);
-                              Navigate.toNamed(context, name: AppRoutes.verifyview);
+                              Navigate.go(context, name: AppRoutes.setupwalletview);
                             }catch(e){
                               hideOverlay(context);
                               showMySnackBar(context: context, message: e.toString(), type: SnackBarType.error);

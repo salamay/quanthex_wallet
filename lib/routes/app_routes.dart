@@ -10,6 +10,7 @@ import 'package:quanthex/views/home/home_view.dart';
 import 'package:quanthex/views/landing_view.dart';
 import 'package:quanthex/views/auth/sign_in/login_view.dart';
 import 'package:quanthex/views/notifications_view.dart';
+import 'package:quanthex/views/otp/model/otp_args.dart';
 import 'package:quanthex/views/qr_scan_view.dart';
 import 'package:quanthex/views/receipt_view.dart';
 import 'package:quanthex/views/receive/receive_view.dart';
@@ -24,7 +25,7 @@ import 'package:quanthex/views/subscribe_view.dart';
 import 'package:quanthex/views/swap_token_view.dart';
 import 'package:quanthex/views/transaction_history_view.dart';
 import 'package:quanthex/views/transactions_records_view.dart';
-import 'package:quanthex/views/verify_view.dart';
+import 'package:quanthex/views/otp/verify_view.dart';
 import 'package:quanthex/views/wallets/import_wallet_view.dart';
 import 'package:quanthex/views/wallets/seed_phrase_view.dart';
 import 'package:quanthex/views/wallets/setup_wallet_view.dart';
@@ -89,7 +90,10 @@ class AppRoutes{
       ),
       GoRoute(
         path: verifyview,
-        builder: (context, state) =>  VerifyView(),
+        builder: (context, state){
+          final args = state.extra as OtpArgs;
+          return VerifyView(args: args);
+        },
       ),
       GoRoute(
         path: setupwalletview,

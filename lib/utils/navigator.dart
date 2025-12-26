@@ -20,6 +20,9 @@ class Navigate {
   static toNamed(BuildContext context, {name,args}) async {
     context.push(name,extra: args);
   }
+  static Future<dynamic> awaitToNamed(BuildContext context, {name,args}) async {
+    return await  context.push(name,extra: args);
+  }
 
   static void back(BuildContext context, {args}) {
     context.pop(args);

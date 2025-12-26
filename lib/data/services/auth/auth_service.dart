@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quanthex/utils/logger.dart';
 
@@ -25,10 +26,60 @@ class AuthService{
     return _instance!;
   }
 
-  Future<String>registerUser({required String email, required String password,required String deviceId,required String deviceName,required String referralCode,required String regVia}) async{
+  Future<void>getSignInOtp({required String email, required String password}) async{
+    logger("Getting signIn otp", runtimeType.toString());
     Response? response;
     // String? token = await FirebaseMessaging.instance.getToken();
-    String token="";
+    var body={
+      "email":email,
+      "password":password
+    };
+      try{
+        response = await my_api.post(jsonEncode(body),ApiUrls.loginOtp, {"Content-Type": "application/json"});
+      }catch(e){
+        logger(e.toString(),runtimeType.toString());
+        throw Exception("Unable to establish connection");
+      }
+      if(response!=null){
+        logger("Getting signIn otp: Response code ${response.statusCode}",runtimeType.toString());
+        if(response.statusCode!>=200 && response.statusCode!<300){
+
+        }else{
+          var data=response.data;
+          throw Exception(data["message"]);
+        }
+      }else{
+        throw Exception("Unable to establish connection");
+      }
+  }
+
+  Future<void>getRegOtp({required String email}) async{
+    logger("Getting reg otp", runtimeType.toString());
+    Response? response;
+    // String? token = await FirebaseMessaging.instance.getToken();
+    var body={};
+    try{
+      response = await my_api.post(jsonEncode(body),"${ApiUrls.registerOtp}?email=$email", {"Content-Type": "application/json"});
+    }catch(e){
+      logger(e.toString(),runtimeType.toString());
+      throw Exception("Unable to establish connection");
+    }
+    if(response!=null){
+      logger("Getting reg otp: Response code ${response.statusCode}",runtimeType.toString());
+      if(response.statusCode!>=200 && response.statusCode!<300){
+
+      }else{
+        var data=response.data;
+        throw Exception(data["message"]);
+      }
+    }else{
+      throw Exception("Unable to establish connection");
+    }
+  }
+
+  Future<String>registerUser({required String email, required String password,required String deviceId,required String deviceName,required String referralCode,required String regVia,required String otp}) async{
+    Response? response;
+    String? token = await FirebaseMessaging.instance.getToken();
     if(token!=null){
       var body={
         "email":email,
@@ -40,7 +91,7 @@ class AuthService{
         "referral_code":referralCode,
       };
       try{
-        response = await my_api.post(jsonEncode(body),ApiUrls.register, {"Content-Type": "application/json"});
+        response = await my_api.post(jsonEncode(body),"${ApiUrls.register}?otp=$otp", {"Content-Type": "application/json"});
       }catch(e){
         logger(e.toString(),runtimeType.toString());
         throw Exception("Unable to establish connection");
@@ -64,10 +115,9 @@ class AuthService{
     }
   }
 
-  Future<String>signIn({required String email, required String password,required String deviceId,required String deviceName}) async{
+  Future<String>signIn({required String email, required String password,required String deviceId,required String deviceName,required String otp}) async{
     Response? response;
-    // String? token = await FirebaseMessaging.instance.getToken();
-    String token="";
+    String? token = await FirebaseMessaging.instance.getToken();
     if(token!=null){
       var body={
         "email":email,
@@ -77,7 +127,7 @@ class AuthService{
         "device_type":deviceName,
       };
       try{
-        response = await my_api.post(jsonEncode(body),ApiUrls.login, {"Content-Type": "application/json"});
+        response = await my_api.post(jsonEncode(body),"${ApiUrls.login}?otp=$otp", {"Content-Type": "application/json"});
       }catch(e){
         logger(e.toString(),runtimeType.toString());
         throw Exception("Unable to establish connection");

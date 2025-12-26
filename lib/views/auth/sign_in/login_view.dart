@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quanthex/utils/navigator.dart';
+import 'package:quanthex/views/otp/model/otp_args.dart';
 import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/widgets/app_textfield.dart';
 import 'package:quanthex/widgets/arrow_back.dart';
@@ -14,15 +15,27 @@ import '../../../utils/logger.dart';
 import '../../../utils/overlay_utils.dart';
 import '../../../widgets/snackbar/my_snackbar.dart';
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   LoginView({super.key});
 
+  @override
+  State<LoginView> createState() => _LoginViewState();
+}
+
+class _LoginViewState extends State<LoginView> {
   final _formKey=GlobalKey<FormState>();
+
   final TextEditingController emailAddress=TextEditingController();
+
   final password = TextEditingController();
+
+
   final TextEditingController confirmPasswordCtr = TextEditingController();
+
   final TextEditingController referralCode=TextEditingController();
+
   ValueNotifier<bool> formValidation=ValueNotifier<bool>(false);
+
   ValueNotifier<bool> agreement=ValueNotifier<bool>(false);
 
   @override
@@ -297,12 +310,26 @@ class LoginView extends StatelessWidget {
                           String refCode=referralCode.text.trim();
                           String deviceName=DeviceUtils.getDeviceType();
                           String deviceId=await DeviceUtils.getDeviceId()??"UNKNOWN_DEVICE_ID";
-                          showOverlay(context);
                           try{
-                            String token=await AuthService.getInstance().signIn(email: email, password: pass, deviceId: deviceId, deviceName: deviceName);
+                            showOverlay(context);
+                            await AuthService.getInstance().getSignInOtp(email: email, password: pass);
+                            hideOverlay(context);
+                            OtpArgs otpArgs=OtpArgs(
+                                email: email,
+                                initialCallBack: ()async{
+                                  await AuthService.getInstance().getSignInOtp(email: email, password: pass);
+                                }
+                            );
+                            String? input=await Navigate.awaitToNamed(context,name: AppRoutes.verifyview,args: otpArgs);
+                            logger("Input: $input", runtimeType.toString());
+                            if(input==null){
+                              return;
+                            }
+                            showOverlay(context);
+                            String token=await AuthService.getInstance().signIn(email: email, password: pass, deviceId: deviceId, deviceName: deviceName,otp: input);
                             await SecureStorage.getInstance().saveAuthToken(token);
                             hideOverlay(context);
-                            Navigate.toNamed(context, name: AppRoutes.verifyview);
+                            Navigate.go(context, name: AppRoutes.setupwalletview);
                           }catch(e){
                             hideOverlay(context);
                             showMySnackBar(context: context, message: e.toString(), type: SnackBarType.error);
