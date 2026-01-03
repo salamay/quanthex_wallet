@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-enum SnackBarType {
-  success,
-  error,
-  info,
-}
-showMySnackBar({required BuildContext context, required String message,required SnackBarType type}) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message),backgroundColor: type==SnackBarType.success?Colors.green:Colors.red,),
-  );
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
+
+enum SnackBarType { success, error, info }
+
+showMySnackBar({required BuildContext context, required String message, required SnackBarType type}) {
+  showTopSnackBar(Overlay.of(context), type==SnackBarType.success?CustomSnackBar.success(
+    messagePadding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 2.sp),
+    maxLines: 5,
+    message: message, backgroundColor: Colors.green):CustomSnackBar.error(
+    maxLines: 5,
+    message: message, backgroundColor: Colors.red));
 }

@@ -4,7 +4,7 @@ import 'package:quanthex/data/Models/users/referral_dto.dart';
 
 import '../../../core/network/Api_url.dart';
 import '../../../core/network/my_api.dart';
-import '../../../utils/logger.dart';
+import '../../utils/logger.dart';
 import '../../Models/mining/mining_dto.dart';
 import '../auth/auth_service.dart';
 

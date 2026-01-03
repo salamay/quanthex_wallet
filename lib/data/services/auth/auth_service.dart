@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:quanthex/utils/logger.dart';
+import 'package:quanthex/data/utils/logger.dart';
 
 import '../../../core/network/Api_url.dart';
 import '../../../core/network/my_api.dart';

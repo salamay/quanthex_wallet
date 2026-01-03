@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quanthex/data/Models/assets/network_model.dart';
 import 'package:quanthex/data/Models/assets/supported_assets.dart';
-import 'package:quanthex/utils/navigator.dart';
+import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/widgets/app_button.dart';
 

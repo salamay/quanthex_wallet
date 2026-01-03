@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:quanthex/utils/navigator.dart';
+import 'package:provider/provider.dart';
+import 'package:quanthex/data/controllers/wallet_controller.dart';
+import 'package:quanthex/data/Models/wallets/wallet_model.dart';
+import 'package:quanthex/routes/app_routes.dart';
+import 'package:quanthex/data/utils/navigator.dart';
+import 'package:quanthex/data/utils/security_utils.dart';
+import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 
 class WalletsView extends StatefulWidget {
   const WalletsView({super.key});
@@ -10,65 +16,132 @@ class WalletsView extends StatefulWidget {
 }
 
 class _WalletsViewState extends State<WalletsView> {
-  final List<Map<String, dynamic>> _wallets = [
-    {
-      'id': '1',
-      'name': 'Combactful',
-      'gradient': [Colors.yellow, Colors.orange, Colors.green],
-      'isSelected': true,
-    },
-    {
-      'id': '2',
-      'name': 'Wallet 2',
-      'gradient': [Colors.purple, Colors.pink],
-      'isSelected': false,
-    },
-    {
-      'id': '3',
-      'name': 'Multi-Coin Wallet',
-      'gradient': [Colors.red, Colors.pink],
-      'isSelected': false,
-    },
-  ];
-
-  void _showRenameModal(String walletId, String currentName) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-      ),
-      builder: (context) => RenameWalletModal(
-        currentName: currentName,
-        onRename: (newName) {
-          setState(() {
-            final wallet = _wallets.firstWhere((w) => w['id'] == walletId);
-            wallet['name'] = newName;
-          });
-          Navigator.pop(context);
-        },
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<WalletController>(context, listen: false).loadWallets();
+    });
   }
 
-  void _showWalletMenu(String walletId) {
+  List<Color> _generateGradientFromAddress(String address) {
+    // Generate consistent gradient colors from wallet address
+    final colors = [
+      [Colors.blue, Colors.purple],
+      [Colors.purple, Colors.pink],
+      [Colors.red, Colors.orange],
+      [Colors.orange, Colors.yellow],
+      [Colors.green, Colors.teal],
+      [Colors.teal, Colors.blue],
+      [Colors.pink, Colors.red],
+      [Colors.yellow, Colors.green],
+    ];
+
+    // Use address hash to pick a color
+    int hash = address.hashCode;
+    int index = hash.abs() % colors.length;
+    return colors[index];
+  }
+
+  String _getWalletDisplayName(WalletModel wallet) {
+    return wallet.name ?? 'Wallet ${wallet.walletAddress?.substring(0, 6) ?? 'Unknown'}';
+  }
+
+  String _getShortAddress(WalletModel wallet) {
+    if (wallet.walletAddress == null || wallet.walletAddress!.isEmpty) {
+      return 'Unknown';
+    }
+    String address = wallet.walletAddress!;
+    if (address.length > 10) {
+      return '${address.substring(0, 6)}...${address.substring(address.length - 4)}';
+    }
+    return address;
+  }
+
+  void _showWalletMenu(WalletModel wallet) {
+    final walletController = Provider.of<WalletController>(context, listen: false);
+    final isLastWallet = walletController.wallets.length == 1;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => WalletMenuModal(
-        onRename: () {
-          Navigator.pop(context);
-          final wallet = _wallets.firstWhere((w) => w['id'] == walletId);
-          _showRenameModal(walletId, wallet['name']);
+      builder: (modalContext) => WalletMenuModal(
+        wallet: wallet,
+        onShowSecretPhrase: () async {
+          Navigator.pop(modalContext);
+          // Wait for modal to fully close
+          await Future.delayed(Duration(milliseconds: 100));
+          // Verify PIN before showing secret phrase
+          if (!mounted) return;
+          bool pinResult = await SecurityUtils.showPinDialog(context: context);
+          if (pinResult && mounted) {
+            Navigate.toNamed(context, name: AppRoutes.backupseedphraseview, args: wallet);
+          } else if (mounted) {
+            showMySnackBar(context: context, message: 'Incorrect PIN', type: SnackBarType.error);
+          }
         },
-        onShowSecretPhrase: () {
-          Navigator.pop(context);
-          // Navigate to secret phrase view
-        },
-        onDelete: () {
-          Navigator.pop(context);
-          // Show delete confirmation
+        onDeleteWallet: () async {
+          Navigator.pop(modalContext);
+          // Wait for modal to fully close
+          await Future.delayed(Duration(milliseconds: 100));
+          if (!mounted) return;
+
+          // Prevent deleting the last wallet
+          if (isLastWallet) {
+            showMySnackBar(context: context, message: 'Cannot delete your last wallet', type: SnackBarType.error);
+            return;
+          }
+
+          // Show confirmation dialog
+          bool? confirmDelete = await showDialog<bool>(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+              title: Text(
+                'Delete Wallet',
+                style: TextStyle(fontFamily: 'Satoshi', fontWeight: FontWeight.w700, fontSize: 18.sp),
+              ),
+              content: Text(
+                'Are you sure you want to delete this wallet? This action cannot be undone. Make sure you have backed up your secret phrase.',
+                style: TextStyle(fontFamily: 'Satoshi', fontSize: 14.sp),
+              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, false),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(fontFamily: 'Satoshi', color: const Color(0xFF757575)),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, true),
+                  child: Text(
+                    'Delete',
+                    style: TextStyle(fontFamily: 'Satoshi', color: Colors.red, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          if (confirmDelete == true && mounted) {
+            // Verify PIN before deletion
+            bool pinResult = await SecurityUtils.showPinDialog(context: context);
+            if (pinResult && mounted) {
+              try {
+                await walletController.deleteWallet(wallet);
+                if (mounted) {
+                  showMySnackBar(context: context, message: 'Wallet deleted successfully', type: SnackBarType.success);
+                }
+              } catch (e) {
+                if (mounted) {
+                  showMySnackBar(context: context, message: 'Failed to delete wallet', type: SnackBarType.error);
+                }
+              }
+            } else if (mounted) {
+              showMySnackBar(context: context, message: 'Incorrect PIN', type: SnackBarType.error);
+            }
+          }
         },
       ),
     );
@@ -97,12 +170,7 @@ class _WalletsViewState extends State<WalletsView> {
                         5.horizontalSpace,
                         Text(
                           'Back',
-                          style: TextStyle(
-                            color: const Color(0xFF2D2D2D),
-                            fontSize: 16.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
@@ -110,31 +178,47 @@ class _WalletsViewState extends State<WalletsView> {
                   Spacer(),
                   Text(
                     'Wallets',
-                    style: TextStyle(
-                      color: const Color(0xFF2D2D2D),
-                      fontSize: 18.sp,
-                      fontFamily: 'Satoshi',
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
                   ),
                   Spacer(),
-                  IconButton(
-                    icon: Icon(Icons.add, size: 24.sp),
-                    onPressed: () {
-                      // Add new wallet
-                    },
-                  ),
+                  SizedBox(width: 60.sp),
                 ],
               ),
             ),
             20.sp.verticalSpace,
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                itemCount: _wallets.length,
-                itemBuilder: (context, index) {
-                  final wallet = _wallets[index];
-                  return _buildWalletItem(wallet);
+              child: Consumer<WalletController>(
+                builder: (context, walletController, child) {
+                  if (walletController.wallets.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.account_balance_wallet_outlined, size: 64.sp, color: const Color(0xFF757575)),
+                          20.sp.verticalSpace,
+                          Text(
+                            'No Wallets',
+                            style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                          ),
+                          8.sp.verticalSpace,
+                          Text(
+                            'Create or import a wallet to get started',
+                            style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: walletController.wallets.length,
+                    itemBuilder: (context, index) {
+                      final wallet = walletController.wallets[index];
+                      final isSelected = walletController.currentWallet?.walletAddress == wallet.walletAddress;
+                      return _buildWalletItem(wallet, isSelected);
+                    },
+                  );
                 },
               ),
             ),
@@ -144,22 +228,12 @@ class _WalletsViewState extends State<WalletsView> {
     );
   }
 
-  Widget _buildWalletItem(Map<String, dynamic> wallet) {
-    final gradient = wallet['gradient'] as List<Color>;
-    final isSelected = wallet['isSelected'] as bool;
+  Widget _buildWalletItem(WalletModel wallet, bool isSelected) {
+    final gradient = _generateGradientFromAddress(wallet.walletAddress ?? '');
 
     return Container(
-      // margin: EdgeInsets.only(bottom: 12.sp),
-      padding: EdgeInsets.only(
-        left: 16.sp,
-        right: 16.sp,
-        top: 12.sp,
-        bottom: 12.sp,
-      ),
-      decoration: BoxDecoration(
-        // color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(12),
-      ),
+      padding: EdgeInsets.only(left: 16.sp, right: 16.sp, top: 12.sp, bottom: 12.sp),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
       child: Column(
         children: [
           Row(
@@ -169,24 +243,25 @@ class _WalletsViewState extends State<WalletsView> {
                 width: 48.sp,
                 height: 48.sp,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: gradient,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  gradient: LinearGradient(colors: gradient, begin: Alignment.topLeft, end: Alignment.bottomRight),
                   shape: BoxShape.circle,
                 ),
               ),
               15.horizontalSpace,
               Expanded(
-                child: Text(
-                  wallet['name'],
-                  style: TextStyle(
-                    color: const Color(0xFF2D2D2D),
-                    fontSize: 16.sp,
-                    fontFamily: 'Satoshi',
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _getWalletDisplayName(wallet),
+                      style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                    ),
+                    4.sp.verticalSpace,
+                    Text(
+                      _getShortAddress(wallet),
+                      style: TextStyle(color: const Color(0xFF757575), fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                    ),
+                  ],
                 ),
               ),
               if (isSelected)
@@ -194,204 +269,16 @@ class _WalletsViewState extends State<WalletsView> {
                   width: 24.sp,
                   height: 24.sp,
                   margin: EdgeInsets.only(right: 10.sp),
-                  decoration: BoxDecoration(
-                    // color: const Color(0xFF792A90),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.check_circle_outline,
-                    size: 20.sp,
-                    color: Color(0xFF792A90),
-                  ),
+                  child: Icon(Icons.check_circle, size: 20.sp, color: Color(0xFF792A90)),
                 ),
               GestureDetector(
-                onTap: () => _showWalletMenu(wallet['id']),
-                child: Icon(
-                  Icons.more_vert_rounded,
-                  size: 24.sp,
-                  color: const Color(0xFF757575),
-                ),
+                onTap: () => _showWalletMenu(wallet),
+                child: Icon(Icons.more_vert, size: 24.sp, color: const Color(0xFF757575)),
               ),
             ],
           ),
           12.sp.verticalSpace,
-          Container(
-            height: 1,
-            width: MediaQuery.sizeOf(context).width,
-            color: Color(0xffEEEEEE),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Rename Wallet Modal
-class RenameWalletModal extends StatefulWidget {
-  final String currentName;
-  final Function(String) onRename;
-
-  const RenameWalletModal({
-    super.key,
-    required this.currentName,
-    required this.onRename,
-  });
-
-  @override
-  State<RenameWalletModal> createState() => _RenameWalletModalState();
-}
-
-class _RenameWalletModalState extends State<RenameWalletModal> {
-  late TextEditingController _nameController;
-  final int _maxLength = 15;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.currentName);
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(24.sp),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40.sp,
-              height: 4.sp,
-              margin: EdgeInsets.only(bottom: 20.sp),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE0E0E0),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          Center(
-            child: Text(
-              'Rename Wallet?',
-              style: TextStyle(
-                color: const Color(0xFF2D2D2D),
-                fontSize: 20.sp,
-                fontFamily: 'Satoshi',
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          20.sp.verticalSpace,
-          Text(
-            'New Wallet Name',
-            style: TextStyle(
-              color: const Color(0xFF757575),
-              fontSize: 14.sp,
-              fontFamily: 'Satoshi',
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          10.sp.verticalSpace,
-          TextField(
-            controller: _nameController,
-            maxLength: _maxLength,
-            decoration: InputDecoration(
-              hintText: 'Enter the new wallet name',
-              hintStyle: TextStyle(
-                color: const Color(0xFF9E9E9E),
-                fontSize: 14.sp,
-                fontFamily: 'Satoshi',
-              ),
-              counterText: '${_nameController.text.length}/$_maxLength',
-              counter: SizedBox(),
-              counterStyle: TextStyle(
-                color: const Color(0xFF757575),
-                fontSize: 12.sp,
-              ),
-              suffix: Text(
-                '${_nameController.text.length}/$_maxLength',
-                style: TextStyle(
-                  color: const Color(0xFF757575),
-                  fontSize: 12.sp,
-                ),
-              ),
-              filled: true,
-              fillColor: const Color(0xFFF5F5F5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(65),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: EdgeInsets.all(16.sp),
-            ),
-            onChanged: (value) {
-              setState(() {}); // Update counter
-            },
-          ),
-          30.sp.verticalSpace,
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigate.back(context);
-                  },
-                  child: Container(
-                    height: 50.sp,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF9E6FF),
-                      borderRadius: BorderRadius.circular(60),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          color: const Color(0xFF792A90),
-                          fontSize: 16.sp,
-                          fontFamily: 'Satoshi',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              15.horizontalSpace,
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    if (_nameController.text.isNotEmpty) {
-                      widget.onRename(_nameController.text);
-                    }
-                  },
-                  child: Container(
-                    height: 50.sp,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF792A90),
-                      borderRadius: BorderRadius.circular(60),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Yes, Rename',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                          fontFamily: 'Satoshi',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          20.sp.verticalSpace,
+          Container(height: 1, width: MediaQuery.sizeOf(context).width, color: Color(0xffEEEEEE)),
         ],
       ),
     );
@@ -400,16 +287,11 @@ class _RenameWalletModalState extends State<RenameWalletModal> {
 
 // Wallet Menu Modal
 class WalletMenuModal extends StatelessWidget {
-  final VoidCallback onRename;
+  final WalletModel wallet;
   final VoidCallback onShowSecretPhrase;
-  final VoidCallback onDelete;
+  final VoidCallback onDeleteWallet;
 
-  const WalletMenuModal({
-    super.key,
-    required this.onRename,
-    required this.onShowSecretPhrase,
-    required this.onDelete,
-  });
+  const WalletMenuModal({super.key, required this.wallet, required this.onShowSecretPhrase, required this.onDeleteWallet});
 
   @override
   Widget build(BuildContext context) {
@@ -425,54 +307,36 @@ class WalletMenuModal extends StatelessWidget {
             width: 40.sp,
             height: 4.sp,
             margin: EdgeInsets.only(top: 10.sp, bottom: 20.sp),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE0E0E0),
-              borderRadius: BorderRadius.circular(2),
-            ),
+            decoration: BoxDecoration(color: const Color(0xFFE0E0E0), borderRadius: BorderRadius.circular(2)),
           ),
-          _buildMenuItem(icon: Icons.edit, title: 'Rename', onTap: onRename),
-          _buildMenuItem(
-            icon: Icons.visibility,
-            title: 'Show Secret Phrase',
-            onTap: onShowSecretPhrase,
+          _buildMenuItem(icon: Icons.visibility, title: 'Show Secret Phrase', onTap: onShowSecretPhrase),
+          12.sp.verticalSpace,
+          Container(
+            height: 1,
+            margin: EdgeInsets.symmetric(horizontal: 20.sp),
+            color: const Color(0xFFEEEEEE),
           ),
-          _buildMenuItem(
-            icon: Icons.delete,
-            title: 'Delete',
-            titleColor: Colors.red,
-            onTap: onDelete,
-          ),
+          12.sp.verticalSpace,
+          _buildMenuItem(icon: Icons.delete_outline, title: 'Delete Wallet', onTap: onDeleteWallet, titleColor: Colors.red),
           20.sp.verticalSpace,
         ],
       ),
     );
   }
 
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    Color? titleColor,
-  }) {
+  Widget _buildMenuItem({required IconData icon, required String title, required VoidCallback onTap, Color? titleColor}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.sp, vertical: 16.sp),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: titleColor ?? const Color(0xFF2D2D2D),
-              size: 24.sp,
-            ),
+            Icon(icon, color: titleColor ?? const Color(0xFF2D2D2D), size: 24.sp),
             15.horizontalSpace,
-            Text(
-              title,
-              style: TextStyle(
-                color: titleColor ?? const Color(0xFF2D2D2D),
-                fontSize: 16.sp,
-                fontFamily: 'Satoshi',
-                fontWeight: FontWeight.w500,
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(color: titleColor ?? const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
               ),
             ),
           ],

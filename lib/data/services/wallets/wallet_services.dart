@@ -1,5 +1,5 @@
 
-import 'package:quanthex/utils/logger.dart';
+import 'package:quanthex/data/utils/logger.dart';
 import 'package:wallet/wallet.dart' as wallet;
 import 'package:web3dart/web3dart.dart';
 

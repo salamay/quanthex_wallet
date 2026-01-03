@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../utils/date_utils.dart';
+import '../../../data/utils/date_utils.dart';
 class ReferralItem extends StatelessWidget {
   ReferralItem({super.key,required this.email,required this.status,required this.timeStamp});
    String email;

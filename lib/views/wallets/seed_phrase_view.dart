@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quanthex/data/Models/wallets/wallet_model.dart';
-import 'package:quanthex/utils/navigator.dart';
-import 'package:quanthex/views/set_pin_view.dart';
+import 'package:quanthex/data/utils/navigator.dart';
+import 'package:quanthex/views/settings/set_pin_view.dart';
 import 'package:quanthex/widgets/app_button.dart';
 
 import '../../routes/app_routes.dart';

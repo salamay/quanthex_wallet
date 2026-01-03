@@ -27,10 +27,14 @@ class ApiUrls{
   // static String BSCRpc="https://97.rpc.thirdweb.com/";
   static String bscScan="https://api.bscscan.com/api";
   static String moralisTokenMetadata="https://deep-index.moralis.io/api/v2.2/erc20/metadata";
+  static String moralisErc20Transfers="https://deep-index.moralis.io/api/v2.2";
+  static String moralisNativeTransfers="https://deep-index.moralis.io/api/v2.2/";
+
+  static String baseUrl="http://161.35.165.60:5790/api";
 
 
   // Router 1
-  static String baseUrl="http://192.168.1.20:5790/api";
+  // static String baseUrl="http://192.168.1.20:5790/api";
 
   // //Router 2
   // static String baseUrl="http://192.168.0.175:5790/api";
@@ -40,9 +44,13 @@ class ApiUrls{
   static String register="$baseUrl/auth/register";
   static String login="$baseUrl/auth/login";
   static String subscribe="$baseUrl/products/subscribe";
+  static String stake="$baseUrl/products/stake";
   static String minings="$baseUrl/products/minings";
+  static String stakings="$baseUrl/products/stakings";
   static String referrals="$baseUrl/users/referrals";
   static String profile="$baseUrl/users/profile";
+  static String withdraw="$baseUrl/products/withdraw";
+  static String withdrawals="$baseUrl/products/withdrawals";
 
 
 }

@@ -8,13 +8,13 @@ import 'package:quanthex/data/Models/users/profile_dto.dart';
 import 'package:quanthex/data/Models/users/referral_dto.dart';
 import 'package:quanthex/data/controllers/mining/mining_controller.dart';
 import 'package:quanthex/data/controllers/user/user_controller.dart';
-import 'package:quanthex/utils/date_utils.dart';
-import 'package:quanthex/utils/navigator.dart';
+import 'package:quanthex/data/utils/date_utils.dart';
+import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/views/referr_and_earn/components/referral_item.dart';
 import 'package:quanthex/views/referr_and_earn/components/round_container_icon.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../../utils/logger.dart';
+import '../../data/utils/logger.dart';
 import '../../widgets/global/error_modal.dart';
 
 class ReferEarnView extends StatefulWidget {
@@ -56,7 +56,6 @@ class _ReferEarnViewState extends State<ReferEarnView> {
 
   @override
   Widget build(BuildContext context) {
-    final String referralLink = 'https://quanthex.io/r/QUX4837';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -65,6 +64,7 @@ class _ReferEarnViewState extends State<ReferEarnView> {
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: Consumer<UserController>(
             builder: (context, userCtr, child) {
+              ProfileDto? userProfile=userCtr.profile;
               List<ReferralDto> referrals = userCtr.referrals;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,23 +163,25 @@ class _ReferEarnViewState extends State<ReferEarnView> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: Text(
-                            referralLink,
+                          child: userProfile!=null?Text(
+                            userProfile.referralCode??"",
                             style: TextStyle(
                               color: const Color(0xFF2D2D2D),
                               fontSize: 14.sp,
                               fontFamily: 'Satoshi',
                               fontWeight: FontWeight.w500,
                             ),
-                          ),
+                          ):const SizedBox(),
                         ),
                         10.horizontalSpace,
                         GestureDetector(
                           onTap: () {
-                            Clipboard.setData(ClipboardData(text: referralLink));
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text('Link copied')));
+                            if(userProfile!=null){
+                              Clipboard.setData(ClipboardData(text: userProfile!.referralCode??""));
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(SnackBar(content: Text('Link copied')));
+                            }
                           },
                           child: Icon(
                             Icons.copy,
@@ -211,9 +213,9 @@ class _ReferEarnViewState extends State<ReferEarnView> {
                   RoundContainerIcon(
                     icon: Icons.share,
                     iconColor: Colors.cyan,
-                    title: 'Share your link',
+                    title: 'Share your referal code',
                     description:
-                    'Invite your friend to join Quanthex by sharing your unique referral links',
+                    'Invite your friend to join Quanthex by sharing your unique referral code',
                   ),
                   15.sp.verticalSpace,
                   RoundContainerIcon(

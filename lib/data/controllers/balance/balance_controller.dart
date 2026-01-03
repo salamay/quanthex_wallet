@@ -1,16 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:quanthex/utils/assets/token_factory.dart';
-import 'package:quanthex/utils/logger.dart';
-import 'package:quanthex/utils/network/network_utils.dart';
+import 'package:quanthex/data/utils/assets/token_factory.dart';
+import 'package:quanthex/data/utils/logger.dart';
+import 'package:quanthex/data/utils/network/network_utils.dart';
 import 'package:wallet/wallet.dart';
 import 'package:web3dart/web3dart.dart';
 import 'dart:math' as math;
 import '../../../core/constants/network_constants.dart';
 import '../../../core/network/Api_url.dart';
 import '../../../core/network/my_api.dart';
-import '../../../utils/assets/client_resolver.dart';
+import '../../utils/assets/client_resolver.dart';
 import '../../Models/assets/supported_assets.dart';
 import '../../Models/balance/CoinBalance.dart';
 import '../../Models/balance/platform_data.dart';
@@ -28,6 +28,10 @@ class BalanceController extends ChangeNotifier{
     for(var e in results.values){
       overallBalance=overallBalance+e.balanceInFiat;
     }
+    notifyListeners();
+  }
+  void toggleHideBalance() {
+    hideBalance = !hideBalance;
     notifyListeners();
   }
 
@@ -170,6 +174,7 @@ class BalanceController extends ChangeNotifier{
         logger("No token to get balance for",runtimeType.toString());
         return {};
       }
+
       Map<String,CoinBalance> data={};
       List<String> chainIds=NetworkUtils.filterNetworksFromAssets(assets: assets);
       for(var chainId in chainIds){

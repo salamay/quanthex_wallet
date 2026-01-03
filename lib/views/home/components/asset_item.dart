@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:quanthex/data/Models/assets/supported_assets.dart';
-import 'package:quanthex/utils/my_currency_utils.dart';
+import 'package:quanthex/data/utils/my_currency_utils.dart';
 
 import '../../../core/constants/network_constants.dart';
 import '../../../data/Models/balance/CoinBalance.dart';
@@ -17,12 +17,12 @@ class AssetItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 15.sp),
-      padding: EdgeInsets.symmetric(vertical: 12.sp),
+     margin: EdgeInsets.symmetric(horizontal: 0.sp, vertical: 6.sp),
+      padding: EdgeInsets.symmetric(vertical: 8.sp, horizontal: 16.sp),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: const Color(0xFFE0E0E0), width: 1),
-        ),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE0E0E0).withOpacity(0.5), width: 1),
       ),
       child:  Consumer<BalanceController>(
         builder: (context, bCtr, child) {
@@ -45,7 +45,6 @@ class AssetItem extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    4.verticalSpace,
                     Row(
                       children: [
                         Text(
@@ -59,10 +58,10 @@ class AssetItem extends StatelessWidget {
                         ),
                         4.horizontalSpace,
                         Text(
-                          coin.networkModel!.chainSymbol.toUpperCase(),
+                          "(${coin.networkModel!.chainSymbol.toUpperCase()})",
                           style: TextStyle(
                             color: const Color(0xFF2D2D2D),
-                            fontSize: 12.sp,
+                            fontSize: 10.sp,
                             fontFamily: 'Satoshi',
                             fontWeight: FontWeight.w400,
                           ),
@@ -70,15 +69,6 @@ class AssetItem extends StatelessWidget {
                       ],
                     ),
                     4.verticalSpace,
-                    priceQuotes!=null?Text(
-                      coin.networkModel!.chainSymbol.toUpperCase(),
-                      style: TextStyle(
-                        color: const Color(0xFF2D2D2D),
-                        fontSize: 12.sp,
-                        fontFamily: 'Satoshi',
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ): const SizedBox(),
                   ],
                 ),
               ),
@@ -86,7 +76,7 @@ class AssetItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   balance!=null?Text(
-                    !bCtr.hideBalance?balance.balanceInCrypto!=0?"${MyCurrencyUtils.format(balance.balanceInCrypto,coin.coinType==CoinType.TOKEN?2:6)??""} ${coin.symbol}":"0 ${coin.symbol}":"****",
+                    !bCtr.hideBalance?balance.balanceInCrypto!=0?MyCurrencyUtils.format(balance.balanceInCrypto,coin.coinType==CoinType.TOKEN?2:6):"0 ":"****",
                     style: TextStyle(
                       color: const Color(0xFF2D2D2D),
                       fontSize: 16.sp,

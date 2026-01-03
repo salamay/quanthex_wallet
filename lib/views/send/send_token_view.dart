@@ -7,8 +7,8 @@ import 'package:quanthex/data/Models/assets/supported_assets.dart';
 import 'package:quanthex/data/Models/network/network_model.dart';
 import 'package:quanthex/data/Models/send/send_payload.dart';
 import 'package:quanthex/data/services/transaction/transaction_service.dart';
-import 'package:quanthex/utils/navigator.dart';
-import 'package:quanthex/utils/overlay_utils.dart';
+import 'package:quanthex/data/utils/navigator.dart';
+import 'package:quanthex/data/utils/overlay_utils.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/views/qr_scan_view.dart';
 import 'package:quanthex/widgets/app_button.dart';
@@ -17,9 +17,9 @@ import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 import '../../core/constants/network_constants.dart';
 import '../../data/Models/balance/CoinBalance.dart';
 import '../../data/controllers/balance/balance_controller.dart';
-import '../../utils/assets/asset_utils.dart';
-import '../../utils/logger.dart';
-import '../../utils/my_currency_utils.dart';
+import '../../data/utils/assets/asset_utils.dart';
+import '../../data/utils/logger.dart';
+import '../../data/utils/my_currency_utils.dart';
 import '../../widgets/arrow_back.dart';
 import 'components/confirm_transaction_modal.dart';
 
@@ -309,32 +309,32 @@ class _SendTokenViewState extends State<SendTokenView> {
                             : const Color(0xffF5F5F5),
                         useFill: true,
                       ),
-                      Positioned(
-                        right: 15.sp,
-                        top: 15.sp,
-                        child: GestureDetector(
-                          onTap: () async {
-                            // Simulate QR scan - in real app, open QR scanner
-                            final scanned = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const QRScanView(),
-                              ),
-                            );
-                            if (context.mounted &&
-                                scanned != null &&
-                                scanned is String) {
-                              _addressController.text = scanned;
-                              _validateAddress(scanned);
-                            }
-                          },
-                          child: Icon(
-                            Icons.qr_code_scanner,
-                            size: 24.sp,
-                            color: const Color(0xFF757575),
-                          ),
-                        ),
-                      ),
+                      // Positioned(
+                      //   right: 15.sp,
+                      //   top: 15.sp,
+                      //   child: GestureDetector(
+                      //     onTap: () async {
+                      //       // Simulate QR scan - in real app, open QR scanner
+                      //       final scanned = await Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //           builder: (context) => const QRScanView(),
+                      //         ),
+                      //       );
+                      //       if (context.mounted &&
+                      //           scanned != null &&
+                      //           scanned is String) {
+                      //         _addressController.text = scanned;
+                      //         _validateAddress(scanned);
+                      //       }
+                      //     },
+                      //     child: Icon(
+                      //       Icons.qr_code_scanner,
+                      //       size: 24.sp,
+                      //       color: const Color(0xFF757575),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                   if (_isAddressCorrect) ...[

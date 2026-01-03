@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:quanthex/data/controllers/home/home_controller.dart';
-import 'package:quanthex/utils/navigator.dart';
+import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/views/home/components/nav_item.dart';
 
 class BottomNavBar extends StatelessWidget {

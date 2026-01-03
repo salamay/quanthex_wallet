@@ -18,4 +18,14 @@ class MyLocalStorage{
     return value;
   }
 
+    Future<void> setBiometricAuth(bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool("biometric_auth_status", status);
+  }
+
+  Future<bool> getBiometricAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool("biometric_auth_status") ?? false;
+  }
+
 }

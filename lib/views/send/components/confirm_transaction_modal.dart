@@ -12,17 +12,18 @@ import 'package:quanthex/data/controllers/balance/balance_controller.dart';
 import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/repository/secure_storage.dart';
 import 'package:quanthex/data/services/transaction/transaction_service.dart';
-import 'package:quanthex/utils/logger.dart';
-import 'package:quanthex/utils/my_currency_utils.dart';
-import 'package:quanthex/utils/security_utils.dart';
+import 'package:quanthex/data/utils/logger.dart';
+import 'package:quanthex/data/utils/my_currency_utils.dart';
+import 'package:quanthex/data/utils/overlay_utils.dart';
+import 'package:quanthex/data/utils/security_utils.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 import 'package:wallet/wallet.dart';
 import 'package:web3dart/web3dart.dart';
 import 'dart:math' as math;
 import '../../../core/constants/network_constants.dart';
-import '../../../utils/assets/token_factory.dart';
-import '../../../utils/network/gas_fee_check.dart';
+import '../../../data/utils/assets/token_factory.dart';
+import '../../../data/utils/network/gas_fee_check.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/confirm_pin_modal.dart';
 import '../../../widgets/info/row_info.dart';
@@ -189,7 +190,7 @@ class ConfirmTransactionModal extends StatelessWidget {
                       children: [
                         // if (isPolygon)
                        CoinImage(
-                           imageUrl: sendPayload.asset!.image,
+                           imageUrl: sendPayload.asset!.networkModel!.imageUrl,
                            height: 20.sp,
                            width: 20.sp
                        ),
@@ -281,8 +282,6 @@ class ConfirmTransactionModal extends StatelessWidget {
                 bool result = await SecurityUtils.showPinDialog(context: context);
                 if (result) {
                   sendTx(context);
-                }else{
-                  showMySnackBar(context: context, message: "Incorrect pin", type: SnackBarType.error);
                 }
               }
             },
@@ -345,7 +344,7 @@ class ConfirmTransactionModal extends StatelessWidget {
       bool isGas=GasFeeCheck.gasFeeCheck(bCtr: balanceController, fee: fee, chainCurrency: network.chainCurrency);
       SupportedCoin asset=sendPayload.asset!;
       if(isGas){
-        context.loaderOverlay.show();
+        showOverlay(context);
         if(asset.coinType==CoinType.TOKEN||asset.coinType==CoinType.WRAPPED_TOKEN){
           final String abi = await rootBundle.loadString("abi/token/token_contract.json");
           String contractAddress = sendPayload.asset!.contractAddress!;
@@ -368,7 +367,7 @@ class ConfirmTransactionModal extends StatelessWidget {
           );
           String txId=await TransactionService().sendTx(transaction: transaction0, credentials: credentials, asset: asset);
           // SendPayload payload=widget.sendPayload.copyWith(txId: txId);
-          context.loaderOverlay.hide();
+          hideOverlay(context);
           if(txId.isNotEmpty){
            await _showSuccessModal(context,sendPayload);
             context.pop(txId);
@@ -388,19 +387,22 @@ class ConfirmTransactionModal extends StatelessWidget {
           int chainId=network.chainId;
           String txId=await TransactionService().sendNativeCoinTx(tx: tx, to: toAddress, credentials: credentials, asset: asset, chainId: chainId);
           logger(txId,runtimeType.toString());
-          context.loaderOverlay.hide();
+          hideOverlay(context);
           if(txId.isNotEmpty){
             await _showSuccessModal(context,sendPayload);
             context.pop(txId);
           }
         }
       }else{
+        hideOverlay(context);
         String nativeCoin=sendPayload.asset!.networkModel!.chainCurrency;
-        logger("Insufficient $nativeCoin for gas, top up your balance to proceed", runtimeType.toString());
+        String message="Insufficient $nativeCoin for gas, top up your balance to proceed";
+        logger(message, runtimeType.toString());
+        showMySnackBar(context: context, message: message, type: SnackBarType.error);
         return ;
       }
     }catch(e){
-      context.loaderOverlay.hide();
+      hideOverlay(context);
       logger(e.toString(), runtimeType.toString());
     }
   }

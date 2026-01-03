@@ -13,7 +13,7 @@ import 'data/controllers/mining/mining_controller.dart';
 import 'data/controllers/user/user_controller.dart';
 import 'data/controllers/wallet_controller.dart';
 
-void main()async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
@@ -40,9 +40,8 @@ class MyApp extends StatelessWidget {
           overlayColor: Colors.transparent,
           overlayWholeScreen: true,
 
-          overlayWidgetBuilder: (context) => Center(
-              child: Loading(size: 30.sp)
-          ),
+          overlayWidgetBuilder: (context) =>
+              Center(child: Loading(size: 30.sp)),
           child: MaterialApp.router(
             title: 'Quanthex',
             debugShowCheckedModeBanner: false,

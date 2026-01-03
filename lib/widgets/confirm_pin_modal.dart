@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:quanthex/widgets/biometric_auth_widget.dart';
 
 class ConfirmPinModal extends StatefulWidget {
   final String title;
@@ -7,13 +9,7 @@ class ConfirmPinModal extends StatefulWidget {
   final Function(String)? onPinComplete;
   final bool showFaceId;
 
-  const ConfirmPinModal({
-    super.key,
-    this.title = 'Confirm Pay',
-    this.pinLength = 5,
-    this.onPinComplete,
-    this.showFaceId = true,
-  });
+  const ConfirmPinModal({super.key, this.title = 'Confirm Pay', this.pinLength = 5, this.onPinComplete, this.showFaceId = true});
 
   @override
   State<ConfirmPinModal> createState() => _ConfirmPinModalState();
@@ -58,23 +54,13 @@ class _ConfirmPinModalState extends State<ConfirmPinModal> {
             width: 40.sp,
             height: 4.sp,
             margin: EdgeInsets.only(bottom: 20.sp),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE0E0E0),
-              borderRadius: BorderRadius.circular(2),
-            ),
+            decoration: BoxDecoration(color: const Color(0xFFE0E0E0), borderRadius: BorderRadius.circular(2)),
           ),
           2.sp.verticalSpace,
           Text(
             widget.title,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: const Color(0xFF595959),
-              fontSize: 15.sp,
-              fontFamily: 'Satoshi',
-              fontWeight: FontWeight.w700,
-              height: 1.47,
-              letterSpacing: -0.41,
-            ),
+            style: TextStyle(color: const Color(0xFF595959), fontSize: 15.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 1.47, letterSpacing: -0.41),
           ),
           20.sp.verticalSpace,
           Row(
@@ -87,71 +73,41 @@ class _ConfirmPinModalState extends State<ConfirmPinModal> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: const Color(0xFF2D2D2D), width: 2),
-                  color: index < _pin.length
-                      ? const Color(0xFF2D2D2D)
-                      : Colors.transparent,
+                  color: index < _pin.length ? const Color(0xFF2D2D2D) : Colors.transparent,
                 ),
               );
             }),
           ),
           if (widget.showFaceId) ...[
             15.sp.verticalSpace,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.face, size: 18.sp, color: const Color(0xFF792A90)),
-                8.horizontalSpace,
-                Text(
-                  'Use Face ID Instead',
-                  style: TextStyle(
-                    color: const Color(0xFF792A90),
-                    fontSize: 14.sp,
-                    fontFamily: 'Satoshi',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            BiometricAuthWidget(
+              reason: widget.title,
+              onAuthenticated: (success) {
+                if (success && widget.onPinComplete != null) {
+                  // Use a special marker for biometric auth
+                  widget.onPinComplete!('BIOMETRIC_SUCCESS');
+                  // Close the modal
+                  if (context.mounted) {
+                    context.pop('BIOMETRIC_SUCCESS');
+                  }
+                }
+              },
+              onError: (error) {
+                // Handle error silently or show message
+              },
             ),
           ],
           30.sp.verticalSpace,
           // Keypad
           Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKeypadButton('1'),
-                  _buildKeypadButton('2'),
-                  _buildKeypadButton('3'),
-                ],
-              ),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [_buildKeypadButton('1'), _buildKeypadButton('2'), _buildKeypadButton('3')]),
               15.sp.verticalSpace,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKeypadButton('4'),
-                  _buildKeypadButton('5'),
-                  _buildKeypadButton('6'),
-                ],
-              ),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [_buildKeypadButton('4'), _buildKeypadButton('5'), _buildKeypadButton('6')]),
               15.sp.verticalSpace,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKeypadButton('7'),
-                  _buildKeypadButton('8'),
-                  _buildKeypadButton('9'),
-                ],
-              ),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [_buildKeypadButton('7'), _buildKeypadButton('8'), _buildKeypadButton('9')]),
               15.sp.verticalSpace,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildKeypadButton('*', isSpecial: true),
-                  _buildKeypadButton('0'),
-                  _buildKeypadButton('', isBackspace: true),
-                ],
-              ),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [_buildKeypadButton('*', isSpecial: true), _buildKeypadButton('0'), _buildKeypadButton('', isBackspace: true)]),
             ],
           ),
           20.sp.verticalSpace,
@@ -160,11 +116,7 @@ class _ConfirmPinModalState extends State<ConfirmPinModal> {
     );
   }
 
-  Widget _buildKeypadButton(
-    String text, {
-    bool isSpecial = false,
-    bool isBackspace = false,
-  }) {
+  Widget _buildKeypadButton(String text, {bool isSpecial = false, bool isBackspace = false}) {
     return GestureDetector(
       onTap: () {
         if (isBackspace) {
@@ -176,29 +128,16 @@ class _ConfirmPinModalState extends State<ConfirmPinModal> {
       child: Container(
         width: 70.sp,
         height: 70.sp,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
-          borderRadius: BorderRadius.circular(12),
-        ),
+        decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(12)),
         child: Center(
           child: isBackspace
-              ? Icon(
-                  Icons.backspace_outlined,
-                  color: const Color(0xFF2D2D2D),
-                  size: 24.sp,
-                )
+              ? Icon(Icons.backspace_outlined, color: const Color(0xFF2D2D2D), size: 24.sp)
               : Text(
                   text,
-                  style: TextStyle(
-                    color: const Color(0xFF2D2D2D),
-                    fontSize: 24.sp,
-                    fontFamily: 'Satoshi',
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                 ),
         ),
       ),
     );
   }
 }
-

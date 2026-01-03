@@ -5,10 +5,10 @@ import 'package:wallet/wallet.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../../../core/constants/network_constants.dart';
-import '../../../utils/assets/client_resolver.dart';
-import '../../../utils/assets/token_factory.dart';
-import '../../../utils/logger.dart';
-import '../../../utils/network/gas_fee_check.dart';
+import '../../utils/assets/client_resolver.dart';
+import '../../utils/assets/token_factory.dart';
+import '../../utils/logger.dart';
+import '../../utils/network/gas_fee_check.dart';
 import '../../../widgets/snackbar/my_snackbar.dart';
 import '../../Models/assets/network_model.dart';
 import '../../Models/assets/supported_assets.dart';

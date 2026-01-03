@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:quanthex/utils/navigator.dart';
+import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/widgets/app_textfield.dart';
 import 'package:quanthex/widgets/bottom_nav_bar.dart';
+import 'package:quanthex/widgets/quanthex_image_banner.dart';
 
 class SwapTokenView extends StatefulWidget {
   const SwapTokenView({super.key});
@@ -57,78 +58,22 @@ class _SwapTokenViewState extends State<SwapTokenView> {
     return Column(
       children: [
         // Header
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.sp, vertical: 0.sp),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              GestureDetector(
-                onTap: () {
-                  Navigate.back(context);
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.arrow_back, size: 20.sp),
-                    5.horizontalSpace,
-                    Text(
-                      'Back',
-                      style: TextStyle(
-                        color: const Color(0xFF2D2D2D),
-                        fontSize: 16.sp,
-                        fontFamily: 'Satoshi',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Spacer(),
               Text(
-                'Swap Token',
-                style: TextStyle(
-                  color: const Color(0xFF2D2D2D),
-                  fontSize: 18.sp,
-                  fontFamily: 'Satoshi',
-                  fontWeight: FontWeight.w700,
-                ),
+                'Swap',
+                style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
               ),
-              Spacer(),
-              IconButton(
-                icon: Container(
-                  width: 41,
-                  height: 41,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 2,
-                    vertical: 9,
-                  ),
-                  decoration: ShapeDecoration(
-                    color: const Color(0x7CDADADA),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.50),
-                    ),
-                  ),
-                  child: Image.asset(
-                    'assets/images/history.png',
-                    width: 19.sp,
-                    height: 19.sp,
-                  ),
-                ),
-                // Icon(
-                //   Icons.description_outlined,
-                //   size: 24.sp,
-                //   color: const Color(0xFF2D2D2D),
-                // ),
-                onPressed: () {
-                  Navigate.toNamed(
-                    context,
-                    name: '/transactionhistoryview',
-                  );
-                },
-              ),
+              const Spacer(),
+              QuanthexImageBanner(width: 110.sp, height: 60.sp),
             ],
           ),
         ),
-        30.sp.verticalSpace,
+        // Quanthex Image Banner
         Expanded(
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 20),
@@ -229,7 +174,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                               10.sp.verticalSpace,
                               Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   SizedBox(),
                                   Text(
@@ -250,187 +195,177 @@ class _SwapTokenViewState extends State<SwapTokenView> {
 
                         _toToken.isEmpty
                             ? Container(
-                          width: MediaQuery.sizeOf(context).width,
-                          height: 67,
-                          decoration: ShapeDecoration(
-                            color: const Color(0xFFF0F0F0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(19),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              10.horizontalSpace,
-
-                              //GREY LOADER
-                              SizedBox(
-                                width: 116,
-                                height: 25,
-                                child: Stack(
+                                width: MediaQuery.sizeOf(context).width,
+                                height: 67,
+                                decoration: ShapeDecoration(
+                                  color: const Color(0xFFF0F0F0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(19),
+                                  ),
+                                ),
+                                child: Row(
                                   children: [
-                                    Positioned(
-                                      left: 0,
-                                      top: 0,
-                                      child: Container(
-                                        width: 25,
-                                        height: 25,
-                                        decoration: ShapeDecoration(
-                                          color: const Color(
-                                            0xFFDFDFDF,
-                                          ),
-                                          shape: OvalBorder(),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 31,
-                                      top: 9,
-                                      child: Container(
-                                        width: 85,
-                                        height: 6,
-                                        decoration: ShapeDecoration(
-                                          color: const Color(
-                                            0xFFDFDFDF,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                            BorderRadius.circular(
-                                              30,
+                                    10.horizontalSpace,
+
+                                    //GREY LOADER
+                                    SizedBox(
+                                      width: 116,
+                                      height: 25,
+                                      child: Stack(
+                                        children: [
+                                          Positioned(
+                                            left: 0,
+                                            top: 0,
+                                            child: Container(
+                                              width: 25,
+                                              height: 25,
+                                              decoration: ShapeDecoration(
+                                                color: const Color(0xFFDFDFDF),
+                                                shape: OvalBorder(),
+                                              ),
                                             ),
                                           ),
+                                          Positioned(
+                                            left: 31,
+                                            top: 9,
+                                            child: Container(
+                                              width: 85,
+                                              height: 6,
+                                              decoration: ShapeDecoration(
+                                                color: const Color(0xFFDFDFDF),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    GestureDetector(
+                                      onTap: _showReceiverModal,
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 16.sp,
+                                          vertical: 8.sp,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF792A90),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'Select Token',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12.sp,
+                                            fontFamily: 'Satoshi',
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
                                       ),
                                     ),
+                                    10.horizontalSpace,
                                   ],
                                 ),
-                              ),
-                              Spacer(),
-                              GestureDetector(
-                                onTap: _showReceiverModal,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 16.sp,
-                                    vertical: 8.sp,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF792A90),
-                                    borderRadius:
-                                    BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    'Select Token',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12.sp,
-                                      fontFamily: 'Satoshi',
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              10.horizontalSpace,
-                            ],
-                          ),
-                        )
+                              )
                             :
-                        // To Section
-                        Container(
-                          padding: EdgeInsets.all(16.sp),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F5F5),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'To',
-                                    style: TextStyle(
-                                      color: const Color(0xFF757575),
-                                      fontSize: 14.sp,
-                                      fontFamily: 'Satoshi',
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Text(
-                                    '$_toAmount',
-                                    style: TextStyle(
-                                      color: const Color(0xFF757575),
-                                      fontSize: 12.sp,
-                                      fontFamily: 'Satoshi',
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              10.sp.verticalSpace,
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  GestureDetector(
-                                    onTap: _showReceiverModal,
-                                    child: Row(
+                              // To Section
+                              Container(
+                                padding: EdgeInsets.all(16.sp),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF5F5F5),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
                                       children: [
-                                        Container(
-                                          width: 32.sp,
-                                          height: 32.sp,
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue
-                                                .withOpacity(0.2),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            Icons.circle,
-                                            size: 20.sp,
-                                            color: Colors.blue,
-                                          ),
-                                        ),
-                                        8.horizontalSpace,
                                         Text(
-                                          _toToken,
+                                          'To',
                                           style: TextStyle(
-                                            color: const Color(
-                                              0xFF2D2D2D,
-                                            ),
-                                            fontSize: 16.sp,
+                                            color: const Color(0xFF757575),
+                                            fontSize: 14.sp,
                                             fontFamily: 'Satoshi',
-                                            fontWeight:
-                                            FontWeight.w600,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                        Icon(
-                                          Icons.keyboard_arrow_down,
-                                          size: 20.sp,
-                                          color: const Color(
-                                            0xFF757575,
+                                        Spacer(),
+                                        Text(
+                                          '$_toAmount',
+                                          style: TextStyle(
+                                            color: const Color(0xFF757575),
+                                            fontSize: 12.sp,
+                                            fontFamily: 'Satoshi',
+                                            fontWeight: FontWeight.w400,
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  Text(
-                                    '3155.02',
-                                    style: TextStyle(
-                                      color: const Color(0xFF2D2D2D),
-                                      fontSize: 28.sp,
-                                      fontFamily: 'Satoshi',
-                                      fontWeight: FontWeight.w700,
+                                    10.sp.verticalSpace,
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: _showReceiverModal,
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                width: 32.sp,
+                                                height: 32.sp,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.blue
+                                                      .withOpacity(0.2),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.circle,
+                                                  size: 20.sp,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                              8.horizontalSpace,
+                                              Text(
+                                                _toToken,
+                                                style: TextStyle(
+                                                  color: const Color(
+                                                    0xFF2D2D2D,
+                                                  ),
+                                                  fontSize: 16.sp,
+                                                  fontFamily: 'Satoshi',
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              Icon(
+                                                Icons.keyboard_arrow_down,
+                                                size: 20.sp,
+                                                color: const Color(0xFF757575),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Text(
+                                          '3155.02',
+                                          style: TextStyle(
+                                            color: const Color(0xFF2D2D2D),
+                                            fontSize: 28.sp,
+                                            fontFamily: 'Satoshi',
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
+                                    5.sp.verticalSpace,
+                                  ],
+                                ),
                               ),
-                              5.sp.verticalSpace,
-                            ],
-                          ),
-                        ),
                       ],
                     ),
-
                     // Swap Direction Button
                     Container(
                       width: 30.sp,
@@ -575,7 +510,6 @@ class _SwapTokenViewState extends State<SwapTokenView> {
     );
   }
 }
-
 
 // Confirm Swap Modal
 class ConfirmSwapModal extends StatefulWidget {

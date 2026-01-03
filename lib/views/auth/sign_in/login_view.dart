@@ -1,7 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:quanthex/utils/navigator.dart';
+import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/views/otp/model/otp_args.dart';
 import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/widgets/app_textfield.dart';
@@ -10,9 +10,9 @@ import 'package:quanthex/widgets/arrow_back.dart';
 import '../../../data/repository/secure_storage.dart';
 import '../../../data/services/auth/auth_service.dart';
 import '../../../routes/app_routes.dart';
-import '../../../utils/device/device_utils.dart';
-import '../../../utils/logger.dart';
-import '../../../utils/overlay_utils.dart';
+import '../../../data/utils/device/device_utils.dart';
+import '../../../data/utils/logger.dart';
+import '../../../data/utils/overlay_utils.dart';
 import '../../../widgets/snackbar/my_snackbar.dart';
 
 class LoginView extends StatefulWidget {

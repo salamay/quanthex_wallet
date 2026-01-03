@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:quanthex/utils/home_nav_resolver.dart';
+import 'package:quanthex/data/utils/home_nav_resolver.dart';
 
 import '../../routes/app_routes.dart';
-import '../../utils/navigator.dart';
+import '../../data/utils/navigator.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

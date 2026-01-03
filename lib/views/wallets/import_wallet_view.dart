@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
-import 'package:quanthex/utils/logger.dart';
-import 'package:quanthex/utils/navigator.dart';
-import 'package:quanthex/views/set_pin_view.dart';
+import 'package:quanthex/data/utils/logger.dart';
+import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/widgets/app_textfield.dart';
 
@@ -30,9 +29,10 @@ class _ImportWalletViewState extends State<ImportWalletView> {
   @override
   void initState() {
     // TODO: implement initState
-    walletController=Provider.of<WalletController>(context,listen: false);
+    walletController = Provider.of<WalletController>(context, listen: false);
     super.initState();
   }
+
   @override
   void dispose() {
     _seedPhraseController.dispose();
@@ -42,7 +42,8 @@ class _ImportWalletViewState extends State<ImportWalletView> {
   void _validateSeedPhrase(String value) {
     // Basic validation - check if it's approximately 12 words
     final words = value.trim().split(RegExp(r'\s+'));
-    final isValid = words.length == 12 && words.every((word) => word.isNotEmpty);
+    final isValid =
+        words.length == 12 && words.every((word) => word.isNotEmpty);
 
     setState(() {
       _hasError = !isValid && value.isNotEmpty;
@@ -296,42 +297,52 @@ class _ImportWalletViewState extends State<ImportWalletView> {
           ),
         ),
       ),
-      bottomNavigationBar:  SafeArea(
+      bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: AppButton(
-              text: 'Import',
-              textColor: Colors.white,
-              color: _isValid
-                  ? const Color(0xFF792A90)
-                  : const Color(0xFFB5B5B5),
-              onTap: () async{
-                // Navigate to PIN setup with import flag
-                if(_isValid){
-                  String mnemonic=_seedPhraseController.text.trim();
-                  await importWallet(context, mnemonic);
-                }
+            text: 'Import',
+            textColor: Colors.white,
+            color: _isValid ? const Color(0xFF792A90) : const Color(0xFFB5B5B5),
+            onTap: () async {
+              // Navigate to PIN setup with import flag
+              if (_isValid) {
+                String mnemonic = _seedPhraseController.text.trim();
+                await importWallet(context, mnemonic);
               }
+            },
           ),
         ),
       ),
     );
   }
 
-  Future<void> importWallet(BuildContext context,String mnemonic) async {
-    try{
+  Future<void> importWallet(BuildContext context, String mnemonic) async {
+    try {
       context.loaderOverlay.show();
-      WalletModel walletModel=await WalletServices.getInstance().importFromMnemonic(mnemonic);
-      await SecureStorage.getInstance().saveWallet([walletModel]);
-      walletController.setCurrentWallet(walletModel);
-      List<WalletModel> wallets=await SecureStorage.getInstance().getWallets();
+      WalletModel walletModel = await WalletServices.getInstance()
+          .importFromMnemonic(mnemonic);
+      // Set default wallet name
+      List<WalletModel> existingWallets = await SecureStorage.getInstance()
+          .getWallets();
+      String defaultName = 'Wallet ${existingWallets.length + 1}';
+      WalletModel namedWallet = WalletModel(
+        mnemonic: walletModel.mnemonic,
+        chainId: walletModel.chainId,
+        walletAddress: walletModel.walletAddress,
+        privateKey: walletModel.privateKey,
+        name: defaultName,
+      );
+      await SecureStorage.getInstance().saveWallet([namedWallet]);
+      walletController.setCurrentWallet(namedWallet);
+      List<WalletModel> wallets = await SecureStorage.getInstance()
+          .getWallets();
       walletController.setWallets(wallets);
       context.loaderOverlay.hide();
-      Navigate.go(context, name: AppRoutes.setpinview,args: true);
-    }catch(e){
+      Navigate.go(context, name: AppRoutes.setpinview, args: true);
+    } catch (e) {
       logger(e.toString(), runtimeType.toString());
       context.loaderOverlay.hide();
     }
-
   }
 }

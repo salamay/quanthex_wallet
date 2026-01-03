@@ -7,10 +7,10 @@ import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/repository/secure_storage.dart';
 import 'package:quanthex/data/services/wallets/wallet_services.dart';
 import 'package:quanthex/routes/app_routes.dart';
-import 'package:quanthex/utils/navigator.dart';
+import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/widgets/app_button.dart';
 
-import '../../utils/logger.dart';
+import '../../data/utils/logger.dart';
 
 class SetupWalletView extends StatefulWidget {
   const SetupWalletView({super.key});
@@ -26,10 +26,10 @@ class _SetupWalletViewState extends State<SetupWalletView> {
   @override
   void initState() {
     // TODO: implement initState
-    walletController=Provider.of<WalletController>(context,listen: false);
+    walletController = Provider.of<WalletController>(context, listen: false);
     super.initState();
-
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -299,11 +299,11 @@ class _SetupWalletViewState extends State<SetupWalletView> {
                 color: selectedOption != null
                     ? const Color(0xFF792A90)
                     : const Color(0xFFB5B5B5),
-                onTap: ()async {
-                  if(selectedOption==null){
+                onTap: () async {
+                  if (selectedOption == null) {
                     return;
                   }
-                  try{
+                  try {
                     if (selectedOption == 0) {
                       // Create new wallet - go to seed phrase view
                       context.loaderOverlay.show();
@@ -311,15 +311,16 @@ class _SetupWalletViewState extends State<SetupWalletView> {
                       context.loaderOverlay.hide();
                     } else {
                       // Import wallet - go to import view
-                      Navigate.toNamed(context, name: AppRoutes.importwalletview);
-
+                      Navigate.toNamed(
+                        context,
+                        name: AppRoutes.importwalletview,
+                      );
                     }
-                  }catch(e){
-                    logger(e.toString(),runtimeType.toString());
+                  } catch (e) {
+                    logger(e.toString(), runtimeType.toString());
                     context.loaderOverlay.hide();
                   }
-
-                }
+                },
               ),
               10.sp.verticalSpace,
               Center(
@@ -412,12 +413,24 @@ class _SetupWalletViewState extends State<SetupWalletView> {
   }
 
   Future<void> createWallet(BuildContext context) async {
-      WalletModel walletModel=await WalletServices.getInstance().createWallet(strength: 128);
-      await SecureStorage.getInstance().saveWallet([walletModel]);
-      walletController.setCurrentWallet(walletModel);
-      List<WalletModel> wallets=await SecureStorage.getInstance().getWallets();
-      walletController.setWallets(wallets);
-      Navigate.go(context, name: AppRoutes.seedphraseview,args: walletModel);
+    WalletModel walletModel = await WalletServices.getInstance().createWallet(
+      strength: 128,
+    );
+    // Set default wallet name
+    List<WalletModel> existingWallets = await SecureStorage.getInstance()
+        .getWallets();
+    String defaultName = 'Wallet ${existingWallets.length + 1}';
+    WalletModel namedWallet = WalletModel(
+      mnemonic: walletModel.mnemonic,
+      chainId: walletModel.chainId,
+      walletAddress: walletModel.walletAddress,
+      privateKey: walletModel.privateKey,
+      name: defaultName,
+    );
+    await SecureStorage.getInstance().saveWallet([namedWallet]);
+    walletController.setCurrentWallet(namedWallet);
+    List<WalletModel> wallets = await SecureStorage.getInstance().getWallets();
+    walletController.setWallets(wallets);
+    Navigate.go(context, name: AppRoutes.seedphraseview, args: namedWallet);
   }
-
 }

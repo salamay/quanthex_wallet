@@ -45,6 +45,12 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-
+<key>NSFaceIDUsageDescription</key>
+<string>We use Face ID to authenticate your transactions for security purposes. To authenticate transactions</string>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+  <string>sms</string>
+  <string>tel</string>
+</array>
 </dict>
 </plist>

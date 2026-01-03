@@ -3,7 +3,7 @@ import 'package:quanthex/data/Models/users/profile_dto.dart';
 import 'package:quanthex/data/Models/users/referral_dto.dart';
 import 'package:quanthex/data/services/user/user_service.dart';
 
-import '../../../utils/logger.dart';
+import '../../utils/logger.dart';
 
 class UserController extends ChangeNotifier{
 

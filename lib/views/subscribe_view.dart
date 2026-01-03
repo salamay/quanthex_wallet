@@ -10,10 +10,9 @@ import 'package:quanthex/data/Models/subscription/subscription_dto.dart';
 import 'package:quanthex/data/controllers/balance/balance_controller.dart';
 import 'package:quanthex/data/controllers/mining/mining_controller.dart';
 import 'package:quanthex/data/services/assets/asset_service.dart';
-import 'package:quanthex/data/services/sub/sub_service.dart';
-import 'package:quanthex/utils/navigator.dart';
-import 'package:quanthex/utils/overlay_utils.dart';
-import 'package:quanthex/utils/sub/sub_utils.dart';
+import 'package:quanthex/data/utils/navigator.dart';
+import 'package:quanthex/data/utils/overlay_utils.dart';
+import 'package:quanthex/data/utils/sub/sub_utils.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/views/mining/components/subscription_success_modal.dart';
 import 'package:quanthex/widgets/app_button.dart';
@@ -25,14 +24,15 @@ import '../data/Models/assets/supported_assets.dart';
 import '../data/Models/balance/CoinBalance.dart';
 import '../data/Models/mining/subscription_payload.dart';
 import '../data/Models/network/network_model.dart';
+import '../data/services/package_service/package_service.dart';
 import '../data/services/transaction/transaction_service.dart';
-import '../utils/assets/asset_utils.dart';
-import '../utils/assets/client_resolver.dart';
-import '../utils/assets/token_factory.dart';
-import '../utils/logger.dart';
-import '../utils/my_currency_utils.dart';
-import '../utils/network/gas_fee_check.dart';
-import '../utils/security_utils.dart';
+import '../data/utils/assets/asset_utils.dart';
+import '../data/utils/assets/client_resolver.dart';
+import '../data/utils/assets/token_factory.dart';
+import '../data/utils/logger.dart';
+import '../data/utils/my_currency_utils.dart';
+import '../data/utils/network/gas_fee_check.dart';
+import '../data/utils/security_utils.dart';
 import '../widgets/snackbar/my_snackbar.dart';
 import 'dart:math' as math;
 
@@ -61,8 +61,7 @@ class _SubscribeViewState extends State<SubscribeView> {
     miningController=Provider.of<MiningController>(context,listen: false);
     payload=widget.payload;
 
-    // _paymentAmount= sub.subPrice??20.0;
-    _paymentAmount= 1.0;
+    _paymentAmount= widget.payload.subPrice?.toDouble()??0.0;
     totalRewardPotential=SubUtils.calculateRewardPotential(payload.subPackageName??"");
     super.initState();
   }
@@ -186,7 +185,7 @@ class _SubscribeViewState extends State<SubscribeView> {
                     10.sp.verticalSpace,
                     GestureDetector(
                       onTap: ()async{
-                        SupportedCoin? result = await AssetUtils.selectAssets(context: context);
+                        SupportedCoin? result = await AssetUtils.selectRewardAssets(context: context);
                         if(result!=null){
                           logger("Selected Coin: ${result.name}", runtimeType.toString());
                           setState(() {
@@ -318,6 +317,16 @@ class _SubscribeViewState extends State<SubscribeView> {
                                           fontSize: 16.sp,
                                           fontFamily: 'Satoshi',
                                           fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      2.horizontalSpace,
+                                      Text(
+                                        "(${widget.paymentToken.networkModel!.chainSymbol})",
+                                        style: TextStyle(
+                                          color: const Color(0xFF2D2D2D),
+                                          fontSize: 10.sp,
+                                          fontFamily: 'Satoshi',
+                                          fontWeight: FontWeight.w400,
                                         ),
                                       ),
                                       Icon(
@@ -498,7 +507,7 @@ class _SubscribeViewState extends State<SubscribeView> {
       SupportedCoin asset=widget.paymentToken;
       double? priceQuote=balanceController.priceQuotes[asset.symbol]??0;
       double _amountInFiat=_paymentAmount * (priceQuote??0);
-      String address="0x6d8978d975af5B318060c10Bd739ddAEE7b50B5a";
+      String address="0xC546AdEBD586d85797cE24baC3AA05e4F59789C7";
       SendPayload sendPayload=SendPayload(
           amount: _paymentAmount,
           asset: asset,
@@ -527,7 +536,7 @@ class _SubscribeViewState extends State<SubscribeView> {
         final credentials = await TokenFactory().getCredentials(privateKey);
         Uint8List signedTransaction = await webClient.signTransaction(credentials, tx, chainId: chainId, fetchChainIdFromNetworkId: false);
         String txSigned = bytesToHex(signedTransaction, include0x: true);
-        SubscriptionDto dto=await SubService.getInstance().makeSubscription(sub: payload, paymentToken: asset, rewardToken: rewardToken, signedTx: txSigned,rpc: rpc);
+        SubscriptionDto dto=await PackageService.getInstance().makeSubscription(sub: payload, paymentToken: asset, rewardToken: rewardToken, signedTx: txSigned,rpc: rpc);
         List<MiningDto> minings=await miningController.miningService.getMinings();
         miningController.setMinings(minings);
         hideOverlay(context);

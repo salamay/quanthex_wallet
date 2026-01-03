@@ -6,7 +6,7 @@ import 'package:quanthex/data/Models/assets/network_model.dart';
 import 'package:quanthex/data/Models/assets/supported_assets.dart';
 import 'package:quanthex/data/Models/mining/subscription_payload.dart';
 import 'package:quanthex/data/Models/subscription/subscription_dto.dart';
-import 'package:quanthex/utils/navigator.dart';
+import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
 
 import '../../../widgets/app_button.dart';
