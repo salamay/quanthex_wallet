@@ -16,12 +16,14 @@ import 'package:quanthex/views/receive/receive_view.dart';
 import 'package:quanthex/views/referr_and_earn/refer_earn_view.dart';
 import 'package:quanthex/views/settings/security_privacy_view.dart';
 import 'package:quanthex/views/send/send_token_view.dart';
-import 'package:quanthex/views/settings/set_pin_view.dart';
+import 'package:quanthex/views/settings/pin/set_pin_view.dart';
+import 'package:quanthex/views/settings/pin/set_new_pin_view.dart';
 import 'package:quanthex/views/settings/settings_view.dart';
+import 'package:quanthex/views/settings/pin/verify_current_pin_view.dart';
 import 'package:quanthex/views/staking/staking_view.dart';
 import 'package:quanthex/views/staking/subscribe_staking_view.dart';
-import 'package:quanthex/views/subscribe_view.dart';
-import 'package:quanthex/views/swap_token_view.dart';
+import 'package:quanthex/views/subscribe/subscribe_view.dart';
+import 'package:quanthex/views/swap/swap_token_view.dart';
 import 'package:quanthex/views/transaction_history_view.dart';
 import 'package:quanthex/views/transactions_records_view.dart';
 import 'package:quanthex/views/otp/verify_view.dart';
@@ -71,6 +73,8 @@ class AppRoutes {
   static String securityprivacyview = '/securityprivacyview';
   static String referearnview = '/referearnview';
   static String withdrawalsview = '/withdrawalsview';
+  static String verifycurrentpinview = '/verifycurrentpinview';
+  static String setnewpinview = '/setnewpinview';
 
   static final router = GoRouter(
     initialLocation: splash,
@@ -185,6 +189,8 @@ class AppRoutes {
       GoRoute(path: changepasswordview, builder: (context, state) => ChangePasswordView()),
       GoRoute(path: generalsettingsview, builder: (context, state) => GeneralSettingsView()),
       GoRoute(path: securityprivacyview, builder: (context, state) => SecurityPrivacyView()),
+      GoRoute(path: verifycurrentpinview, builder: (context, state) => VerifyCurrentPinView()),
+      GoRoute(path: setnewpinview, builder: (context, state) => SetNewPinView()),
       GoRoute(path: referearnview, builder: (context, state) => ReferEarnView()),
       GoRoute(path: withdrawalsview, builder: (context, state) => WithdrawalsView()),
     ],

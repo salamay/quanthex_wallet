@@ -5,11 +5,11 @@ class SubUtils{
   static int maxOfReferrals=1296;
 
 
-  static double STARTER_AMOUNT_MAX=700.0;
-  static double GROWTH_AMOUNT_MAX=4000.0;
-  static double ADVANCE_AMOUNT_MAX=7000.0;
-  static double PRO_AMOUNT_MAX=15000.0;
-
+  static double STARTER_AMOUNT_MAX=498.0;
+  static double GROWTH_AMOUNT_MAX=1914.0;
+  static double ADVANCE_AMOUNT_MAX=4602.0;
+  static double PRO_AMOUNT_MAX=10644.0;
+  static double MEGA_AMOUNT_MAX = 21300.0;
 
   static double calculateRewardPotential(String packageName){
     if(packageName==starter){
@@ -64,61 +64,66 @@ class SubUtils{
     double levelAmount=100;
     if(packageName==starter){
       if(noOfReferrals<=6){
-        levelAmount=100;
+        levelAmount=102;
       }else if(noOfReferrals>6&&noOfReferrals<=36){
-        levelAmount=150;
+        levelAmount=180;
       }else if(noOfReferrals>36&&noOfReferrals<=216){
-        levelAmount=200;
-      }else if(noOfReferrals>216&&noOfReferrals<1296){
-        levelAmount=250;
-      }else if(noOfReferrals>1296){
-        levelAmount=700;
+        levelAmount=216;
+      }else if(noOfReferrals>=216&&noOfReferrals<1296){
+        levelAmount=498;
       }else{
         return 0;
       }
       return levelAmount;
     }else if(packageName==growth){
       if(noOfReferrals<=6){
-        levelAmount=400;
+        levelAmount=402;
       }else if(noOfReferrals>6&&noOfReferrals<=36){
-        levelAmount=600;
+        levelAmount=648;
       }else if(noOfReferrals>36&&noOfReferrals<=216){
-        levelAmount=1000;
-      }else if(noOfReferrals>216&&noOfReferrals<1296){
-        levelAmount=2000;
-      }else if(noOfReferrals>1296){
-        levelAmount=4000;
+        levelAmount=864;
+      }else if(noOfReferrals>=216&&noOfReferrals<1296){
+        levelAmount=1914;
       }else{
         return 0;
       }
       return levelAmount;
     }else if(packageName==advance){
       if(noOfReferrals<=6){
-        levelAmount=1000;
+        levelAmount=1002;
       }else if(noOfReferrals>6&&noOfReferrals<=36){
-        levelAmount=1500;
+        levelAmount=1440;
       }else if(noOfReferrals>36&&noOfReferrals<=216){
-        levelAmount=2000;
-      }else if(noOfReferrals>216&&noOfReferrals<1296){
-        levelAmount=2500;
-      }else if(noOfReferrals>1296){
-        levelAmount=7000;
+        levelAmount=2160;
+      }else if(noOfReferrals>=216&&noOfReferrals<1296){
+        levelAmount=4602;
       }else{
         return 0;
       }
       return levelAmount;
     }else if(packageName==pro){
       if(noOfReferrals<=6){
-        levelAmount=2000;
+        levelAmount=2004;
       }else if(noOfReferrals>6&&noOfReferrals<=36){
-        levelAmount=3000;
+        levelAmount=3240;
       }else if(noOfReferrals>36&&noOfReferrals<=216){
-        levelAmount=4000;
-      }else if(noOfReferrals>216&&noOfReferrals<1296){
-        levelAmount=6000;
-      }else if(noOfReferrals>1296){
-        levelAmount=15000;
+        levelAmount=5400;
+      }else if(noOfReferrals>=216&&noOfReferrals<1296){
+        levelAmount=10644;
       }else{
+        return 0;
+      }
+      return levelAmount;
+    } else if (packageName == mega) {
+      if (noOfReferrals <= 6) {
+        levelAmount = 4020;
+      } else if (noOfReferrals > 6 && noOfReferrals <= 36) {
+        levelAmount = 5400;
+      } else if (noOfReferrals > 36 && noOfReferrals <= 216) {
+        levelAmount = 11880;
+      } else if (noOfReferrals >= 216 && noOfReferrals < 1296) {
+        levelAmount = 21300;
+      } else {
         return 0;
       }
       return levelAmount;

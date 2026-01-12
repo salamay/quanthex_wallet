@@ -14,6 +14,8 @@ class AssetItem extends StatelessWidget {
 
   SupportedCoin coin;
 
+
+  
   @override
   Widget build(BuildContext context) {
     return Container(

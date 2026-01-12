@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:quanthex/data/Models/wallets/wallet_model.dart';
+import 'package:quanthex/data/controllers/swap/swap_controller.dart';
 import 'package:quanthex/data/controllers/user/user_controller.dart';
 import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/services/assets/asset_service.dart';
@@ -34,7 +37,7 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   ValueNotifier<bool> _loadingNotifier = ValueNotifier(true);
   ValueNotifier<bool> _errorNotifier = ValueNotifier(false);
   ValueNotifier<bool> balanceLoadingNotifier = ValueNotifier(true);
@@ -42,42 +45,55 @@ class _HomeViewState extends State<HomeView> {
   late WalletController walletController;
   late BalanceController balanceController;
   late UserController userController;
+  late SwapController swapController;
   AssetService assetService = AssetService.getInstance();
+  late Timer _balanceTimer;
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    assetController = Provider.of<AssetController>(context, listen: false);
-    balanceController = Provider.of<BalanceController>(context, listen: false);
-    walletController = Provider.of<WalletController>(context, listen: false);
-    userController = Provider.of<UserController>(context, listen: false);
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
-      getData();
+  void _startBalanceTimer() {
+    _balanceTimer = Timer.periodic(Duration(seconds: 30), (timer) async {
+      refreshData();
     });
-    super.initState();
+  }
+
+  void _stopBalanceTimer() {
+    _balanceTimer.cancel();
   }
 
   Future<void> getData() async {
     try {
+      if (!mounted) {
+        return;
+      }
       _loadingNotifier.value = true;
       balanceLoadingNotifier.value = true;
-      bool isCacheEmpty = await AssetRepo.isCacheAssetEmpty();
+      bool isCacheEmpty = await AssetRepo.getInstance().isCacheAssetEmpty();
       bool isNew = isCacheEmpty ? true : false;
       logger("isNew: $isNew", runtimeType.toString());
-      List<SupportedCoin> assets = await assetController.getAllAssets(isNew: isNew, assetService: assetService, walletController: walletController);
+      List<SupportedCoin> assets = await assetController.getAllAssets(isNew: isNew, assetService: assetService, walletController: walletController, swapController: swapController);
       logger("Assets ${assets.length}", runtimeType.toString());
       await assetController.getAssetsQuotes(balanceController: balanceController, assets: assets);
       await getTokenBalances(context: context);
+      if (isNew) {
+        await AssetRepo.getInstance().saveAssets(newTokens: assets);
+      }
       userController.getProfile();
       _loadingNotifier.value = false;
       balanceLoadingNotifier.value = false;
       _errorNotifier.value = false;
+      _startBalanceTimer();
     } catch (e) {
-      logger("Unable to get data", runtimeType.toString());
+      logger(e.toString(), runtimeType.toString());
       _errorNotifier.value = true;
       _loadingNotifier.value = false;
       balanceLoadingNotifier.value = false;
     }
+  }
+
+  Future<void> refreshData() async {
+    List<SupportedCoin> assets = await assetController.assets;
+    logger("Assets ${assets.length}", runtimeType.toString());
+    await assetController.getAssetsQuotes(balanceController: balanceController, assets: assets);
+    await getTokenBalances(context: context);
   }
 
   Future<void> reload() async {
@@ -94,6 +110,40 @@ class _HomeViewState extends State<HomeView> {
       balanceLoadingNotifier.value = false;
       return;
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _balanceTimer = Timer.periodic(Duration(seconds: 30), (timer) async {});
+    assetController = Provider.of<AssetController>(context, listen: false);
+    balanceController = Provider.of<BalanceController>(context, listen: false);
+    walletController = Provider.of<WalletController>(context, listen: false);
+    userController = Provider.of<UserController>(context, listen: false);
+    swapController = Provider.of<SwapController>(context, listen: false);
+    WidgetsBinding.instance.addObserver(this);
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
+      getData();
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _stopBalanceTimer();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    logger("AppLifecycleState: $state", runtimeType.toString());
+    if (state == AppLifecycleState.resumed) {
+      _startBalanceTimer();
+    } else if (state == AppLifecycleState.inactive) {
+      _stopBalanceTimer();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   @override
@@ -432,10 +482,11 @@ class _HomeViewState extends State<HomeView> {
     List<SupportedCoin> tokens = assets.where((element) => element.coinType == CoinType.TOKEN).toList();
     List<SupportedCoin> nativeTokens = assets.where((element) => element.coinType == CoinType.NATIVE_TOKEN || element.coinType == CoinType.WRAPPED_TOKEN).toList();
     Map<String, CoinBalance> results = await balanceController.getTokenBalance(tokens);
+
     await Future.wait(
       nativeTokens.map((e) async {
         int old = DateTime.now().second;
-        await Future.delayed(const Duration(milliseconds: 500), () async {});
+        await Future.delayed(const Duration(milliseconds: 200), () async {});
         int newTime = DateTime.now().second;
         logger("Time taken: ${newTime - old}", runtimeType.toString());
         CoinBalance? nativeBalance = await balanceController.getNativeCoinBalance(asset: e);

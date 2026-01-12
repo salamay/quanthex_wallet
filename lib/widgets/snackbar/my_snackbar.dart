@@ -11,6 +11,8 @@ showMySnackBar({required BuildContext context, required String message, required
     messagePadding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 2.sp),
     maxLines: 5,
     message: message, backgroundColor: Colors.green):CustomSnackBar.error(
-    maxLines: 5,
-    message: message, backgroundColor: Colors.red));
+      messagePadding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 2.sp),
+      maxLines: 5,
+      message: message, backgroundColor: Colors.red)
+      );
 }

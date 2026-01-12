@@ -9,7 +9,6 @@ class WhatIsStakingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20.sp, vertical: 0.sp),
       padding: EdgeInsets.all(20.sp),
       decoration: BoxDecoration(
         color: Colors.white,

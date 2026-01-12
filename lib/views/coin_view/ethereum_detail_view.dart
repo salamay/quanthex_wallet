@@ -154,9 +154,14 @@ class _EthereumDetailViewState extends State<EthereumDetailView> {
                     return Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          priceQuote != null ? MyCurrencyUtils.formatCurrency(priceQuote) : 'Loading...',
-                          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 32.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                        Skeletonizer(
+                          ignoreContainers: false,
+                          enabled: priceQuote == null,
+                          effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                          child: Text(
+                            priceQuote != null ? MyCurrencyUtils.formatCurrency(priceQuote) : 'N/A USD',
+                            style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 32.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                          ),
                         ),
                         15.horizontalSpace,
                       ],

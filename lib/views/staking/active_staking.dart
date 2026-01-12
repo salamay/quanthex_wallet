@@ -58,7 +58,6 @@ class ActiveStaking extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        20.sp.verticalSpace,
         // Farming USDT Card
         Container(
           padding: EdgeInsets.all(20.sp),
@@ -205,7 +204,7 @@ class ActiveStaking extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        15.sp.verticalSpace,
+        8.sp.verticalSpace,
         Consumer<MiningController>(
           builder: (context, mCtr, child) {
             List<WithdrawalDto> withdrawals = mCtr.withdrawals;
@@ -216,7 +215,6 @@ class ActiveStaking extends StatelessWidget {
             );
           },
         ),
-        40.sp.verticalSpace,
       ],
     );
   }

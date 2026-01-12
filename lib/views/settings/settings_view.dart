@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:quanthex/data/controllers/assets/asset_controller.dart';
+import 'package:quanthex/data/controllers/balance/balance_controller.dart';
+import 'package:quanthex/data/controllers/home/home_controller.dart';
+import 'package:quanthex/data/controllers/wallet_controller.dart';
+import 'package:quanthex/data/repository/my_local_storage.dart';
+import 'package:quanthex/data/repository/secure_storage.dart';
+import 'package:quanthex/data/services/auth/auth_service.dart';
+import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/routes/app_routes.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/widgets/quanthex_image_banner.dart';
+import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -19,12 +29,7 @@ class SettingsView extends StatelessWidget {
             children: [
               Text(
                 'Settings',
-                style: TextStyle(
-                  color: const Color(0xFF2D2D2D),
-                  fontSize: 22.sp,
-                  fontFamily: 'Satoshi',
-                  fontWeight: FontWeight.w700,
-                ),
+                style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 22.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
               ),
             ],
           ),
@@ -68,10 +73,7 @@ class SettingsView extends StatelessWidget {
                   iconColor: const Color(0xFF792A90),
                   title: 'Security & Privacy',
                   onTap: () {
-                    Navigate.toNamed(
-                      context,
-                      name: AppRoutes.securityprivacyview,
-                    );
+                    Navigate.toNamed(context, name: AppRoutes.securityprivacyview);
                   },
                   context: context,
                 ),
@@ -117,7 +119,7 @@ class SettingsView extends StatelessWidget {
                 // Log Out Button
                 GestureDetector(
                   onTap: () {
-                    // Navigate.backAll(context);
+                    _showLogoutConfirmationBottomSheet(context);
                   },
                   child: Container(
                     width: double.infinity,
@@ -129,12 +131,7 @@ class SettingsView extends StatelessWidget {
                     child: Center(
                       child: Text(
                         'Log Out',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 16.sp,
-                          fontFamily: 'Satoshi',
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(color: Colors.red, fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
@@ -148,26 +145,108 @@ class SettingsView extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingItem({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    VoidCallback? onTap,
-    bool hasToggle = false,
-    bool toggleValue = false,
-    Function(bool)? onToggle,
-    context,
-  }) {
+  void _showLogoutConfirmationBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (modalContext) => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: EdgeInsets.all(24.sp),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40.sp,
+              height: 4.sp,
+              margin: EdgeInsets.only(bottom: 20.sp),
+              decoration: BoxDecoration(color: const Color(0xFFE0E0E0), borderRadius: BorderRadius.circular(2)),
+            ),
+            Text(
+              'Log Out',
+              style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+            ),
+            16.sp.verticalSpace,
+            Text(
+              'Are you sure you want to log out?',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: const Color(0xFF757575), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+            ),
+            30.sp.verticalSpace,
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(modalContext);
+                    },
+                    child: Container(
+                      height: 50.sp,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'No',
+                          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                16.horizontalSpace,
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(modalContext);
+                      _performLogout(context);
+                    },
+                    child: Container(
+                      height: 50.sp,
+                      decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(12)),
+                      child: Center(
+                        child: Text(
+                          'Yes',
+                          style: TextStyle(color: Colors.white, fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            20.sp.verticalSpace,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _performLogout(BuildContext context) async {
+    try {
+      await SecureStorage.getInstance().clear();
+      await MyLocalStorage().clear();
+      Provider.of<WalletController>(context, listen: false).clear();
+      Provider.of<AssetController>(context, listen: false).clear();
+      Provider.of<BalanceController>(context, listen: false).clear();
+      Provider.of<HomeController>(context, listen: false).clear();
+      AuthService.getInstance().authToken = "";
+      Navigate.go(context, name: AppRoutes.landingview);
+    } catch (e) {
+      logger("Error logging out", runtimeType.toString());
+      showMySnackBar(context: context, message: "Failed to log out", type: SnackBarType.error);
+    }
+  }
+
+  Widget _buildSettingItem({required IconData icon, required Color iconColor, required String title, VoidCallback? onTap, bool hasToggle = false, bool toggleValue = false, Function(bool)? onToggle, context}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         // margin: EdgeInsets.only(bottom: 16.sp),
-        padding: EdgeInsets.only(
-          left: 16.sp,
-          top: 12.sp,
-          bottom: 12.sp,
-          right: 16.sp,
-        ),
+        padding: EdgeInsets.only(left: 16.sp, top: 12.sp, bottom: 12.sp, right: 16.sp),
         decoration: BoxDecoration(
           // color: const Color(0xFFF5F5F5),
           borderRadius: BorderRadius.circular(12),
@@ -179,45 +258,21 @@ class SettingsView extends StatelessWidget {
                 Container(
                   width: 40.sp,
                   height: 40.sp,
-                  decoration: BoxDecoration(
-                    color: iconColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: BoxDecoration(color: iconColor.withOpacity(0.1), shape: BoxShape.circle),
                   child: Icon(icon, color: iconColor, size: 24.sp),
                 ),
                 15.horizontalSpace,
                 Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(
-                      color: const Color(0xFF2D2D2D),
-                      fontSize: 16.sp,
-                      fontFamily: 'Satoshi',
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
                   ),
                 ),
-                if (hasToggle)
-                  Switch(
-                    value: toggleValue,
-                    onChanged: onToggle,
-                    activeTrackColor: const Color(0xFF792A90),
-                    activeThumbColor: const Color(0xFF792A90),
-                  )
-                else
-                  Icon(
-                    Icons.chevron_right,
-                    color: const Color(0xFF757575),
-                    size: 24.sp,
-                  ),
+                if (hasToggle) Switch(value: toggleValue, onChanged: onToggle, activeTrackColor: const Color(0xFF792A90), activeThumbColor: const Color(0xFF792A90)) else Icon(Icons.chevron_right, color: const Color(0xFF757575), size: 24.sp),
               ],
             ),
             12.sp.verticalSpace,
-            Container(
-              height: 1,
-              width: MediaQuery.sizeOf(context).width,
-              color: Color(0xffEEEEEE),
-            ),
+            Container(height: 1, width: MediaQuery.sizeOf(context).width, color: Color(0xffEEEEEE)),
           ],
         ),
       ),

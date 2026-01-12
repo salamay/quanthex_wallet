@@ -97,4 +97,9 @@ class WalletController extends ChangeNotifier {
     wallets = await _storage.getWallets();
     notifyListeners();
   }
+  Future<void> clear() async {
+    logger("Clearing wallets", runtimeType.toString());
+    wallets = [];
+    currentWallet = null;
+  }
 }

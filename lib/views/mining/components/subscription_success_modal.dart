@@ -8,6 +8,7 @@ import 'package:quanthex/data/Models/mining/subscription_payload.dart';
 import 'package:quanthex/data/Models/subscription/subscription_dto.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
+import 'package:quanthex/widgets/quanthex_image_banner.dart';
 
 import '../../../widgets/app_button.dart';
 
@@ -140,6 +141,8 @@ class SubscriptionSuccessModal extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                 ),
               ),
+                const Spacer(),
+              QuanthexImageBanner(height: 60.sp, width: 100.sp),
             ],
           ),
           30.sp.verticalSpace,

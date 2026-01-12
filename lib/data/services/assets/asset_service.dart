@@ -32,31 +32,17 @@ import '../../Models/balance/platform_data.dart';
 import '../../Models/network/network_model.dart';
 import '../../repository/assets/asset_repository.dart';
 
+Map<int, List<String>> defaultTokens = {
+  1: [eth_usdc_contract, eth_usdt_contract, eth_weth_contract],
+  56: [bsc_usdc_contract, bsc_doge_contract, bsc_usdt_contract, bsc_trx_contract, bsc_wbnb_contract],
+  137: [polygon_bnb_contract, polygon_dai_contract, polygon_usdt_contract, polygon_usdc_contract, polygon_orio_contract, polygon_fib_contract, polygon_weth_contract, polygon_wpol_contract],
+};
 
 class AssetService{
   final my_api = MyApi();
   CoinGeckoApi coingeckoApi = CoinGeckoApi(credentials: ProCredentials(apiKey: MyApi.coinGecko));
 
-  Map<int,List<String>> defaultTokens = {
-    1:[
-      eth_usdc_contract,
-      eth_usdt_contract
-    ],
-    56: [
-      bsc_usdc_contract,
-      bsc_doge_contract,
-      bsc_usdt_contract,
-      bsc_trx_contract
-    ],
-    137: [
-      polygon_bnb_contract,
-      polygon_dai_contract,
-      polygon_usdt_contract,
-      polygon_usdc_contract,
-      polygon_orio_contract,
-      polygon_fib_contract,
-    ],
-  };
+  
   static AssetService? _instance;
   AssetService._internal();
 
@@ -163,7 +149,7 @@ class AssetService{
         List<SupportedCoin> nativeAssets=assets.where((e)=>e.coinType==CoinType.NATIVE_TOKEN).toList();
         //This is used to get the quotes for native assets
         Map<String,String> mappedData=NetworkUtils.mapSymbolToPlatformId(assets: assets, existingPlatform: existingPlatform);
-        var data=await balanceController.getQuotesByIds(payload: mappedData);
+        var data=await balanceController.getQuotesByIds(p: mappedData);
 
     }
   }
@@ -275,27 +261,27 @@ class AssetService{
           int chainId=key;
           if(chainId==chain_id_eth) {
             network = chain_eth;
-            List<SupportedCoin> scT=await AssetRepo.getScannedAssets();
+            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets();
             logger("Cached token ($eth): ${scT.length}",runtimeType.toString());
             coins.addAll(scT);
           } else if(chainId==chain_id_bsc){
             network=chain_bsc;
-            List<SupportedCoin> scT=await AssetRepo.getScannedAssets();
+            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets();
             logger("Cached token ($bsc): ${scT.length}",runtimeType.toString());
             coins.addAll(scT);
           }else if(chainId==chain_id_pol){
             network=chain_polygon;
-            List<SupportedCoin> scT=await AssetRepo.getScannedAssets();
+            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets();
             logger("Cached token ($polygon): ${scT.length}",runtimeType.toString());
             coins.addAll(scT);
           }else if(chainId==chain_id_arb){
             network=chain_arbitrum;
-            List<SupportedCoin> scT=await AssetRepo.getScannedAssets();
+            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets();
             logger("Cached token ($arb): ${scT.length}",runtimeType.toString());
             coins.addAll(scT);
           }else if(chainId==chain_id_avax){
             network=chain_avalanche;
-            List<SupportedCoin> scT=await AssetRepo.getScannedAssets();
+            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets();
             logger("Cached token ($avax): ${scT.length}",runtimeType.toString());
             coins.addAll(scT);
           }else{

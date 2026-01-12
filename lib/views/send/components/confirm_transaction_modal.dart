@@ -27,7 +27,7 @@ import '../../../data/utils/network/gas_fee_check.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/confirm_pin_modal.dart';
 import '../../../widgets/info/row_info.dart';
-import '../../../widgets/transfer_success_modal.dart';
+import '../../swap/transfer_success_modal.dart';
 class ConfirmTransactionModal extends StatelessWidget {
   ConfirmTransactionModal({super.key,required this.sendPayload});
   SendPayload sendPayload;
@@ -341,7 +341,7 @@ class ConfirmTransactionModal extends StatelessWidget {
         logger("Fee is null", runtimeType.toString());
         return ;
       }
-      bool isGas=GasFeeCheck.gasFeeCheck(bCtr: balanceController, fee: fee, chainCurrency: network.chainCurrency);
+      bool isGas=GasFeeCheck.gasFeeCheck(bCtr: balanceController, feeInCrypto: fee.feeInCrypto, chainCurrency: network.chainCurrency);
       SupportedCoin asset=sendPayload.asset!;
       if(isGas){
         showOverlay(context);
@@ -403,6 +403,7 @@ class ConfirmTransactionModal extends StatelessWidget {
       }
     }catch(e){
       hideOverlay(context);
+      showMySnackBar(context: context, message: "An error occurred, make sure you have enough gas fee for this transaction and try again", type: SnackBarType.error);
       logger(e.toString(), runtimeType.toString());
     }
   }

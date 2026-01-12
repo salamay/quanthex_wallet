@@ -491,7 +491,7 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
       logger("Estimated fee: ${fee!=null?MyCurrencyUtils.format(fee.feeInFiat,2):"N/A"} USD", runtimeType.toString());
       NetworkModel network=widget.paymentToken.networkModel!;
       int decimal = asset.decimal!;
-      bool isGas=GasFeeCheck.gasFeeCheck(bCtr: balanceController, fee: fee, chainCurrency: network.chainCurrency);
+      bool isGas=GasFeeCheck.gasFeeCheck(bCtr: balanceController, feeInCrypto: fee.feeInCrypto, chainCurrency: network.chainCurrency);
       if(isGas){
         double totalAmount = ((_paymentAmount) * math.pow(10, decimal));
         logger("Total amount: $totalAmount",runtimeType.toString());

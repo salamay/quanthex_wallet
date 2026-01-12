@@ -19,7 +19,7 @@ class StakingTokenItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20.sp, vertical: 6.sp),
+        margin: EdgeInsets.symmetric(vertical: 6.sp),
         padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 16.sp),
         decoration: BoxDecoration(
           color: Colors.white,

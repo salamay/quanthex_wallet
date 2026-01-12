@@ -13,14 +13,13 @@ enum NetworkType{
 enum ChainUnit{
   satoshi,ethers,wei,matic
 }
-int chain_id_eth=1;
-int chain_id_pol=137;
-int chain_id_bsc=56;
-int chain_id_arb=42161;
-int chain_id_avax=43114;
+const int chain_id_eth=1;
+const int chain_id_pol=137;
+const int chain_id_bsc=56;
+const int chain_id_arb=42161;
+const int chain_id_avax=43114;
 
 String binance = "Binance Smart Chain";
-String bsc = "BSC";
 String ethereum = "Ethereum";
 String polygon = "Polygon";
 String boorio = "Boorio";

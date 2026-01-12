@@ -112,11 +112,11 @@ class _ReceiveViewState extends State<ReceiveView> {
                           ],
                         ),
                       ),
-                      Icon(
-                        Icons.swap_horiz,
-                        size: 24.sp,
-                        color: const Color(0xFF757575),
-                      ),
+                      // Icon(
+                      //   Icons.swap_horiz,
+                      //   size: 24.sp,
+                      //   color: const Color(0xFF757575),
+                      // ),
                     ],
                   ),
                 ),

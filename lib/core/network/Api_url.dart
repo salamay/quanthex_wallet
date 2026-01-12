@@ -6,12 +6,12 @@ class ApiUrls{
   static String assetPlatform="https://pro-api.coingecko.com/api/v3/asset_platforms";
 
   // static String BSCRpc="https://bsc-dataseed3.binance.org/";
-  static String BSCRpc="https://go.getblock.us/037f321822514b399038c492e60433d2";
+  static String BSCRpc="https://go.getblock.io/119fad79ee5d4ffda4c3de8fdc77618e";
   // static String BSCRpc="https://go.getblock.io/119fad79ee5d4ffda4c3de8fdc77618e";
   static String BSCRpcSocket="wss://go.getblock.us/3a5b51cd686c43dea5a29fe87e06753c";
-  static String ETHRpc="https://go.getblock.us/b69ee67f6e6e4c319af561ae55f55aa3";
+  static String ETHRpc="https://go.getblock.io/8e30f8a3d9314d4785167d79abdf164c";
   static String ETHRpcSocket="wss://go.getblock.io/87c9e022c4a84a0f97cb295d2a6e76d6";
-  static String polygonRpc="https://go.getblock.us/6fca04d1f8204303bda2c7c8072cbd4a";
+  static String polygonRpc="https://go.getblock.io/5fa1b57ec3724b18944c5c10006d95ef";
   static String polygonRpcSocket="wss://go.getblock.us/31d9ca6bcfdd44e295dab452ca5a0bbd";
   static String boorioRpc="https://rpc1.boorio.tech/";
   static String arbitrumRpc="https://go.getblock.us/26a2bfa624654defa1a3f343262bc62f";

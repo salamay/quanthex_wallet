@@ -15,6 +15,8 @@ class AppTextfield extends StatefulWidget {
   final Widget? prefixIcon;
   final EdgeInsetsGeometry? contentPadding;
   final Function(String)? onChanged;
+  final Function()? onEditingComplete;
+  final Function(String)? onFieldSubmitted;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
@@ -25,9 +27,14 @@ class AppTextfield extends StatefulWidget {
   final bool isPassword;
   final TextStyle? hintStyle;
   final bool? filled;
+  final FocusNode? focusNode;
+  int? errorMaxLines;
+  bool? enable;
+  TextAlign? textAlign;
 
-  const AppTextfield({
+  AppTextfield({
     super.key,
+    this.focusNode,
     this.hintText = '',
     this.errorText,
     this.obscurePassword = false,
@@ -39,6 +46,8 @@ class AppTextfield extends StatefulWidget {
     this.onTap,
     this.isdense,
     this.onChanged,
+    this.onEditingComplete,
+    this.onFieldSubmitted,
     this.prefixIcon,
     this.contentPadding,
     this.validator,
@@ -52,6 +61,9 @@ class AppTextfield extends StatefulWidget {
     this.controller,
     this.useFill,
     this.filled,
+    this.errorMaxLines,
+    this.enable,
+    this.textAlign,
   });
 
   @override
@@ -71,28 +83,29 @@ class _AppTextfieldState extends State<AppTextfield> {
   Widget build(BuildContext context) {
     return TextFormField(
       onTap: widget.onTap,
-
+      focusNode: widget.focusNode,
+      enabled: widget.enable ?? true,
       // key: key,
       readOnly: widget.readonly ?? false,
       // cursorColor: const Color(0xffAEACAC),
       onChanged: widget.onChanged,
-      onTapOutside: (val){
-        FocusScope.of(context).unfocus();
-      },
+      textAlign: widget.textAlign ?? TextAlign.start,
       obscureText: widget.isPassword ? showPassword : widget.obscurePassword,
       controller: widget.controller,
       keyboardType: widget.keyboardType,
       validator: widget.validator,
       style: widget.textStyle ?? const TextStyle(color: Color(0xFF6F6F6F)),
       textInputAction: TextInputAction.done,
-      maxLines: widget.isPassword || widget.obscurePassword
-          ? 1
-          : widget.maxLines,
+      maxLines: widget.isPassword || widget.obscurePassword ? 1 : widget.maxLines,
       maxLength: widget.maxLength,
+      onEditingComplete: widget.onEditingComplete,
+      onFieldSubmitted: widget.onFieldSubmitted,
+
       decoration: InputDecoration(
         contentPadding: widget.contentPadding,
+        
         isDense: widget.isdense,
-        errorMaxLines: 3,
+        errorMaxLines: widget.errorMaxLines ?? 3,
         hintText: widget.hintText,
         errorText: widget.errorText,
         prefixIcon: widget.prefixIcon,
@@ -110,58 +123,33 @@ class _AppTextfieldState extends State<AppTextfield> {
                     showPassword = !showPassword;
                   });
                 },
-                child: Icon(
-                  showPassword
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                  color: Color(0xffC6C6C6),
-                ),
+                child: Icon(showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: Color(0xffC6C6C6)),
               )
             : widget.suffixIcon,
         suffixIconColor: Colors.black,
-        hintStyle:
-            widget.hintStyle ??
-            TextStyle(
-              color: const Color(0xFF6F6F6F),
-              fontSize: 14.sp,
-              fontFamily: 'SF Pro',
-              fontWeight: FontWeight.w400,
-            ),
-        errorStyle:TextStyle(
-          color: Colors.red,
-          fontSize: 10.sp,
-          fontFamily: 'SF Pro',
-          fontWeight: FontWeight.w400,
-        ),
+        hintStyle: widget.hintStyle ?? TextStyle(
+          color: const Color(0xFF6F6F6F),
+           fontSize: 14.sp, 
+           fontFamily: 'SF Pro', 
+           fontWeight: FontWeight.w400,
+           ),
+        errorStyle: TextStyle(color: Colors.red, fontSize: 10.sp, fontFamily: 'SF Pro', fontWeight: FontWeight.w400),
         focusedBorder:
             widget.border ??
             OutlineInputBorder(
-              borderSide: BorderSide(
-                width: 0.5,
-                color: widget.borderColor ?? const Color(0xFFEAEAEA),
-              ),
-              borderRadius: BorderRadius.all(
-                Radius.circular(widget.radius ?? 25),
-              ),
+              borderSide: BorderSide(width: 0.5, color: widget.borderColor ?? const Color(0xFFEAEAEA)),
+              borderRadius: BorderRadius.all(Radius.circular(widget.radius ?? 25)),
             ),
         enabledBorder:
             widget.border ??
             OutlineInputBorder(
-              borderSide: BorderSide(
-                width: 0.5,
-                color: widget.borderColor ?? const Color(0xFFEAEAEA),
-              ),
-              borderRadius: BorderRadius.all(
-                Radius.circular(widget.radius ?? 25),
-              ),
+              borderSide: BorderSide(width: 0.5, color: widget.borderColor ?? const Color(0xFFEAEAEA)),
+              borderRadius: BorderRadius.all(Radius.circular(widget.radius ?? 25)),
             ),
         border:
             widget.border ??
             OutlineInputBorder(
-              borderSide: BorderSide(
-                width: 0.5,
-                color: widget.borderColor ?? const Color(0xFFEAEAEA),
-              ),
+              borderSide: BorderSide(width: 0.5, color: widget.borderColor ?? const Color(0xFFEAEAEA)),
               borderRadius: BorderRadius.all(
                 Radius.circular(widget.radius ?? 25), //C3C7E5
               ),

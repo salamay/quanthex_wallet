@@ -6,6 +6,7 @@ import 'package:quanthex/data/Models/assets/supported_assets.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/widgets/app_button.dart';
+import 'package:quanthex/widgets/quanthex_image_banner.dart';
 
 class TransferSuccessModal extends StatelessWidget {
   final SupportedCoin token;
@@ -124,6 +125,8 @@ class TransferSuccessModal extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                 ),
               ),
+              const Spacer(),
+              QuanthexImageBanner(height: 60.sp, width: 100.sp,),
             ],
           ),
           30.sp.verticalSpace,

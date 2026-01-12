@@ -80,7 +80,8 @@ class _SecurityPrivacyViewState extends State<SecurityPrivacyView> {
                 description: 'Add an extra layer of security to your wallet by setting up a PIN. This will be used to unlock your wallet and approve transactions.',
                 buttonText: 'Change Pin',
                 onButtonTap: () {
-                  Navigate.toNamed(context, name: AppRoutes.setpinview, args: false);
+                  // Navigate.toNamed(context, name: AppRoutes.setpinview, args: false);
+                  Navigate.toNamed(context, name: AppRoutes.verifycurrentpinview, args: false);
                 },
               ),
               // Unlock Method

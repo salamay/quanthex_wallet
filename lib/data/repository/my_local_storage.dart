@@ -27,5 +27,9 @@ class MyLocalStorage{
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool("biometric_auth_status") ?? false;
   }
+  Future<void> clear() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
 
 }

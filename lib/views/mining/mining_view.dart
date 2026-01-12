@@ -14,6 +14,7 @@ import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/data/utils/product_utils.dart';
 import 'package:quanthex/data/utils/share/share_utils.dart';
 import 'package:quanthex/data/utils/sub/sub_utils.dart';
+import 'package:quanthex/views/mining/components/hash_card.dart';
 import 'package:quanthex/views/mining/components/mining_simulation_widget.dart';
 import 'package:quanthex/widgets/quanthex_image_banner.dart';
 
@@ -239,6 +240,30 @@ class _MiningViewState extends State<MiningView> {
                             value: MyCurrencyUtils.formatCurrency(amountEarned),
                             isFullWidth: true,
                           ),
+                        ),
+                      ],
+                    ),
+                       15.sp.verticalSpace,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: HashCard(label: 'Giga Hash', value: "${mining.mining!.hashRate} Hex MH/s", isInProgress: !(double.parse(mining.mining!.hashRate ?? "0")>=ProductUtils.LEVEL_ONE_HASHRATE), fontSize: 15.sp),
+                        ),
+                        15.horizontalSpace,
+                        Expanded(
+                          child: HashCard(label: "Tera Hash", value: "${mining.mining!.hashRate} Hex MH/s", isInProgress: !(double.parse(mining.mining!.hashRate ?? "0") >= ProductUtils.LEVEL_TWO_HASHRATE)),
+                        ),
+                      ],
+                    ),
+                          15.sp.verticalSpace,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: HashCard(label: 'Tera Hash', value: "${mining.mining!.hashRate} Hex MH/s", isInProgress: !(double.parse(mining.mining!.hashRate ?? "0") >= ProductUtils.LEVEL_THREE_HASHRATE), fontSize: 15.sp),
+                        ),
+                        15.horizontalSpace,
+                        Expanded(
+                          child: HashCard(label: "Peta Hash", value: "${mining.mining!.hashRate} Hex MH/s", isInProgress: !(double.parse(mining.mining!.hashRate ?? "0") >= ProductUtils.LEVEL_FOUR_HASHRATE)),
                         ),
                       ],
                     ),

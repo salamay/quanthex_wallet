@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
+import 'package:quanthex/data/controllers/swap/swap_controller.dart';
 import 'package:quanthex/routes/app_routes.dart';
 import 'package:quanthex/widgets/loading_overlay/loading.dart';
 
@@ -16,6 +18,8 @@ import 'data/controllers/wallet_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+    await initHiveForFlutter();
+
   runApp(const MyApp());
 }
 
@@ -33,6 +37,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => HomeController()),
         ChangeNotifierProvider(create: (_) => MiningController()),
         ChangeNotifierProvider(create: (_) => UserController()),
+        ChangeNotifierProvider(create: (_) => SwapController()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),

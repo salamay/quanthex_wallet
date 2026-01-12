@@ -19,21 +19,21 @@ import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/widgets/confirm_pin_modal.dart';
 import 'package:web3dart/web3dart.dart';
 
-import '../core/constants/network_constants.dart';
-import '../data/Models/assets/supported_assets.dart';
-import '../data/Models/balance/CoinBalance.dart';
-import '../data/Models/mining/subscription_payload.dart';
-import '../data/Models/network/network_model.dart';
-import '../data/services/package_service/package_service.dart';
-import '../data/services/transaction/transaction_service.dart';
-import '../data/utils/assets/asset_utils.dart';
-import '../data/utils/assets/client_resolver.dart';
-import '../data/utils/assets/token_factory.dart';
-import '../data/utils/logger.dart';
-import '../data/utils/my_currency_utils.dart';
-import '../data/utils/network/gas_fee_check.dart';
-import '../data/utils/security_utils.dart';
-import '../widgets/snackbar/my_snackbar.dart';
+import '../../core/constants/network_constants.dart';
+import '../../data/Models/assets/supported_assets.dart';
+import '../../data/Models/balance/CoinBalance.dart';
+import '../../data/Models/mining/subscription_payload.dart';
+import '../../data/Models/network/network_model.dart';
+import '../../data/services/package_service/package_service.dart';
+import '../../data/services/transaction/transaction_service.dart';
+import '../../data/utils/assets/asset_utils.dart';
+import '../../data/utils/assets/client_resolver.dart';
+import '../../data/utils/assets/token_factory.dart';
+import '../../data/utils/logger.dart';
+import '../../data/utils/my_currency_utils.dart';
+import '../../data/utils/network/gas_fee_check.dart';
+import '../../data/utils/security_utils.dart';
+import '../../widgets/snackbar/my_snackbar.dart';
 import 'dart:math' as math;
 
 class SubscribeView extends StatefulWidget {
@@ -524,7 +524,7 @@ class _SubscribeViewState extends State<SubscribeView> {
       logger("Estimated fee: ${fee!=null?MyCurrencyUtils.format(fee.feeInFiat,2):"N/A"} USD", runtimeType.toString());
       NetworkModel network=widget.paymentToken.networkModel!;
       int decimal = asset.decimal!;
-      bool isGas=GasFeeCheck.gasFeeCheck(bCtr: balanceController, fee: fee, chainCurrency: network.chainCurrency);
+      bool isGas=GasFeeCheck.gasFeeCheck(bCtr: balanceController, feeInCrypto: fee.feeInCrypto, chainCurrency: network.chainCurrency);
       if(isGas){
         double totalAmount = ((_paymentAmount) * math.pow(10, decimal));
         logger("Total amount: $totalAmount",runtimeType.toString());
@@ -551,7 +551,7 @@ class _SubscribeViewState extends State<SubscribeView> {
       // Proceed with sending the transaction using the sendPayload
     }catch(e){
       logger(e.toString(), runtimeType.toString());
-      showMySnackBar(context: context, message: "An error occurred when estimating gas, Please check the address and make sure you have good internet or enough gas fee", type: SnackBarType.error);
+      showMySnackBar(context: context, message: e.toString().replaceAll("Exception: ", ""), type: SnackBarType.error);
       hideOverlay(context);
       return;
     }

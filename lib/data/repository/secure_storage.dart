@@ -167,4 +167,8 @@ class SecureStorage {
       await _storage!.write(key: wallets_key, value: json.encode(finalData));
     }
   }
+  Future<void> clear() async {
+    logger("Clearing secure storage", runtimeType.toString());
+    await _storage!.deleteAll();
+  }
 }
