@@ -1,6 +1,8 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/views/otp/model/otp_args.dart';
 import 'package:quanthex/widgets/app_button.dart';
@@ -23,20 +25,19 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final _formKey=GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController emailAddress=TextEditingController();
+  final TextEditingController emailAddress = TextEditingController();
 
   final password = TextEditingController();
 
-
   final TextEditingController confirmPasswordCtr = TextEditingController();
 
-  final TextEditingController referralCode=TextEditingController();
+  final TextEditingController referralCode = TextEditingController();
 
-  ValueNotifier<bool> formValidation=ValueNotifier<bool>(false);
+  ValueNotifier<bool> formValidation = ValueNotifier<bool>(false);
 
-  ValueNotifier<bool> agreement=ValueNotifier<bool>(false);
+  ValueNotifier<bool> agreement = ValueNotifier<bool>(false);
 
   @override
   Widget build(BuildContext context) {
@@ -63,17 +64,11 @@ class _LoginViewState extends State<LoginView> {
         backgroundColor: Colors.white,
         actions: [
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 9,
-              vertical: 6,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
             decoration: ShapeDecoration(
               color: const Color(0xFFF9E6FF),
               shape: RoundedRectangleBorder(
-                side: BorderSide(
-                  width: 1,
-                  color: const Color(0xFFFAEBFF),
-                ),
+                side: BorderSide(width: 1, color: const Color(0xFFFAEBFF)),
                 borderRadius: BorderRadius.circular(50),
               ),
             ),
@@ -88,10 +83,7 @@ class _LoginViewState extends State<LoginView> {
                   height: 12.8.sp,
                   clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/Union.png'),
-                      fit: BoxFit.fill,
-                    ),
+                    image: DecorationImage(image: AssetImage('assets/images/Union.png'), fit: BoxFit.fill),
                   ),
                 ),
                 5.verticalSpace,
@@ -118,12 +110,12 @@ class _LoginViewState extends State<LoginView> {
             height: MediaQuery.of(context).size.height,
             child: Form(
               key: _formKey,
-              onChanged: (){
+              onChanged: () {
                 logger("Form changed", runtimeType.toString());
-                if(_formKey.currentState!.validate()){
-                  formValidation.value=true;
-                }else{
-                  formValidation.value=false;
+                if (_formKey.currentState!.validate()) {
+                  formValidation.value = true;
+                } else {
+                  formValidation.value = false;
                 }
               },
               child: Column(
@@ -132,67 +124,33 @@ class _LoginViewState extends State<LoginView> {
                   20.sp.verticalSpace,
                   Text(
                     'Welcome Back',
-                    style: TextStyle(
-                      color: const Color(0xFF2D2D2D),
-                      fontSize: 19,
-                      fontFamily: 'Satoshi',
-                      fontWeight: FontWeight.w700,
-                      height: 1.16,
-                    ),
+                    style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 19, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 1.16),
                   ),
                   10.sp.verticalSpace,
                   SizedBox(
                     width: 325.sp,
                     child: Text(
                       'Please sign in to your account to continue using our app.',
-                      style: TextStyle(
-                        color: const Color(0xFF757575),
-                        fontSize: 14.sp,
-                        fontFamily: 'Satoshi',
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                     ),
                   ),
 
                   30.sp.verticalSpace,
                   Text(
                     'Email Address',
-                    style: TextStyle(
-                      color: const Color(0xFF333333),
-                      fontSize: 14,
-                      fontFamily: 'Satoshi',
-                      fontWeight: FontWeight.w700,
-                      height: 1.57,
-                      letterSpacing: -0.41,
-                    ),
+                    style: TextStyle(color: const Color(0xFF333333), fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 1.57, letterSpacing: -0.41),
                   ),
 
                   5.sp.verticalSpace,
-                  AppTextfield(
-                      hintText: 'Enter your email address',
-                    controller: emailAddress,
-                    validator: (val)=>!EmailValidator.validate(val!)?"Please enter a valid email address":null,
-                  ),
+                  AppTextfield(hintText: 'Enter your email address', controller: emailAddress, validator: (val) => !EmailValidator.validate(val!) ? "Please enter a valid email address" : null),
 
                   20.sp.verticalSpace,
                   Text(
                     'Password',
-                    style: TextStyle(
-                      color: const Color(0xFF333333),
-                      fontSize: 14,
-                      fontFamily: 'Satoshi',
-                      fontWeight: FontWeight.w700,
-                      height: 1.57,
-                      letterSpacing: -0.41,
-                    ),
+                    style: TextStyle(color: const Color(0xFF333333), fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 1.57, letterSpacing: -0.41),
                   ),
                   5.sp.verticalSpace,
-                  AppTextfield(
-                      hintText: 'Password',
-                      isPassword: true,
-                    controller: password,
-                    validator: (val)=>val==null?"A valid password is required":null,
-                  ),
+                  AppTextfield(hintText: 'Password', isPassword: true, controller: password, validator: (val) => val == null ? "A valid password is required" : null),
 
                   20.sp.verticalSpace,
                   SizedBox(
@@ -211,14 +169,7 @@ class _LoginViewState extends State<LoginView> {
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
                             'Or',
-                            style: TextStyle(
-                              color: const Color(0xFF959595),
-                              fontSize: 11.sp,
-                              fontFamily: 'Satoshi',
-                              fontWeight: FontWeight.w700,
-                              height: 2.sp,
-                              letterSpacing: -0.41,
-                            ),
+                            style: TextStyle(color: const Color(0xFF959595), fontSize: 11.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 2.sp, letterSpacing: -0.41),
                           ),
                         ),
                         // 20.sp.verticalSpace,
@@ -235,47 +186,58 @@ class _LoginViewState extends State<LoginView> {
 
                   15.sp.verticalSpace,
 
-                  Container(
-                    width: 333.sp,
-                    height: 45.sp,
-                    padding: const EdgeInsets.symmetric(
-                      // horizontal: 131,
-                      // vertical: 18,
-                    ),
-                    decoration: ShapeDecoration(
-                      color: const Color(0xFF323232),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                  GestureDetector(
+                    onTap: () async {
+                      try { 
+                        if (!context.mounted) return;
+
+                        GoogleSignIn googleSignIn = AuthService.getInstance().googleSignIn;
+                        if (googleSignIn.supportsAuthenticate() && AuthService.getInstance().isGoogleSignInInitialized) {
+                          GoogleSignInAccount account = await googleSignIn.authenticate();
+                          String idToken = await account.authentication.idToken ?? "";
+                          if (idToken.isNotEmpty) {
+                            String email = account.email ?? "";
+                            String deviceId = await DeviceUtils.getDeviceId() ?? "UNKNOWN_DEVICE_ID";
+                            String deviceName = DeviceUtils.getDeviceType();
+                            await AuthService.getInstance().signInWithGoogle(idToken: idToken, email: email, deviceId: deviceId, deviceName: deviceName);
+                          }
+                        }
+                           // Sign in with Google
+                      } catch (e) {
+                        logger(e.toString(), runtimeType.toString());
+                        showMySnackBar(context: context, message: "Unable to sign in with Google", type: SnackBarType.error);
+                      }
+                    },
+                    child: Container(
+                      width: 333.sp,
+                      height: 45.sp,
+                      padding: const EdgeInsets.symmetric(
+                        // horizontal: 131,
+                        // vertical: 18,
                       ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 7,
-                      children: [
-                        Container(
-                          width: 17.sp,
-                          height: 17.sp,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage("assets/images/googleimage.png"),
-                              fit: BoxFit.cover,
+                      decoration: ShapeDecoration(
+                        color: const Color(0xFF323232),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        spacing: 7,
+                        children: [
+                          Container(
+                            width: 17.sp,
+                            height: 17.sp,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(image: AssetImage("assets/images/googleimage.png"), fit: BoxFit.cover),
                             ),
                           ),
-                        ),
-                        Text(
-                          'Sign in using Google',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w700,
-                            height: 1.69,
-                            letterSpacing: -0.41,
+                          Text(
+                            'Sign in using Google',
+                            style: TextStyle(color: Colors.white, fontSize: 13.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 1.69, letterSpacing: -0.41),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
 
@@ -283,61 +245,55 @@ class _LoginViewState extends State<LoginView> {
                   Center(
                     child: Text(
                       'Forgot Password?',
-                      style: TextStyle(
-                        color: const Color(0xFF792A90),
-                        fontSize: 13,
-                        fontFamily: 'Satoshi',
-                        fontWeight: FontWeight.w700,
-                        height: 1.69,
-                      ),
+                      style: TextStyle(color: const Color(0xFF792A90), fontSize: 13, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 1.69),
                     ),
                   ),
                   20.sp.verticalSpace,
 
                   ValueListenableBuilder(
-                      valueListenable: formValidation,
-                      builder: (context,valid,_) {
+                    valueListenable: formValidation,
+                    builder: (context, valid, _) {
                       return AppButton(
                         text: 'Sign In',
                         textColor: Colors.white,
-                        color: valid?const Color(0xFF792A90):Color(0xFFB5B5B5),
+                        color: valid ? const Color(0xFF792A90) : Color(0xFFB5B5B5),
                         onTap: () async {
-                          if(!valid){
+                          if (!valid) {
                             return;
                           }
-                          String email=emailAddress.text.trim();
-                          String pass=password.text.trim();
-                          String refCode=referralCode.text.trim();
-                          String deviceName=DeviceUtils.getDeviceType();
-                          String deviceId=await DeviceUtils.getDeviceId()??"UNKNOWN_DEVICE_ID";
-                          try{
+                          String email = emailAddress.text.trim();
+                          String pass = password.text.trim();
+                          String refCode = referralCode.text.trim();
+                          String deviceName = DeviceUtils.getDeviceType();
+                          String deviceId = await DeviceUtils.getDeviceId() ?? "UNKNOWN_DEVICE_ID";
+                          try {
                             showOverlay(context);
                             await AuthService.getInstance().getSignInOtp(email: email, password: pass);
                             hideOverlay(context);
-                            OtpArgs otpArgs=OtpArgs(
-                                email: email,
-                                initialCallBack: ()async{
-                                  await AuthService.getInstance().getSignInOtp(email: email, password: pass);
-                                }
+                            OtpArgs otpArgs = OtpArgs(
+                              email: email,
+                              initialCallBack: () async {
+                                await AuthService.getInstance().getSignInOtp(email: email, password: pass);
+                              },
                             );
-                            String? input=await Navigate.awaitToNamed(context,name: AppRoutes.verifyview,args: otpArgs);
+                            String? input = await Navigate.awaitToNamed(context, name: AppRoutes.verifyview, args: otpArgs);
                             logger("Input: $input", runtimeType.toString());
-                            if(input==null){
+                            if (input == null) {
                               return;
                             }
                             showOverlay(context);
-                            String token=await AuthService.getInstance().signIn(email: email, password: pass, deviceId: deviceId, deviceName: deviceName,otp: input);
+                            String token = await AuthService.getInstance().signIn(email: email, password: pass, deviceId: deviceId, deviceName: deviceName, otp: input);
                             await SecureStorage.getInstance().saveAuthToken(token);
                             hideOverlay(context);
                             Navigate.go(context, name: AppRoutes.setupwalletview);
-                          }catch(e){
+                          } catch (e) {
                             hideOverlay(context);
                             showMySnackBar(context: context, message: e.toString(), type: SnackBarType.error);
                             return;
                           }
                         },
                       );
-                    }
+                    },
                   ),
                   10.sp.verticalSpace,
                 ],

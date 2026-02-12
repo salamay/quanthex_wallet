@@ -6,6 +6,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:quanthex/data/Models/wallets/wallet_model.dart';
+import 'package:quanthex/data/controllers/notification/notification_controller.dart';
 import 'package:quanthex/data/controllers/swap/swap_controller.dart';
 import 'package:quanthex/data/controllers/user/user_controller.dart';
 import 'package:quanthex/data/controllers/wallet_controller.dart';
@@ -44,6 +45,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   late AssetController assetController;
   late WalletController walletController;
   late BalanceController balanceController;
+  late NotificationController notificationController;
   late UserController userController;
   late SwapController swapController;
   AssetService assetService = AssetService.getInstance();
@@ -64,9 +66,11 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       if (!mounted) {
         return;
       }
+      await notificationController.getUnreadCount();
       _loadingNotifier.value = true;
       balanceLoadingNotifier.value = true;
-      bool isCacheEmpty = await AssetRepo.getInstance().isCacheAssetEmpty();
+      String walletAddress = walletController.currentWallet?.walletAddress ?? "";
+      bool isCacheEmpty = await AssetRepo.getInstance().isCacheAssetEmpty(walletAddress);
       bool isNew = isCacheEmpty ? true : false;
       logger("isNew: $isNew", runtimeType.toString());
       List<SupportedCoin> assets = await assetController.getAllAssets(isNew: isNew, assetService: assetService, walletController: walletController, swapController: swapController);
@@ -74,7 +78,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       await assetController.getAssetsQuotes(balanceController: balanceController, assets: assets);
       await getTokenBalances(context: context);
       if (isNew) {
-        await AssetRepo.getInstance().saveAssets(newTokens: assets);
+        await AssetRepo.getInstance().saveAssets(walletAddress: walletAddress, newTokens: assets);
       }
       userController.getProfile();
       _loadingNotifier.value = false;
@@ -121,6 +125,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     walletController = Provider.of<WalletController>(context, listen: false);
     userController = Provider.of<UserController>(context, listen: false);
     swapController = Provider.of<SwapController>(context, listen: false);
+    notificationController = Provider.of<NotificationController>(context, listen: false);
     WidgetsBinding.instance.addObserver(this);
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
       getData();
@@ -196,51 +201,49 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                   },
                 ),
                 Spacer(),
-                // IconButton(
-                //   icon: Container(
-                //     width: 41.sp,
-                //     height: 41.sp,
-                //     padding: const EdgeInsets.all(10),
-                //     decoration: ShapeDecoration(
-                //       color: const Color(0x7CDADADA),
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(20.50),
-                //       ),
-                //     ),
-                //     child: Image.asset(
-                //       'assets/images/scan_icon.png',
-                //       width: 19.sp,
-                //       height: 19.sp,
-                //     ),
-                //   ),
-                //   // Icon(
-                //   //   Icons.qr_code_scanner,
-                //   //   size: 24.sp,
-                //   //   color: const Color(0xFF2D2D2D),
-                //   // ),
-                //   onPressed: () {
-                //     Navigate.toNamed(context, name: '/qrscanview');
-                //   },
-                // ),
-                // IconButton(
-                //   icon: Container(
-                //     width: 41.sp,
-                //     height: 41.sp,
-                //     padding: const EdgeInsets.all(10),
-                //     decoration: ShapeDecoration(
-                //       color: const Color(0x7CDADADA),
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(20.50),
-                //       ),
-                //     ),
-                //     child: Image.asset(
-                //       'assets/images/noti_icon.png',
-                //       width: 19.sp,
-                //       height: 19.sp,
-                //     ),
-                //   ),
-                //   onPressed: () {},
-                // ),
+                Consumer<NotificationController>(
+                  builder: (context, notiCtr, child) {
+                    int unreadCount = notiCtr.unreadCount;
+
+                    return Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        IconButton(
+                          icon: Container(
+                            width: 41.sp,
+                            height: 41.sp,
+                            padding: const EdgeInsets.all(10),
+                            decoration: ShapeDecoration(
+                              color: const Color(0x7CDADADA),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.50)),
+                            ),
+                            child: Image.asset('assets/images/noti_icon.png', width: 19.sp, height: 19.sp),
+                          ),
+                          onPressed: () {
+                            Navigate.toNamed(context, name: AppRoutes.notificationlistview);
+                          },
+                        ),
+                        if (unreadCount > 0)
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: Container(
+                              width: 15.sp,
+                              height: 15.sp,
+                              padding: EdgeInsets.all(2.sp),
+                              decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                              child: Center(
+                                child: Text(
+                                  unreadCount.toString(),
+                                  style: TextStyle(color: Colors.white, fontSize: 10.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ],
             ),
             // Quanthex Image Banner
@@ -482,7 +485,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     List<SupportedCoin> tokens = assets.where((element) => element.coinType == CoinType.TOKEN).toList();
     List<SupportedCoin> nativeTokens = assets.where((element) => element.coinType == CoinType.NATIVE_TOKEN || element.coinType == CoinType.WRAPPED_TOKEN).toList();
     Map<String, CoinBalance> results = await balanceController.getTokenBalance(tokens);
-
+    assetController.populateAssetsByBalanceInFiat(results);
     await Future.wait(
       nativeTokens.map((e) async {
         int old = DateTime.now().second;
@@ -490,11 +493,14 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         int newTime = DateTime.now().second;
         logger("Time taken: ${newTime - old}", runtimeType.toString());
         CoinBalance? nativeBalance = await balanceController.getNativeCoinBalance(asset: e);
+        assetController.populateAssetsByBalanceInFiatNativeTokens(e.symbol, nativeBalance ?? CoinBalance(balanceInCrypto: 0, balanceInFiat: 0));
         results[e.symbol] = nativeBalance ?? CoinBalance(balanceInCrypto: 0, balanceInFiat: 0);
       }),
     );
+    assetController.sortAssetsByBalanceInFiat();
     balanceController.overallBalance = 0;
     balanceController.calculateTotalBalance(results);
+    //Sort the results by balanceInFiat in descending order
   }
 
   List<Color> _generateGradientFromAddress(String address) {
@@ -675,6 +681,11 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     try {
       await walletController.switchWallet(wallet);
       // Refresh data after switching wallet
+      _stopBalanceTimer();
+      _startBalanceTimer();
+      assetController.assets = [];
+      balanceController.balances = {};
+      balanceController.overallBalance = 0;
       await reload();
       if (mounted) {
         showMySnackBar(context: context, message: 'Wallet switched successfully', type: SnackBarType.success);

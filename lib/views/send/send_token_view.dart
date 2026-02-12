@@ -192,27 +192,35 @@ class _SendTokenViewState extends State<SendTokenView> {
                                 double? priceQuotes = bCtr.priceQuotes[_selectedCoin.symbol];
                                 return priceQuotes != null
                                     ? Expanded(
-                                        child: TextField(
-                                          controller: _amountController,
-                                          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 28.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                          textAlign: TextAlign.right,
-                                          decoration: InputDecoration(
-                                            hintText: '0',
-
-                                            hintStyle: TextStyle(color: const Color(0xFF9E9E9E), fontSize: 28.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                                            border: InputBorder.none,
-                                          ),
-                                          onChanged: (value) {
-                                            try {
-                                              double input = double.tryParse(value) ?? 0.0;
-                                              setState(() {
-                                                _amountInFiat = input * priceQuotes;
-                                              });
-                                            } catch (e) {
-                                              logger("Error parsing amount: $e", runtimeType.toString());
-                                            }
-                                          },
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Expanded(
+                                              child: TextField(
+                                                controller: _amountController,
+                                                style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 28.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                                                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                                textAlign: TextAlign.right,
+                                                decoration: InputDecoration(
+                                                  hintText: '0',
+                                              
+                                                  hintStyle: TextStyle(color: const Color(0xFF9E9E9E), fontSize: 28.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                                                  border: InputBorder.none,
+                                                ),
+                                                onChanged: (value) {
+                                                  try {
+                                                    double input = double.tryParse(value) ?? 0.0;
+                                                    setState(() {
+                                                      _amountInFiat = input * priceQuotes;
+                                                    });
+                                                  } catch (e) {
+                                                    logger("Error parsing amount: $e", runtimeType.toString());
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       )
                                     : const SizedBox();
@@ -240,43 +248,46 @@ class _SendTokenViewState extends State<SendTokenView> {
                     style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                   ),
                   10.sp.verticalSpace,
-                  Stack(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      AppTextfield(
-                        controller: _addressController,
-                        hintText: 'Enter your receiver\'s address',
-                        borderColor: _isAddressCorrect ? const Color(0xFF792A90) : const Color(0xFFE0E0E0),
-                        radius: 25,
-                        onChanged: _validateAddress,
-                        filledColor: _isAddressCorrect ? Colors.transparent : const Color(0xffF5F5F5),
-                        useFill: true,
+                      Expanded(
+                        flex: 8,
+                        child: AppTextfield(
+                          controller: _addressController,
+                          hintText: 'Enter your receiver\'s address',
+                          maxLines: 1,
+                          borderColor: _isAddressCorrect ? const Color(0xFF792A90) : const Color(0xFFE0E0E0),
+                          radius: 25,
+                          onChanged: _validateAddress,
+                          filledColor: _isAddressCorrect ? Colors.transparent : const Color(0xffF5F5F5),
+                          useFill: true,
+                        ),
                       ),
-                      // Positioned(
-                      //   right: 15.sp,
-                      //   top: 15.sp,
-                      //   child: GestureDetector(
-                      //     onTap: () async {
-                      //       // Simulate QR scan - in real app, open QR scanner
-                      //       final scanned = await Navigator.push(
-                      //         context,
-                      //         MaterialPageRoute(
-                      //           builder: (context) => const QRScanView(),
-                      //         ),
-                      //       );
-                      //       if (context.mounted &&
-                      //           scanned != null &&
-                      //           scanned is String) {
-                      //         _addressController.text = scanned;
-                      //         _validateAddress(scanned);
-                      //       }
-                      //     },
-                      //     child: Icon(
-                      //       Icons.qr_code_scanner,
-                      //       size: 24.sp,
-                      //       color: const Color(0xFF757575),
-                      //     ),
-                      //   ),
-                      // ),
+                      10.horizontalSpace,
+                      GestureDetector(
+                        onTap: () async {
+                          // Simulate QR scan - in real app, open QR scanner
+                          final scanned = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const QRScanView(),
+                            ),
+                          );
+                          if (context.mounted &&
+                              scanned != null &&
+                              scanned is String) {
+                            _addressController.text = scanned;
+                            _validateAddress(scanned);
+                          }
+                        },
+                        child: Icon(
+                          Icons.qr_code_scanner,
+                          size: 24.sp,
+                          color: const Color(0xFF757575),
+                        ),
+                      ),
                     ],
                   ),
                   if (_isAddressCorrect) ...[

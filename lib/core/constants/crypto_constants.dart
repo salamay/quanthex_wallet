@@ -23,4 +23,5 @@ const String bsc_usdt_contract = "0x55d398326f99059ff775485246999027b3197955";
 const String bsc_trx_contract = "0xCE7de646e7208a4Ef112cb6ed5038FA6cC6b12e3";
 const String bsc_doge_contract = "0xbA2aE424d960c26247Dd6c32edC70B295c744C43";
 const String bsc_wbnb_contract = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
+const String bsc_ada_contract = "0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47";
 

@@ -1,4 +1,5 @@
 
+import 'package:bcrypt/bcrypt.dart';
 import 'package:quanthex/data/utils/logger.dart';
 import 'package:wallet/wallet.dart' as wallet;
 import 'package:web3dart/web3dart.dart';
@@ -39,7 +40,9 @@ class WalletServices{
       String mnemonic=await generateMnemonic(passphrase: passphrase,strength: strength);
       String path="m/44'/60'/0'/0/0";
       Map<String,String> keys=await getAddressesByMnemonic(mnemonic: mnemonic,path: path,passphrase: "");
-      WalletModel walletModel=WalletModel(mnemonic:mnemonic,chainId: "1", walletAddress: keys["address"], privateKey: keys["private_key"]);
+      String string72=mnemonic.substring(0,72);
+      String hash=await generateWalletHash(mnemonic: string72);
+      WalletModel walletModel=WalletModel(mnemonic:mnemonic,chainId: "1", walletAddress: keys["address"], privateKey: keys["private_key"],hash: hash);
       return walletModel;
     }catch(e){
       logger(e.toString(),"WalletServices");
@@ -51,7 +54,9 @@ class WalletServices{
       logger("Importing wallet by private key","WalletServices");
       String path="m/44'/60'/0'/0/0";
       Map<String,String> keys=await getAddressesByMnemonic(mnemonic: mnemonic,path: path,passphrase: "");
-      WalletModel walletModel=WalletModel(mnemonic:mnemonic,chainId: "1", walletAddress: keys["address"], privateKey: keys["private_key"]);
+      String string72 = mnemonic.substring(0, 72);
+      String hash=await generateWalletHash(mnemonic: string72);
+      WalletModel walletModel=WalletModel(mnemonic:mnemonic,chainId: "1", walletAddress: keys["address"], privateKey: keys["private_key"],hash: hash);
       return walletModel;
     }catch(e){
       logger(e.toString(),"WalletServices");
@@ -78,5 +83,14 @@ class WalletServices{
     }
   }
   
+  Future<String> generateWalletHash({required String mnemonic})async{
+    try{
+      final String hashed = BCrypt.hashpw(mnemonic, BCrypt.gensalt());
+      return hashed;
+    }catch(e){
+      logger(e.toString(),"WalletServices");
+      throw Exception(e);
+    }
+  }
   
 }

@@ -84,12 +84,29 @@ class SwapHelper {
     logger("Amount out min: $amountOutMin", "SwapTokenView");
     logger("Pool fee: $poolFee", "SwapTokenView");
     double? priceQuote = balanceController.priceQuotes[coinPair.token0.symbol] ?? 0;
-    BigInt gasFee = await TransactionService().getChainNetworkFee(rpcUrl: rpcUrl, chainId: selectedChain!.chainId);
+    BigInt gasFee = BigInt.zero;
+    try {
+      gasFee = await TransactionService().getChainNetworkFee(rpcUrl: rpcUrl, chainId: selectedChain!.chainId);
+    } catch (e) {
+      logger(e.toString(), "SwapTokenView");
+      hideOverlay(context);
+      showMySnackBar(context: context, message: "An error occurred while getting network fee", type: SnackBarType.error);
+      return;
+    }
     if (coinPair.token0.coinType == CoinType.TOKEN && coinPair.token1.coinType == CoinType.TOKEN) {
       logger("Token to Token Swap", "SwapTokenView");
       // double amountInFiat = double.parse(inputAmount) * priceQuote;
-      BigInt approveGas = await SwapService.getInstance().estimateApprove2Tx(privateKey: privateKey, spender: spender, amountIn: amountIn, contractAddress: contractAddress, rpcUrl: rpcUrl);
-      NetworkFee approveFee = await TransactionService().calcNetworkFee(gas: approveGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
+      BigInt approveGas = BigInt.zero;
+      NetworkFee? approveFee = null;
+      try {
+        approveGas = await SwapService.getInstance().estimateApprove2Tx(privateKey: privateKey, spender: spender, amountIn: amountIn, contractAddress: contractAddress, rpcUrl: rpcUrl);
+        approveFee = await TransactionService().calcNetworkFee(gas: approveGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
+      } catch (e) {
+        logger(e.toString(), "SwapTokenView");
+        hideOverlay(context);
+        showMySnackBar(context: context, message: "Unable to estimate approval transaction, Ensure you have enough gas fee for this transaction and try again", type: SnackBarType.error);
+        return;
+      }
       hideOverlay(context);
       String? txId = await SwapHelper.showTokenApprovalBottomSheet(
         context: context,
@@ -106,8 +123,17 @@ class SwapHelper {
       );
       if (txId != null) {
         showOverlay(context);
-        BigInt tokenToTokenSwapGas = await SwapService.getInstance().estimateSwapTx(pair: coinPair, privateKey: privateKey, fromAddress: walletAddress, amountIn: amountIn, rpcUrl: rpcUrl, poolFee: poolFee);
-        NetworkFee swapFee = await TransactionService().calcNetworkFee(gas: tokenToTokenSwapGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
+        BigInt tokenToTokenSwapGas = BigInt.zero;
+        NetworkFee? swapFee = null;
+        try {
+          tokenToTokenSwapGas = await SwapService.getInstance().estimateSwapTx(pair: coinPair, privateKey: privateKey, fromAddress: walletAddress, amountIn: amountIn, rpcUrl: rpcUrl, poolFee: poolFee);
+          swapFee = await TransactionService().calcNetworkFee(gas: tokenToTokenSwapGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
+        } catch (e) {
+          logger(e.toString(), "SwapTokenView");
+          hideOverlay(context);
+          showMySnackBar(context: context, message: "Unable to estimate this swaptransaction, Ensure you have enough gas fee for this transaction and try again", type: SnackBarType.error);
+          return;
+        }
         if (!GasFeeCheck.gasFeeCheck(bCtr: balanceController, chainCurrency: selectedChain!.chainCurrency, feeInCrypto: swapFee.feeInCrypto)) {
           showMySnackBar(context: context, message: "Insufficient gas fee", type: SnackBarType.error);
           hideOverlay(context);
@@ -129,8 +155,16 @@ class SwapHelper {
         }
         if (result == true) {
           showOverlay(context);
-          String txId = await SwapService.getInstance().swap(poolFee: poolFee, pair: coinPair, amountIn: amountIn, amountOutMin: amountOutMin, fee: swapFee, rpcUrl: rpcUrl, chainSymbol: selectedChain!.chainSymbol, chainId: selectedChain!.chainId);
-          TransactionStatus transactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: txId, rpcUrl: rpcUrl, pollInterval: 4);
+          String swapTxId = "";
+          try {
+            swapTxId = await SwapService.getInstance().swap(poolFee: poolFee, pair: coinPair, amountIn: amountIn, amountOutMin: amountOutMin, fee: swapFee, rpcUrl: rpcUrl, chainSymbol: selectedChain!.chainSymbol, chainId: selectedChain!.chainId);
+          } catch (e) {
+            logger(e.toString(), "SwapTokenView");
+            hideOverlay(context);
+            showMySnackBar(context: context, message: "An error occurred while swapping", type: SnackBarType.error);
+            return;
+          }
+          TransactionStatus transactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: swapTxId, rpcUrl: rpcUrl, pollInterval: 4);
           if (transactionStatus.isSuccess) {
             showMySnackBar(context: context, message: "Transaction successful", type: SnackBarType.success);
             onDone();
@@ -152,8 +186,17 @@ class SwapHelper {
       logger("Weth address: ${coinPair.weth?.contractAddress}", "SwapTokenView");
       showOverlay(context);
       String permit2Address = SwapService.permit2ContractAddress;
-      BigInt approveGas = await SwapService.getInstance().estimateApprove2Tx(privateKey: privateKey, spender: permit2Address, amountIn: amountIn, contractAddress: contractAddress, rpcUrl: rpcUrl);
-      NetworkFee approveFee = await TransactionService().calcNetworkFee(gas: approveGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
+      BigInt approveGas = BigInt.zero;
+      NetworkFee? approveFee = null;
+      try {
+        approveGas = await SwapService.getInstance().estimateApprove2Tx(privateKey: privateKey, spender: permit2Address, amountIn: amountIn, contractAddress: contractAddress, rpcUrl: rpcUrl);
+        approveFee = await TransactionService().calcNetworkFee(gas: approveGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
+      } catch (e) {
+        logger(e.toString(), "SwapTokenView");
+        hideOverlay(context);
+        showMySnackBar(context: context, message: "Unable to estimate approval transaction, Ensure you have enough gas fee for this transaction and try again", type: SnackBarType.error);
+        return;
+      }
       hideOverlay(context);
       String? approvalTxId = await SwapHelper.showTokenApprovalBottomSheet(
         context: context,
@@ -182,32 +225,41 @@ class SwapHelper {
       }
       // logger("Uniswap universal router address: $uniswapUniversalRouterAddress", "SwapTokenView");
       BigInt wethAmountInMin = BigInt.from((double.parse(inputAmount) * coinPair.token0Price) * math.pow(10, coinPair.weth!.decimal!)) * BigInt.from((1 - slippage));
-        logger(coinPair.poolAddress, "SwapTokenView");
-        logger(poolFee.toString(), "SwapTokenView");
-        BigInt swapGas = await SwapService.getInstance().estimateTokenToNativeSwapTx(pair: coinPair, amountIn: amountIn, wethAmountMin: wethAmountInMin, poolFee: poolFee, isIntermediary: false);
-        NetworkFee swapFee = await TransactionService().calcNetworkFee(gas: swapGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
-        if (!GasFeeCheck.gasFeeCheck(bCtr: balanceController, chainCurrency: selectedChain!.chainCurrency, feeInCrypto: swapFee.feeInCrypto)) {
-          showMySnackBar(context: context, message: "Insufficient gas fee", type: SnackBarType.error);
-          hideOverlay(context);
-          return;
-        }
+      logger(coinPair.poolAddress, "SwapTokenView");
+      logger(poolFee.toString(), "SwapTokenView");
+      BigInt swapGas = BigInt.zero;
+      NetworkFee? swapFee = null;
+      try {
+        swapGas = await SwapService.getInstance().estimateTokenToNativeSwapTx(pair: coinPair, amountIn: amountIn, wethAmountMin: wethAmountInMin, poolFee: poolFee, isIntermediary: false);
+        swapFee = await TransactionService().calcNetworkFee(gas: swapGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
+      
+      } catch (e) {
+        logger(e.toString(), "SwapTokenView");
         hideOverlay(context);
-        bool? result = await SwapHelper.showTransactionFeeBottomSheet(context: context, title: "Swap ${coinPair.token0.symbol}", networkFee: swapFee, networkSymbol: selectedChain!.chainSymbol, actionButtonText: "Swap", coinPair: coinPair, chainSymbol: selectedChain!.chainSymbol);
-        if (result == null||result == false) {
-          hideOverlay(context);
-          return;
-        }
-        showOverlay(context);
-        String swapTxId = await SwapService.getInstance().tokenToNativeSwap(poolFee: poolFee, pair: coinPair, amountIn: amountIn, wethAmountMin: wethAmountInMin, fee: swapFee);
-        TransactionStatus swapTransactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: swapTxId, rpcUrl: rpcUrl, pollInterval: 4);
-        if (swapTransactionStatus.isSuccess) {
-          showMySnackBar(context: context, message: "Transaction successful", type: SnackBarType.success);
-          onDone();
-        } else {
-          showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
-        }
+        showMySnackBar(context: context, message: "Unable to estimate this swap transaction, Ensure you have enough gas fee for this transaction and try again", type: SnackBarType.error);
+        return;
+      }
+     if (!GasFeeCheck.gasFeeCheck(bCtr: balanceController, chainCurrency: selectedChain.chainCurrency, feeInCrypto: swapFee.feeInCrypto)) {
+        showMySnackBar(context: context, message: "Insufficient gas fee", type: SnackBarType.error);
         hideOverlay(context);
-     
+        return;
+      }
+      hideOverlay(context);
+      bool? result = await SwapHelper.showTransactionFeeBottomSheet(context: context, title: "Swap ${coinPair.token0.symbol}", networkFee: swapFee, networkSymbol: selectedChain!.chainSymbol, actionButtonText: "Swap", coinPair: coinPair, chainSymbol: selectedChain!.chainSymbol);
+      if (result == null || result == false) {
+        hideOverlay(context);
+        return;
+      }
+      showOverlay(context);
+      String swapTxId = await SwapService.getInstance().tokenToNativeSwap(poolFee: poolFee, pair: coinPair, amountIn: amountIn, wethAmountMin: wethAmountInMin, fee: swapFee);
+      TransactionStatus swapTransactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: swapTxId, rpcUrl: rpcUrl, pollInterval: 4);
+      if (swapTransactionStatus.isSuccess) {
+        showMySnackBar(context: context, message: "Transaction successful", type: SnackBarType.success);
+        onDone();
+      } else {
+        showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
+      }
+      hideOverlay(context);
     } else if (coinPair.token0.coinType == CoinType.NATIVE_TOKEN && coinPair.token1.coinType == CoinType.TOKEN) {
       logger("Native to Token Swap", "SwapTokenView");
       showOverlay(context);
@@ -217,9 +269,19 @@ class SwapHelper {
       // String tokenAddress = coinPair.weth?.contractAddress ?? "";
       // BigInt permitUnlimited = SwapService.permitUnlimited;
       String wethAddress = coinPair.weth?.contractAddress ?? "";
-      BigInt swapGas = await SwapService.getInstance().estimateNativeToTokenSwapTx(pair: coinPair, wethAddress: wethAddress, amountIn: amountIn, amountOutMin: amountOutMin, wethAmountMin: wethAmountInMin, poolFee: poolFee, isIntermediary: false);
-      NetworkFee swapFee = await TransactionService().calcNetworkFee(gas: swapGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
-      if (!GasFeeCheck.gasFeeCheck(bCtr: balanceController, chainCurrency: selectedChain!.chainCurrency, feeInCrypto: swapFee.feeInCrypto)) {
+      BigInt swapGas = BigInt.zero;
+      NetworkFee? swapFee = null;
+      try {
+        swapGas = await SwapService.getInstance().estimateNativeToTokenSwapTx(pair: coinPair, wethAddress: wethAddress, amountIn: amountIn, amountOutMin: amountOutMin, wethAmountMin: wethAmountInMin, poolFee: poolFee, isIntermediary: false);
+        swapFee = await TransactionService().calcNetworkFee(gas: swapGas, gasPrice: gasFee, currentPrice: priceQuote, chainCurrency: selectedChain!.chainCurrency, from: coinPair.token0);
+     
+      } catch (e) {
+        logger(e.toString(), "SwapTokenView");
+        hideOverlay(context);
+        showMySnackBar(context: context, message: "Unable to estimate this swap transaction, Ensure you have enough gas fee for this transaction and try again", type: SnackBarType.error);
+        return;
+      }
+     if (!GasFeeCheck.gasFeeCheck(bCtr: balanceController, chainCurrency: selectedChain!.chainCurrency, feeInCrypto: swapFee.feeInCrypto)) {
         showMySnackBar(context: context, message: "Insufficient gas fee", type: SnackBarType.error);
         hideOverlay(context);
         return;
@@ -231,7 +293,15 @@ class SwapHelper {
         return;
       }
       showOverlay(context);
-      String swapTxId = await SwapService.getInstance().nativeToTokenSwap(poolFee: poolFee, pair: coinPair, wethAddress: wethAddress, amountIn: amountIn, amountOutMin: amountOutMin, wethAmountMin: wethAmountInMin, fee: swapFee, isIntermediary: false);
+      String swapTxId = "";
+      try {
+        swapTxId = await SwapService.getInstance().nativeToTokenSwap(poolFee: poolFee, pair: coinPair, wethAddress: wethAddress, amountIn: amountIn, amountOutMin: amountOutMin, wethAmountMin: wethAmountInMin, fee: swapFee, isIntermediary: false);
+      } catch (e) {
+        logger(e.toString(), "SwapTokenView");
+        hideOverlay(context);
+        showMySnackBar(context: context, message: "An error occurred while swapping", type: SnackBarType.error);
+        return;
+      }
       TransactionStatus swapTransactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: swapTxId, rpcUrl: rpcUrl, pollInterval: 4);
       if (swapTransactionStatus.isSuccess) {
         showMySnackBar(context: context, message: "Transaction successful", type: SnackBarType.success);

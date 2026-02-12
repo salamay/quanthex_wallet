@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:quanthex/data/controllers/assets/asset_controller.dart';
 import 'package:quanthex/data/controllers/balance/balance_controller.dart';
 import 'package:quanthex/data/controllers/home/home_controller.dart';
+import 'package:quanthex/data/controllers/mining/mining_controller.dart';
+import 'package:quanthex/data/controllers/notification/notification_controller.dart';
+import 'package:quanthex/data/controllers/user/user_controller.dart';
 import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/repository/my_local_storage.dart';
 import 'package:quanthex/data/repository/secure_storage.dart';
@@ -233,7 +236,11 @@ class SettingsView extends StatelessWidget {
       Provider.of<AssetController>(context, listen: false).clear();
       Provider.of<BalanceController>(context, listen: false).clear();
       Provider.of<HomeController>(context, listen: false).clear();
+      Provider.of<UserController>(context, listen: false).clear();
+      Provider.of<NotificationController>(context, listen: false).clear();
+      Provider.of<MiningController>(context, listen: false).clear();
       AuthService.getInstance().authToken = "";
+      
       Navigate.go(context, name: AppRoutes.landingview);
     } catch (e) {
       logger("Error logging out", runtimeType.toString());

@@ -12,7 +12,6 @@ class AssetRepo {
   AssetRepo._internal();
 
   static FlutterSecureStorage? _storage;
-  static const assets_keys = 'assets_keys_';
 
   static AssetRepo getInstance() {
     if (_instance == null) {
@@ -26,11 +25,11 @@ class AssetRepo {
     return _instance!;
   }
 
-  Future<void> saveAssets({required List<SupportedCoin> newTokens}) async {
+  Future<void> saveAssets({required String walletAddress,required List<SupportedCoin> newTokens}) async {
     log("Saving scanned asset ");
     // newTokens.removeWhere((e)=>e.coinType==CoinType.NATIVE_TOKEN);
     try {
-      List<SupportedCoin> cachedAssets = await getScannedAssets();
+      List<SupportedCoin> cachedAssets = await getScannedAssets(walletAddress);
       if (cachedAssets.isNotEmpty) {
         for (SupportedCoin token in newTokens) {
           if (token.coinType == CoinType.NATIVE_TOKEN) {
@@ -54,16 +53,16 @@ class AssetRepo {
         cachedAssets = newTokens;
       }
       List<Map<String, dynamic>> data = cachedAssets.map((e) => e.toJson()).toList();
-      await _storage!.write(key: assets_keys, value: json.encode(data));
+      await _storage!.write(key: walletAddress, value: json.encode(data));
     } catch (e) {
       log("Error saving scanned asset: $e");
     }
   }
 
-  Future<List<SupportedCoin>> getScannedAssets() async {
+  Future<List<SupportedCoin>> getScannedAssets(String walletAddress) async {
     log("Getting coins from local storage ");
     try {
-      String? data = await _storage!.read(key: assets_keys);
+      String? data = await _storage!.read(key: walletAddress);
       if (data == null) {
         return [];
       }
@@ -79,8 +78,8 @@ class AssetRepo {
     }
   }
 
-  Future<bool> isCacheAssetEmpty() async {
-    List<SupportedCoin> scannedToken = await getScannedAssets();
+  Future<bool> isCacheAssetEmpty(String walletAddress) async {
+    List<SupportedCoin> scannedToken = await getScannedAssets(walletAddress);
     log("Cache assets: ${scannedToken.length}");
     if (scannedToken.isNotEmpty) {
       return false;

@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/widgets/app_button.dart';
+import 'package:quanthex/widgets/loading_overlay/loading.dart';
 
 class QRScanView extends StatefulWidget {
   const QRScanView({super.key});
@@ -11,10 +16,53 @@ class QRScanView extends StatefulWidget {
   State<QRScanView> createState() => _QRScanViewState();
 }
 
-class _QRScanViewState extends State<QRScanView> {
+class _QRScanViewState extends State<QRScanView> with WidgetsBindingObserver {
   String? _scannedAddress;
   bool _isScanning = true;
+final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  late MobileScannerController cameraController;
+    ValueNotifier<bool> isScanned = ValueNotifier(false);
 
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    cameraController = MobileScannerController();
+    super.initState();
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    // If the controller is not ready, do not try to start or stop it.
+    // Permission dialogs can trigger lifecycle changes before the controller is ready.
+
+    switch (state) {
+      case AppLifecycleState.detached:
+        unawaited(cameraController.stop());
+
+      case AppLifecycleState.hidden:
+        unawaited(cameraController.stop());
+      case AppLifecycleState.paused:
+        unawaited(cameraController.stop());
+        return;
+      case AppLifecycleState.resumed:
+        unawaited(cameraController.start());
+        return;
+      case AppLifecycleState.inactive:
+        unawaited(cameraController.stop());
+        return;
+    }
+  }
+
+
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    cameraController.dispose();
+    super.dispose();
+  }
+
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,6 +120,7 @@ class _QRScanViewState extends State<QRScanView> {
                       ],
                     ),
                   ),
+                  
                   // Scanner View
                   Expanded(
                     child: Container(
@@ -80,6 +129,7 @@ class _QRScanViewState extends State<QRScanView> {
                         alignment: Alignment.center,
                         children: [
                           // Scanning Frame
+                          
                           Container(
                             width: 250.sp,
                             height: 250.sp,
@@ -90,6 +140,14 @@ class _QRScanViewState extends State<QRScanView> {
                             child: Stack(
                               children: [
                                 // Corner indicators
+                                MobileScanner(
+                                  controller: cameraController,
+                                  fit: BoxFit.cover,
+                                  onDetect: _handleBarcode,
+                                  placeholderBuilder: (context) {
+                                    return Center(child: Loading(size: 40));
+                                  },
+                                ),
                                 Positioned(
                                   top: 0,
                                   left: 0,
@@ -182,25 +240,7 @@ class _QRScanViewState extends State<QRScanView> {
                                     ),
                                   ),
                                 ),
-
-                                // Scanning line
-                                if (_isScanning)
-                                  Positioned(
-                                    top: 20,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      height: 2,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            const Color(0xFF792A90),
-                                            const Color(0xFFAA45C7),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                
                               ],
                             ),
                           ),
@@ -211,154 +251,19 @@ class _QRScanViewState extends State<QRScanView> {
                 ],
               ),
               // Bottom Sheet
-              if (_scannedAddress != null)
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(24),
-                      ),
-                    ),
-                    padding: EdgeInsets.all(24.sp),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 40.sp,
-                          height: 4.sp,
-                          margin: EdgeInsets.only(bottom: 20.sp),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE0E0E0),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                        Text(
-                          'Scanned Crypto Wallet',
-                          style: TextStyle(
-                            color: const Color(0xFF757575),
-                            fontSize: 14.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        15.sp.verticalSpace,
-                        Text(
-                          _scannedAddress!,
-                          style: TextStyle(
-                            color: const Color(0xFF2D2D2D),
-                            fontSize: 18.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        30.sp.verticalSpace,
-                        Row(
-                          children: [
-                            Expanded(
-                               child: AppButton(
-                                 text: 'Confirm',
-                                 textColor: Colors.white,
-                                 color: const Color(0xFF792A90),
-                                 padding: EdgeInsets.all(5),
- 
-                                 onTap: () {
-                                   // Handle confirm - return scanned address
-                                   Navigator.pop(context, _scannedAddress);
-                                 },
-                               ),
-                            ),
-                            15.horizontalSpace,
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Clipboard.setData(
-                                    ClipboardData(text: _scannedAddress!),
-                                  );
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Address copied')),
-                                  );
-                                },
-                                child: Container(
-                                  height: 50.sp,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF9E6FF),
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.copy,
-                                        size: 18.sp,
-                                        color: const Color(0xFF792A90),
-                                      ),
-                                      8.horizontalSpace,
-                                      Text(
-                                        'Copy',
-                                        style: TextStyle(
-                                          color: const Color(0xFF792A90),
-                                          fontSize: 15.sp,
-                                          fontFamily: 'Satoshi',
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        20.sp.verticalSpace,
-                      ],
-                    ),
-                  ),
-                )
-              else
-                // Simulate scan button
-                Positioned(
-                  bottom: 40.sp,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        // Simulate scanning
-                        setState(() {
-                          _scannedAddress = '0x352hhxj3.....hds67';
-                          _isScanning = false;
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 30.sp,
-                          vertical: 12.sp,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF792A90),
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Text(
-                          'Scan QR Code',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
       ),
     );
+  }
+    void _handleBarcode(BarcodeCapture code) {
+    // Do something with the barcode data.
+    final data = code.barcodes.last.displayValue;
+    logger(data.toString(), 'MyScanner');
+    if (!isScanned.value) {
+      Navigator.pop(context, data);
+    }
+    isScanned.value = true;
   }
 }

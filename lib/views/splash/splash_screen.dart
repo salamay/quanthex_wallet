@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:quanthex/data/services/auth/auth_service.dart';
 import 'package:quanthex/data/utils/home_nav_resolver.dart';
 
 import '../../routes/app_routes.dart';
@@ -20,6 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     SchedulerBinding.instance.addPostFrameCallback((e)async{
+      await AuthService.getInstance().initializeGoogleSignIn();
       Timer(const Duration(seconds: 2), () {
         HomeNavResolver.resolveHomeRoute(context);
       });

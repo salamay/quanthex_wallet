@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +13,7 @@ import 'package:quanthex/data/Models/send/send_payload.dart';
 import 'package:quanthex/data/Models/swap/model/coin_pair.dart';
 import 'package:quanthex/data/controllers/assets/asset_controller.dart';
 import 'package:quanthex/data/controllers/balance/balance_controller.dart';
+import 'package:quanthex/data/controllers/home/home_controller.dart';
 import 'package:quanthex/data/controllers/swap/swap_controller.dart';
 import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/services/swap/swap_service.dart';
@@ -47,11 +50,15 @@ class SwapTokenView extends StatefulWidget {
 class _SwapTokenViewState extends State<SwapTokenView> {
   final String _fromToken = 'ETH';
   String _toToken = '';
+  bool isLoadingQuotes = false;
+  Timer? _quotesRefreshTimer;
+  final Duration _quotesRefreshInterval = Duration(seconds: 10);
 
   late SwapController swapController;
   late AssetController assetController;
   late WalletController walletController;
   late BalanceController balanceController;
+  late HomeController homeController;
   ValueNotifier<SupportedCoin?> fromNotifier = ValueNotifier(null);
   ValueNotifier<SupportedCoin?> toNotifier = ValueNotifier(null);
   ValueNotifier<CoinPair?> coinPairNotifier = ValueNotifier(null);
@@ -76,11 +83,51 @@ class _SwapTokenViewState extends State<SwapTokenView> {
     assetController = Provider.of<AssetController>(context, listen: false);
     walletController = Provider.of<WalletController>(context, listen: false);
     balanceController = Provider.of<BalanceController>(context, listen: false);
+    homeController = Provider.of<HomeController>(context, listen: false);
     // Set default chain
     selectedChain = chain_bsc;
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
       getData(false);
+      _startQuotesRefreshTimer();
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _stopQuotesRefreshTimer();
+    super.dispose();
+  }
+  void _stopQuotesRefreshTimer() {
+    _quotesRefreshTimer?.cancel();
+  }
+
+  void _startQuotesRefreshTimer() {
+    _quotesRefreshTimer?.cancel();
+    _quotesRefreshTimer = Timer.periodic(_quotesRefreshInterval, (timer) async {
+      if (!mounted) {
+        return;
+      }
+      try {
+        if (homeController.index == 1) {
+          isLoadingQuotes = true;
+          logger("Refreshing quotes", "SwapTokenView");
+
+          setState(() {});
+          await balanceController.getTokenQuotes(tokens: swapController.tokens);
+          isLoadingQuotes = false;  setState(() {});
+        } else {
+          logger("Not in swap view, skipping quotes refresh", "SwapTokenView");
+          isLoadingQuotes = false;
+          setState(() {});
+          }
+        } catch (e) {
+          isLoadingQuotes = false;
+          setState(() {});
+          logger(e.toString(), "SwapTokenView");
+        }
+      },
+    );
   }
 
   void getData(bool showError) async {
@@ -205,11 +252,8 @@ class _SwapTokenViewState extends State<SwapTokenView> {
     }
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
-    
     return GestureDetector(
       onTap: () {
         fromFocusNode.unfocus();
@@ -523,8 +567,8 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                             // Swap Details
                             ValueListenableBuilder(
                               valueListenable: errorNotifier,
-                              builder: (context,isError,_) {
-                                if(isError) {
+                              builder: (context, isError, _) {
+                                if (isError) {
                                   return GestureDetector(
                                     onTap: () {
                                       getRoute(context, true);
@@ -549,7 +593,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                         } else if (coinPair == null && poolLoading == true) {
                                           return Loading(size: 20.sp);
                                         } else {
-                                          if(coinPair == null) {
+                                          if (coinPair == null) {
                                             return const SizedBox();
                                           }
                                           return Skeletonizer(
@@ -564,7 +608,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                                 String token1Price = coinPair.token1Price.toString();
                                                 String swapRate = '1 $token0Symbol = ${MyCurrencyUtils.format(double.parse(token0Price), coinPair.token1.coinType == CoinType.TOKEN ? 6 : 6)} $token1Symbol';
                                                 String estimatedReceive = toAmountController.text.trim().isEmpty ? '0.00' : toAmountController.text.trim();
-                                                return Column(
+                                                return isLoadingQuotes ? Loading(size: 20.sp) : Column(
                                                   children: [
                                                     SwapDetails(label: 'Swap Rate', value: swapRate),
                                                     // Divider(height: 20.sp),
@@ -625,7 +669,6 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                                             color: const Color(0xFF792A90),
                                                             onTap: () async {
                                                               if (formKey.currentState!.validate()) {
-                                                                try {
                                                                   if (toAmountController.text.trim().isEmpty) {
                                                                     showMySnackBar(context: context, message: 'Please enter an amount', type: SnackBarType.error);
                                                                     return;
@@ -647,11 +690,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                                                     },
                                                                   );
                                                                   hideOverlay(context);
-                                                                } catch (e) {
-                                                                  logger(e.toString(), "SwapTokenView");
-                                                                  hideOverlay(context);
-                                                                  showMySnackBar(context: context, message: "An error occurred while swapping", type: SnackBarType.error);
-                                                                }
+                                                                
                                                               }
                                                             },
                                                           )
@@ -663,12 +702,11 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                             ),
                                           );
                                         }
-                                        
                                       },
                                     );
                                   },
                                 );
-                              }
+                              },
                             ),
                           ],
                         ),
@@ -753,10 +791,9 @@ class _SwapTokenViewState extends State<SwapTokenView> {
           SupportedCoin wethToken = wethTokens.first;
           coinPair = await swapController.getPool(chainSymbol: selectedChain!.chainSymbol, token0: wethToken, token1: token1);
           if (coinPair == null) {
-             poolLoadingNotifier.value = false;
+            poolLoadingNotifier.value = false;
             coinPairNotifier.value = null;
             if (showError) {
-             
               showMySnackBar(context: context, message: 'Pool not found, no route found for this pair', type: SnackBarType.error);
             }
             return;

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:quanthex/core/constants/crypto_constants.dart' show bsc, bsc_doge_contract, eth, pol, polygon_doge_contract, polygon_orio_contract;
+import 'package:quanthex/core/constants/crypto_constants.dart' show bsc, bsc_doge_contract, eth, pol, polygon_doge_contract, polygon_orio_contract, bsc_ada_contract;
 import 'package:quanthex/core/constants/network_constants.dart';
 import 'package:quanthex/data/Models/assets/network_model.dart';
 import 'package:quanthex/data/Models/assets/scan_token.dart';
@@ -13,9 +13,9 @@ import 'package:quanthex/data/utils/logger.dart';
 
 class SwapController extends ChangeNotifier {
   Map<String, String> chainLink = {
-    eth: "https://gateway.thegraph.com/api/249d2390c3de6e6417f4de6073355531/subgraphs/id/5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
-    bsc: "https://gateway.thegraph.com/api/249d2390c3de6e6417f4de6073355531/subgraphs/id/F85MNzUGYqgSHSHRGgeVMNsdnW1KtZSVgFULumXRZTw2",
-    pol: "https://gateway.thegraph.com/api/249d2390c3de6e6417f4de6073355531/subgraphs/id/HMcqgvDY6f4MpnRSJqUUsBPHePj8Hq3AxiDBfDUrWs15",
+    eth: "https://gateway.thegraph.com/api/7e8b89f52322d9cdf2d03b3c2d135400/subgraphs/id/5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
+    bsc: "https://gateway.thegraph.com/api/7e8b89f52322d9cdf2d03b3c2d135400/subgraphs/id/F85MNzUGYqgSHSHRGgeVMNsdnW1KtZSVgFULumXRZTw2",
+    pol: "https://gateway.thegraph.com/api/7e8b89f52322d9cdf2d03b3c2d135400/subgraphs/id/HMcqgvDY6f4MpnRSJqUUsBPHePj8Hq3AxiDBfDUrWs15",
   };
   List<SupportedCoin> tokens = [];
   Map<String, String> tokenImages = {};
@@ -65,8 +65,9 @@ class SwapController extends ChangeNotifier {
         if (network.chainSymbol == bsc) {
           addresses = addresses.take(20).toList();
           addresses.add(bsc_doge_contract);
+          addresses.add(bsc_ada_contract);
         } else if (network.chainSymbol == pol) {
-          // addresses.add(polygon_orio_contract);
+          addresses.add(polygon_orio_contract);
           addresses.add(polygon_doge_contract);
         } else if (network.chainSymbol == eth) {}
       }
@@ -138,7 +139,7 @@ class SwapController extends ChangeNotifier {
     Pool pool = poolData.pools!.first;
     if (token0.symbol == pool.token0?.symbol?.toUpperCase() && token1.symbol == pool.token1?.symbol?.toUpperCase()) {
       logger("Normal pool", runtimeType.toString());
-       return CoinPair(
+      return CoinPair(
         token0: token0,
         token1: token1,
         fee: double.parse(pool.feeTier!),
@@ -156,7 +157,7 @@ class SwapController extends ChangeNotifier {
       );
     } else {
       logger("Inverse pool", runtimeType.toString());
-       return CoinPair(
+      return CoinPair(
         token0: token1,
         token1: token0,
         fee: double.parse(pool.feeTier!),
@@ -172,6 +173,5 @@ class SwapController extends ChangeNotifier {
         intermediaryPoolFee: BigInt.zero,
       );
     }
-   
   }
 }

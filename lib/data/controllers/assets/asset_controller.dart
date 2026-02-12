@@ -3,6 +3,7 @@ import 'package:quanthex/core/constants/network_constants.dart';
 import 'package:quanthex/data/Models/assets/scan_token.dart';
 import 'package:quanthex/data/Models/assets/supported_assets.dart';
 import 'package:coingecko_api/data/coin.dart' as coingecko_coin;
+import 'package:quanthex/data/Models/balance/CoinBalance.dart';
 import 'package:quanthex/data/Models/transactions/erc20_transfer_dto.dart';
 import 'package:quanthex/data/Models/transactions/native_tx_dto.dart';
 import 'package:quanthex/data/controllers/swap/swap_controller.dart';
@@ -23,6 +24,40 @@ class AssetController extends ChangeNotifier {
   Map<String, coingecko_coin.Coin> tokenMetadatas = {};
   Map<String, List<Erc20TransferDto>> erc20Transfers = {};
   Map<String, List<NativeTxDto>> nativeTransfers = {};
+
+  void populateAssetsByBalanceInFiat(Map<String, CoinBalance> results) {
+    results.forEach((key, value) {
+      int index = assets.indexWhere((element) {
+        if(element.coinType == CoinType.TOKEN||element.coinType == CoinType.WRAPPED_TOKEN){
+          return element.contractAddress == key;
+        }
+        return false;
+      });
+      if (index != -1) {
+        SupportedCoin asset = assets[index];
+        asset.balanceInFiat = value.balanceInFiat;
+        asset.balanceInCrypto = value.balanceInCrypto;
+        assets[index] = asset;
+      }
+    });
+    notifyListeners();
+  }
+
+  void populateAssetsByBalanceInFiatNativeTokens(String symbol, CoinBalance balance) {
+    int index = assets.indexWhere((element) => element.coinType == CoinType.NATIVE_TOKEN && element.symbol.toUpperCase() == symbol.toUpperCase());
+    if (index != -1) {
+      SupportedCoin asset = assets[index];
+      asset.balanceInFiat = balance.balanceInFiat;
+      asset.balanceInCrypto = balance.balanceInCrypto;
+      assets[index] = asset;
+    }
+    notifyListeners();
+  }
+
+  void sortAssetsByBalanceInFiat() {
+    assets.sort((a, b) => b.balanceInFiat?.compareTo(a.balanceInFiat??0) ?? 0);
+    notifyListeners();
+  }
 
   Future<void> getAssetsQuotes({required BalanceController balanceController, required List<SupportedCoin> assets}) async {
     await assetService.getQuotes(balanceController: balanceController, assets: assets);
@@ -67,9 +102,8 @@ class AssetController extends ChangeNotifier {
             coins.insert(0, nativeToken);
           }).toList(),
         );
-
       } else {
-        List<SupportedCoin> cachedAssets = await AssetRepo.getInstance().getScannedAssets();
+        List<SupportedCoin> cachedAssets = await AssetRepo.getInstance().getScannedAssets(walletAddress);
         coins.addAll(cachedAssets);
       }
       assets = coins;
@@ -113,6 +147,7 @@ class AssetController extends ChangeNotifier {
     notifyListeners();
     return result;
   }
+
   Future<void> clear() async {
     logger("Clearing assets", runtimeType.toString());
     assets = [];
@@ -120,6 +155,5 @@ class AssetController extends ChangeNotifier {
     tokenMetadatas = {};
     erc20Transfers = {};
     nativeTransfers = {};
-    
   }
 }

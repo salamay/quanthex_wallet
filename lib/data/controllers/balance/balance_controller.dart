@@ -20,6 +20,7 @@ class BalanceController extends ChangeNotifier {
   Map<String, CoinBalance> balances = {};
   Map<String, double?> priceQuotes = {};
   Map<String, PlatformData> platforms = {};
+  bool isLoadingPriceQuotes = false;
   bool hideBalance = false;
   double overallBalance = 0;
 
@@ -68,9 +69,13 @@ class BalanceController extends ChangeNotifier {
   }
 
   Future<List<Map<String, double?>?>> getTokenQuotes({required List<SupportedCoin> tokens}) async {
-    // try{
+    try{
+    isLoadingPriceQuotes = true;
+    notifyListeners(); 
     if (tokens.isEmpty) {
       logger("No assets to get quotes for", runtimeType.toString());
+      isLoadingPriceQuotes = false;
+      notifyListeners();
       return [];
     }
     List<String> chainIds = NetworkUtils.filterNetworksFromAssets(assets: tokens);
@@ -98,24 +103,30 @@ class BalanceController extends ChangeNotifier {
               priceQuotes[e.symbol] = double.parse(priceData['usd'].toString());
             }
           }).toList();
+          isLoadingPriceQuotes = false;
           notifyListeners();
           return priceQuotes;
         } else {
           String message = response.data.toString();
           logger(message, runtimeType.toString());
+          isLoadingPriceQuotes = false;
+          notifyListeners();
           return null;
         }
       }),
     );
     return data;
-
-    // }catch(e){
-    //   throw Exception(e);
-    // }
+    }catch(e){
+      isLoadingPriceQuotes = false;
+      notifyListeners();
+      throw Exception(e);
+    }
   }
 
   Future<Map<String, double?>> getQuotesByIds({required Map<String, String> p}) async {
     try {
+      isLoadingPriceQuotes = true;
+      notifyListeners();
       Map<String, String> payload = {};
       for (var key in p.keys) {
         if (key == "BSC") {
@@ -127,6 +138,8 @@ class BalanceController extends ChangeNotifier {
       List<String> symbols = payload.keys.toList();
       if (symbols.isEmpty) {
         logger("No symbols and ids to get quotes for", runtimeType.toString());
+        isLoadingPriceQuotes = false;
+        notifyListeners();
         return {};
       }
       List<String> coinIds = payload.values.toList().map((id) {
@@ -134,6 +147,8 @@ class BalanceController extends ChangeNotifier {
           //this is because matic has been migrated
           return "polygon-ecosystem-token";
         } else {
+          isLoadingPriceQuotes = false;
+          notifyListeners();
           return id;
         }
       }).toList();
@@ -157,14 +172,19 @@ class BalanceController extends ChangeNotifier {
             tempHolder[s] = priceData;
           }
         }
+        isLoadingPriceQuotes = false;
         notifyListeners();
         return tempHolder;
       } else {
         String message = response.data.toString();
         logger(message, runtimeType.toString());
+        isLoadingPriceQuotes = false;
+        notifyListeners();
         return {};
       }
     } catch (e) {
+      isLoadingPriceQuotes = false;
+      notifyListeners();
       throw Exception(e);
     }
   }

@@ -4,14 +4,12 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+
 class MyApi{
 
-  static const coinMarketCapKey="4adc2f15-9dfb-40f1-ae39-94c36a81891b";
-  static const coinGecko="CG-tcE5kazL3EhqnL2pKhfJmSqD";
-  static const bscScanKey="44F2IJ8EJQT5JAWUIFWRH96SKIGSNWXJZB";
-  static const ethScanKey="H1DPN1Y5C1BCHBQW3MEWABBZ16ANIAUC1T";
-  static const polScanKey="ZYTD2GBM6NQCPI3FXVJYBQPS9H57K28WB2";
-  static const moralisKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImYxMmNkMGJjLWU4M2UtNGFlMy05ZTRhLTI3YzY5ZDViYmI4MiIsIm9yZ0lkIjoiNDU5ODI4IiwidXNlcklkIjoiNDczMDc5IiwidHlwZUlkIjoiYmMyZGMyMjgtMTAzMi00NmZlLTg3YjMtMWE5MTM4ZTllNjdmIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3NTI3NTMzNjksImV4cCI6NDkwODUxMzM2OX0.xegyqypNhaFqqiiN378Ii2ECOWgc-ZP5rENdobDV9A4";
+  static const coinGecko="CG-8PWXisCcwmHNbHFN4Mxby1zY";
+  static const ethScanKey="N8N1CQHKPX5YY1Q219XNX2EJRWDRUIGY2W";
+  static const moralisKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjJjZDlkYTRlLWVkZmUtNDJmNC1iOGRmLTIwMTk4OTE2YmJlNiIsIm9yZ0lkIjoiNDk4OTgzIiwidXNlcklkIjoiNTEzNDY1IiwidHlwZUlkIjoiYjdkNmZkNjUtODk2OC00NjI0LTk2YmItMTkwMDEwZmIxNjFhIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3NzA0MjY4NDcsImV4cCI6NDkyNjE4Njg0N30.h46nVUkFn9XpCi0FpRWHLsTlaC-_xSd5Ie3BizSaBCo";
   Dio dio = Dio();
 
 

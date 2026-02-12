@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:quanthex/data/utils/date_utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
@@ -55,20 +56,6 @@ class _TransactionDetailsViewState extends State<TransactionDetailsView> {
     return '${address.substring(0, 6)}...${address.substring(address.length - 4)}';
   }
 
-  String _formatTimestamp(String timestamp) {
-    if (timestamp.isEmpty) return 'Unknown';
-    try {
-      final date = DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp) * 1000);
-      final month = date.month.toString().padLeft(2, '0');
-      final day = date.day.toString().padLeft(2, '0');
-      final hour = date.hour.toString().padLeft(2, '0');
-      final minute = date.minute.toString().padLeft(2, '0');
-      final second = date.second.toString().padLeft(2, '0');
-      return '$month/$day $hour:$minute:$second';
-    } catch (e) {
-      return timestamp;
-    }
-  }
 
   String _getTransactionExplorerUrl() {
     if (widget.transactionHash.isEmpty) return '';
@@ -255,7 +242,9 @@ class _TransactionDetailsViewState extends State<TransactionDetailsView> {
                                   16.sp.verticalSpace,
                                   _buildInfoRow(label: 'Block Height', value: widget.blockNumber.replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')),
                                   16.sp.verticalSpace,
-                                  _buildInfoRow(label: 'Time', value: _formatTimestamp(widget.timestamp)),
+                                  _buildInfoRow(label: 'Date', value: MyDateUtils.formatDate(DateTime.parse(widget.timestamp).millisecondsSinceEpoch)),
+                                      16.sp.verticalSpace,
+                                  _buildInfoRow(label: 'Time', value: MyDateUtils.hourTime(DateTime.parse(widget.timestamp))),
                                 ],
                               ),
                             ),

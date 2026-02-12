@@ -8,9 +8,11 @@ import 'package:quanthex/data/Models/network/network_model.dart';
 import 'package:quanthex/data/controllers/balance/balance_controller.dart';
 import 'package:quanthex/data/services/swap/swap_service.dart';
 import 'package:quanthex/data/services/transaction/transaction_service.dart';
+import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/data/utils/my_currency_utils.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/data/utils/network/gas_fee_check.dart';
+import 'package:quanthex/data/utils/overlay_utils.dart';
 import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 import 'dart:math' as math;
 
@@ -380,7 +382,15 @@ class _TokenApprovalBottomSheetState extends State<TokenApprovalBottomSheet> {
                   String walletAddress = widget.token.walletAddress ?? "";
                   String privateKey = widget.token.privateKey ?? "";
                   BigInt amountIn = !widget.isUnlimited?BigInt.from(double.parse(widget.approvalAmount!.toString()) * math.pow(10, widget.token.decimal!)):SwapService.permitUnlimited;
-                  String txId = await SwapService.getInstance().approve(walletAddress: walletAddress, privateKey: privateKey, spender: widget.spenderAddress, spender2: "", token0: widget.token, amountIn: amountIn, fee: widget.networkFee!, isIntermediary: false);
+
+                  String txId = "";
+                  try {
+                    txId = await SwapService.getInstance().approve(walletAddress: walletAddress, privateKey: privateKey, spender: widget.spenderAddress, spender2: "", token0: widget.token, amountIn: amountIn, fee: widget.networkFee!, isIntermediary: false);
+                  } catch (e) {
+                    logger(e.toString(), "TokenApprovalBottomSheet");
+                    showMySnackBar(context: context, message: "An error occurred while approving", type: SnackBarType.error);
+                    return;
+                  }
                   TransactionStatus transactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: txId, rpcUrl: network.rpcUrl,pollInterval: 4);
                   if(transactionStatus.isSuccess){
                      isPending = false;

@@ -5,6 +5,7 @@ import 'package:quanthex/data/Models/staking/staking_dto.dart';
 import 'package:quanthex/data/Models/staking/staking_payload.dart';
 import 'package:quanthex/data/controllers/mining/mining_controller.dart';
 import 'package:quanthex/data/controllers/assets/asset_controller.dart';
+import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/routes/app_routes.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/views/staking/active_staking.dart';
@@ -34,12 +35,14 @@ class _StakingViewState extends State<StakingView> {
   String _selectedFilter = 'Balance';
   late MiningController miningController;
   late AssetController assetController;
+  late WalletController walletController;
 
   @override
   void initState() {
     super.initState();
     miningController = Provider.of<MiningController>(context, listen: false);
     assetController = Provider.of<AssetController>(context, listen: false);
+    walletController = Provider.of<WalletController>(context, listen: false);
     fetchData();
   }
 
@@ -212,7 +215,9 @@ class _StakingViewState extends State<StakingView> {
   }
 
   void _navigateToStakingView(SupportedCoin asset) {
-    StakingPayload payload = StakingPayload();
+     String subWalletHash = walletController.currentWallet!.hash;
+    String subWalletAddress = walletController.currentWallet!.walletAddress ?? "";
+    StakingPayload payload = StakingPayload(stakingWalletHash: subWalletHash, stakingWalletAddress: subWalletAddress);
     payload.stakingRewardContract = asset.contractAddress ?? "";
     payload.stakingRewardAssetDecimals = asset.decimal ?? 18;
     payload.stakingRewardAssetSymbol = asset.symbol;

@@ -1,4 +1,5 @@
 class SubscriptionDto {
+  String? subId;
   String? email;
   String? subType;
   num? subPrice;
@@ -18,8 +19,13 @@ class SubscriptionDto {
   String? subDuration;
   String? subSignedTx;
   String? subRpc;
+  String? subMiningTag;
+  String? subWalletHash;
+  String? subWalletAddress;
+  
 
   SubscriptionDto({
+    this.subId,
     this.email,
     this.subType,
     this.subPrice,
@@ -39,10 +45,14 @@ class SubscriptionDto {
     this.subDuration,
     this.subSignedTx,
     this.subRpc,
+    this.subMiningTag,
+    this.subWalletHash,
+    this.subWalletAddress,
   });
 
   factory SubscriptionDto.fromJson(Map<String, dynamic> json) {
     return SubscriptionDto(
+      subId: json['sub_id'],
       email: json['email'],
       subType: json['sub_type'],
       subPrice: json['sub_price'],
@@ -62,11 +72,15 @@ class SubscriptionDto {
       subDuration: json['sub_duration'],
       subSignedTx: json['sub_signed_tx'],
       subRpc: json['sub_rpc'],
+      subMiningTag: json['sub_mining_tag'],
+      subWalletHash: json['sub_wallet_hash'],
+      subWalletAddress: json['sub_wallet_address'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'sub_id': subId,
       'email': email,
       'sub_type': subType,
       'sub_price': subPrice,
@@ -86,10 +100,14 @@ class SubscriptionDto {
       'sub_duration': subDuration,
       'sub_signed_tx': subSignedTx,
       'sub_rpc': subRpc,
+      'sub_mining_tag': subMiningTag,
+      'sub_wallet_hash': subWalletHash,
+      'sub_wallet_address': subWalletAddress,
     };
   }
 
   SubscriptionDto copyWith({
+    String? subId,
     String? email,
     String? subType,
     double? subPrice,
@@ -109,8 +127,12 @@ class SubscriptionDto {
     String? subDuration,
     String? subSignedTx,
     String? subRpc,
+    String? subMiningTag,
+    String? subWalletHash,
+    String? subWalletAddress,
   }) {
     return SubscriptionDto(
+      subId: subId ?? this.subId,
       email: email ?? this.email,
       subType: subType ?? this.subType,
       subPrice: subPrice ?? this.subPrice,
@@ -134,6 +156,9 @@ class SubscriptionDto {
       subDuration: subDuration ?? this.subDuration,
       subSignedTx: subSignedTx ?? this.subSignedTx,
       subRpc: subRpc ?? this.subRpc,
+      subMiningTag: subMiningTag ?? this.subMiningTag,
+      subWalletHash: subWalletHash ?? this.subWalletHash,
+      subWalletAddress: subWalletAddress ?? this.subWalletAddress,
     );
   }
 }

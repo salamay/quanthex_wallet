@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:quanthex/data/Models/mining/mining_dto.dart';
 import 'package:quanthex/data/Models/staking/staking_payload.dart';
 import 'package:quanthex/data/Models/wallets/wallet_model.dart';
 import 'package:quanthex/views/change_password_view.dart';
@@ -8,6 +9,8 @@ import 'package:quanthex/views/general_settings_view.dart';
 import 'package:quanthex/views/home/home_page.dart';
 import 'package:quanthex/views/landing_view.dart';
 import 'package:quanthex/views/auth/sign_in/login_view.dart';
+import 'package:quanthex/views/mining/subscription_package.dart';
+import 'package:quanthex/views/notifications/notification_list_view.dart';
 import 'package:quanthex/views/notifications_view.dart';
 import 'package:quanthex/views/otp/model/otp_args.dart';
 import 'package:quanthex/views/qr_scan_view.dart';
@@ -22,7 +25,7 @@ import 'package:quanthex/views/settings/settings_view.dart';
 import 'package:quanthex/views/settings/pin/verify_current_pin_view.dart';
 import 'package:quanthex/views/staking/staking_view.dart';
 import 'package:quanthex/views/staking/subscribe_staking_view.dart';
-import 'package:quanthex/views/subscribe/subscribe_view.dart';
+import 'package:quanthex/views/mining/subscribe_view.dart';
 import 'package:quanthex/views/swap/swap_token_view.dart';
 import 'package:quanthex/views/transaction_history_view.dart';
 import 'package:quanthex/views/transactions_records_view.dart';
@@ -61,6 +64,8 @@ class AppRoutes {
   static String ethereumdetailview = '/ethereumdetailview';
   static String sendtokenview = '/sendtokenview';
   static String receiveview = '/receiveview';
+    static String packageview = '/packageview';
+
   static String miningview = '/miningview';
   static String subscribeview = '/subscribeview';
   static String stakingview = '/stakingview';
@@ -68,6 +73,7 @@ class AppRoutes {
   static String settingsview = '/settingsview';
   static String walletsview = '/walletsview';
   static String notificationsview = '/notificationsview';
+  static String notificationlistview = '/notificationlistview';
   static String changepasswordview = '/changepasswordview';
   static String generalsettingsview = '/generalsettingsview';
   static String securityprivacyview = '/securityprivacyview';
@@ -163,7 +169,11 @@ class AppRoutes {
           return ReceiveView(coin: args);
         },
       ),
-      GoRoute(path: miningview, builder: (context, state) => MiningView()),
+      GoRoute(path: miningview, builder: (context, state) {
+        final args = state.extra as MiningDto;
+        return MiningView(mining: args);
+      }),
+      GoRoute(path: packageview, builder: (context, state) => SubscriptionPackage()),
       GoRoute(
         path: subscribeview,
         builder: (context, state) {
@@ -186,6 +196,7 @@ class AppRoutes {
       GoRoute(path: settingsview, builder: (context, state) => SettingsView()),
       GoRoute(path: walletsview, builder: (context, state) => WalletsView()),
       GoRoute(path: notificationsview, builder: (context, state) => NotificationsView()),
+      GoRoute(path: notificationlistview, builder: (context, state) => NotificationListView()),
       GoRoute(path: changepasswordview, builder: (context, state) => ChangePasswordView()),
       GoRoute(path: generalsettingsview, builder: (context, state) => GeneralSettingsView()),
       GoRoute(path: securityprivacyview, builder: (context, state) => SecurityPrivacyView()),

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/repository/secure_storage.dart';
 import 'package:quanthex/data/services/auth/auth_service.dart';
+import 'package:quanthex/data/services/notification/notification_service.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 
 import '../../routes/app_routes.dart';
@@ -10,6 +11,8 @@ import '../../routes/app_routes.dart';
 class HomeNavResolver {
   static Future<void> resolveHomeRoute(BuildContext context) async {
     String authToken = await SecureStorage.getInstance().getAuthToken();
+          await NotificationService.getInstance().requestPermission();
+
     if (authToken.isNotEmpty) {
       AuthService.getInstance().authToken = authToken;
       WalletController walletController = Provider.of<WalletController>(

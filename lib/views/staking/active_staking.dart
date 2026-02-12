@@ -7,6 +7,7 @@ import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/data/utils/security_utils.dart';
 import 'package:quanthex/views/staking/components/earning_item.dart';
 import 'package:quanthex/views/staking/components/staking_detail_row.dart';
+import 'package:quanthex/widgets/global/empty_view.dart';
 import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 
 import '../../data/Models/staking/staking_dto.dart';
@@ -17,38 +18,24 @@ import 'components/withdrawal_success.dart';
 
 class ActiveStaking extends StatelessWidget {
   ActiveStaking({super.key, required this.stake});
-  StakingDto stake;
+  final StakingDto stake;
 
   void _showWithdrawSuccessModal(BuildContext context, StakingDto stake) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => WithdrawSuccessModal(
-        amount: double.parse(stake.stakedAmountCrypto ?? "0"),
-        token: stake.stakedAssetSymbol ?? '',
-        chain: stake.stakingRewardChainName ?? '',
-        tokenImage: stake.stakedAssetImage ?? '',
-      ),
+      builder: (context) => WithdrawSuccessModal(amount: double.parse(stake.stakedAmountCrypto ?? "0"), token: stake.stakedAssetSymbol ?? '', chain: stake.stakingRewardChainName ?? '', tokenImage: stake.stakedAssetImage ?? ''),
     );
   }
 
-  Future<bool> _showWithdrawModal(
-    BuildContext context,
-    StakingDto stake,
-  ) async {
+  Future<bool> _showWithdrawModal(BuildContext context, StakingDto stake) async {
     bool? result = await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-      ),
-      builder: (context) => ConfirmWithdrawalModal(
-        amount: double.parse(stake.stakedAmountCrypto ?? "0"),
-        token: stake.stakedAssetSymbol ?? '',
-        tokenImage: stake.stakedAssetImage ?? '',
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(40))),
+      builder: (context) => ConfirmWithdrawalModal(amount: double.parse(stake.stakedAmountCrypto ?? "0"), token: stake.stakedAssetSymbol ?? '', tokenImage: stake.stakedAssetImage ?? ''),
     );
     return result ?? false;
   }
@@ -67,11 +54,7 @@ class ActiveStaking extends StatelessWidget {
             //   end: Alignment.bottomRight,
             //   colors: [const Color(0xFF792A90), const Color(0xFF9B4DB0)],
             // ),
-            gradient: LinearGradient(
-              begin: Alignment(0.00, 0.50),
-              end: Alignment(1.00, 0.50),
-              colors: [const Color(0xFF792A90), const Color(0xFF280233)],
-            ),
+            gradient: LinearGradient(begin: Alignment(0.00, 0.50), end: Alignment(1.00, 0.50), colors: [const Color(0xFF792A90), const Color(0xFF280233)]),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -81,23 +64,26 @@ class ActiveStaking extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Farming USDT',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24.sp,
-                        fontFamily: 'Satoshi',
-                        fontWeight: FontWeight.w700,
-                      ),
+                      'Staking Yield (USDT)',
+                      style: TextStyle(color: Colors.white, fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
                     ),
                     8.sp.verticalSpace,
-                    Text(
-                      '0.5 - 20% Daily APY',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 14.sp,
-                        fontFamily: 'Satoshi',
-                        fontWeight: FontWeight.w400,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Variable Daily Yield',
+                          style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                        ),
+                        10.horizontalSpace,
+                        Tooltip(
+                          margin: EdgeInsets.symmetric(horizontal: 10.sp),
+                          message: "Yield is calculated daily based on system performance and may vary over time",
+                          child: Icon(Icons.help_outline, size: 16.sp, color: const Color(0xFF757575)),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -108,9 +94,7 @@ class ActiveStaking extends StatelessWidget {
                 decoration: BoxDecoration(
                   // color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/farming_image.png'),
-                  ),
+                  image: DecorationImage(image: AssetImage('assets/images/stake_icon.png')),
                 ),
                 // child: Icon(Icons.eco, size: 50.sp, color: Colors.white),
               ),
@@ -132,9 +116,7 @@ class ActiveStaking extends StatelessWidget {
                   if (userPin.isEmpty) {
                     logger("User PIN is empty", "ConfirmWithdrawalModal");
                   } else {
-                    bool pinResult = await SecurityUtils.showPinDialog(
-                      context: context,
-                    );
+                    bool pinResult = await SecurityUtils.showPinDialog(context: context);
                     if (pinResult) {
                       try {
                         String? stakeId = stake.stakingId;
@@ -142,27 +124,14 @@ class ActiveStaking extends StatelessWidget {
                           await miningController.withdraw(stakeId: stakeId);
                           _showWithdrawSuccessModal(context, stake);
                         } else {
-                          showMySnackBar(
-                            context: context,
-                            message: "Invalid stake ID",
-                            type: SnackBarType.error,
-                          );
+                          showMySnackBar(context: context, message: "Invalid stake ID", type: SnackBarType.error);
                         }
                       } catch (e) {
                         logger("Error withdrawing: $e", "ActiveStaking");
-                        showMySnackBar(
-                          context: context,
-                          message:
-                              "Failed to process withdrawal: ${e.toString()}",
-                          type: SnackBarType.error,
-                        );
+                        showMySnackBar(context: context, message: "Failed to process withdrawal: ${e.toString()}", type: SnackBarType.error);
                       }
                     } else {
-                      showMySnackBar(
-                        context: context,
-                        message: "Incorrect pin",
-                        type: SnackBarType.error,
-                      );
+                      showMySnackBar(context: context, message: "Incorrect pin", type: SnackBarType.error);
                     }
                   }
                 }
@@ -174,44 +143,42 @@ class ActiveStaking extends StatelessWidget {
         // Staking Details Card
         Container(
           padding: EdgeInsets.all(16.sp),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5F5F5),
-            borderRadius: BorderRadius.circular(16),
-          ),
+          decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
           child: Column(
             children: [
-              StakingDetailRow(label: 'Matching Bonus', value: '20%'),
+              StakingDetailRow(label: 'Yield Contribution', value: '20%', tooltip: 'Yield allocated based on eligible network participation and staking activity.'),
               15.sp.verticalSpace,
-              StakingDetailRow(label: 'Capital Flexibility', value: 'Anytime'),
+              StakingDetailRow(label: 'Flexible Capital Access', value: 'Anytime',tooltip: "Capital remains accessible and can be withdrawn subject to platform conditions.",),
               15.sp.verticalSpace,
-              StakingDetailRow(
-                label: 'Instant Activation',
-                value: 'Immediately after payment',
-              ),
+              StakingDetailRow(label: 'Instant Activation', value: 'Immediately after payment'),
               15.sp.verticalSpace,
-              StakingDetailRow(label: 'Daily Payouts', value: 'Every 24 Hours'),
+              StakingDetailRow(label: 'Daily Yield Distribution', value: 'Every 24 Hours',tooltip: "Yield is distributed on a daily cycle every 24 hours.",),
             ],
+          ),
+        ),
+        10.sp.verticalSpace,
+        Align(
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.8,
+            child:  Text(
+              "Staking verification may take up to 48 hours. Once verified, yield dstribution will occur on a 24 hour daily cycle.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400,),
+            ),
           ),
         ),
         30.sp.verticalSpace,
         // Subscribed Packages
         Text(
-          'Withdrawals',
-          style: TextStyle(
-            color: const Color(0xFF2D2D2D),
-            fontSize: 18.sp,
-            fontFamily: 'Satoshi',
-            fontWeight: FontWeight.w700,
-          ),
+          'Claimed Yields',
+          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
         ),
         8.sp.verticalSpace,
         Consumer<MiningController>(
           builder: (context, mCtr, child) {
             List<WithdrawalDto> withdrawals = mCtr.withdrawals;
             return Column(
-              children: withdrawals
-                  .map((e) => EarningItem(withdrawal: e))
-                  .toList(),
+              children: withdrawals.isNotEmpty ? withdrawals.map((e) => EarningItem(withdrawal: e)).toList() : [EmptyView(message: 'No withdrawals yet')],
             );
           },
         ),

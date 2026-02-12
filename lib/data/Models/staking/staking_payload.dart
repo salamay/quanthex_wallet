@@ -15,7 +15,11 @@ class StakingPayload {
   String? stakingRewardAssetImage;
   String? signedTx;
   String? rpc;
-
+  int? duration;
+  int? endDate;
+  int? startDate;
+  String? stakingWalletHash;
+  String? stakingWalletAddress;
   StakingPayload({
     this.stakedAssetSymbol,
     this.stakedAssetContract,
@@ -32,7 +36,12 @@ class StakingPayload {
     this.stakingRewardAssetDecimals,
     this.stakingRewardAssetImage,
     this.signedTx,
-    this.rpc
+    this.rpc,
+    this.duration,
+    this.endDate,
+    this.startDate,
+    required this.stakingWalletHash,
+    required this.stakingWalletAddress,
   });
 
   factory StakingPayload.fromJson(Map<String, dynamic> json) {
@@ -57,6 +66,11 @@ class StakingPayload {
       json['staking_reward_asset_image'],
       signedTx: json ['signed_tx'],
       rpc: json['rpc'],
+      duration: json['duration'],
+      endDate: json['end_date'],
+      startDate: json['start_date'],
+      stakingWalletHash: json['staking_wallet_hash'],
+      stakingWalletAddress: json['staking_wallet_address'],
     );
   }
 
@@ -82,6 +96,11 @@ class StakingPayload {
       stakingRewardAssetImage,
       'signed_tx': signedTx,
       'rpc': rpc,
+      'duration': duration,
+      'end_date': endDate,
+      'start_date': startDate,
+      'staking_wallet_hash': stakingWalletHash,
+      'staking_wallet_address': stakingWalletAddress,
     };
   }
 
@@ -102,6 +121,11 @@ class StakingPayload {
     String? stakingRewardAssetImage,
     String? signedTx,
     String? rpc,
+    int? duration,
+    int? endDate,
+    int? startDate,
+    String? stakingWalletHash,
+    String? stakingWalletAddress,
   }) {
     return StakingPayload(
       stakedAssetSymbol:
@@ -141,6 +165,11 @@ class StakingPayload {
           this.stakingRewardAssetImage,
       signedTx: signedTx ?? this.signedTx,
       rpc: rpc ?? this.rpc,
+      duration: duration ?? this.duration,
+      endDate: endDate ?? this.endDate,
+      startDate: startDate ?? this.startDate,
+      stakingWalletHash: stakingWalletHash ?? this.stakingWalletHash,
+      stakingWalletAddress: stakingWalletAddress ?? this.stakingWalletAddress,
     );
   }
 }

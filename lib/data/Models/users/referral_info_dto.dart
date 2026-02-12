@@ -2,6 +2,7 @@ class ReferralInfoDto {
   String? referralId;
   String? referralUid;
   String? referreeUid;
+  String? referralSubscriptionId;
   String? referralCreatedAt;
   String? referralUpdatedAt;
 
@@ -9,6 +10,7 @@ class ReferralInfoDto {
     this.referralId,
     this.referralUid,
     this.referreeUid,
+    this.referralSubscriptionId,
     this.referralCreatedAt,
     this.referralUpdatedAt,
   });
@@ -18,6 +20,7 @@ class ReferralInfoDto {
       referralId: json['referral_id'],
       referralUid: json['referral_uid'],
       referreeUid: json['referree_uid'],
+      referralSubscriptionId: json['referral_subscription_id'],
       referralCreatedAt: json['referral_created_at'],
       referralUpdatedAt: json['referral_updated_at'],
     );
@@ -28,6 +31,7 @@ class ReferralInfoDto {
       'referral_id': referralId,
       'referral_uid': referralUid,
       'referree_uid': referreeUid,
+      'referral_subscription_id': referralSubscriptionId,
       'referral_created_at': referralCreatedAt,
       'referral_updated_at': referralUpdatedAt,
     };
@@ -37,6 +41,7 @@ class ReferralInfoDto {
     String? referralId,
     String? referralUid,
     String? referreeUid,
+    String? referralSubscriptionId,
     String? referralCreatedAt,
     String? referralUpdatedAt,
   }) {
@@ -44,6 +49,7 @@ class ReferralInfoDto {
       referralId: referralId ?? this.referralId,
       referralUid: referralUid ?? this.referralUid,
       referreeUid: referreeUid ?? this.referreeUid,
+      referralSubscriptionId: referralSubscriptionId ?? this.referralSubscriptionId,
       referralCreatedAt:
       referralCreatedAt ?? this.referralCreatedAt,
       referralUpdatedAt:

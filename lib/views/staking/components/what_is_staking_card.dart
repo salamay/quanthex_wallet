@@ -27,7 +27,8 @@ class WhatIsStakingCard extends StatelessWidget {
                 ),
                 8.verticalSpace,
                 Text(
-                  'Staking Reward lets you earn daily returns on your capital while still keeping full control of your money. You subscribe to a staking plan, your capital is locked for daily earnings, and you can withdraw it anytime.',
+                  'Staking allows you to generate daily yield on your capital while maintaining full control of your assets. By subscribing to a staking plan, your capital is committed to the staking mechanism for yield accrual. Capital withdrawal remains available at any time, subject to system conditions.',
+                  maxLines: 8,
                   style: TextStyle(color: const Color(0xFF757575), fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.4),
                 ),
                 16.verticalSpace,

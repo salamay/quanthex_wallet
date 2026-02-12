@@ -53,7 +53,7 @@ class MyDateUtils{
     if (isSameDay(date, now)) return "Today";
     if (isSameDay(date, now.subtract(Duration(days: 1)))) return "Yesterday";
 
-    return DateFormat('E, d MMM').format(date);
+    return DateFormat('E, d MMM h:mm a').format(date);
   }
 
   static int nowCustom(){

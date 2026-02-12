@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:quanthex/data/Models/wallets/wallet_model.dart';
 import 'package:quanthex/data/repository/secure_storage.dart';
+import 'package:quanthex/data/services/wallets/wallet_services.dart';
 import 'package:quanthex/data/utils/logger.dart';
 
 class WalletController extends ChangeNotifier {
@@ -73,6 +74,7 @@ class WalletController extends ChangeNotifier {
       walletAddress: wallet.walletAddress,
       privateKey: wallet.privateKey,
       name: newName,
+      hash: wallet.hash,
     );
     await _storage.updateWallet(updatedWallet);
 

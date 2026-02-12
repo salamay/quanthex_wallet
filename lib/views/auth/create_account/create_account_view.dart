@@ -34,7 +34,6 @@ class _CreateAccountViewState extends State<CreateAccountView> {
 
   final TextEditingController confirmPasswordCtr = TextEditingController();
 
-  final TextEditingController referralCode=TextEditingController();
 
   ValueNotifier<bool> formValidation=ValueNotifier<bool>(false);
 
@@ -253,23 +252,7 @@ class _CreateAccountViewState extends State<CreateAccountView> {
                         },
                       ),
                       15.sp.verticalSpace,
-                      Text(
-                        'Referral Code (Optional)',
-                        style: TextStyle(
-                          color: const Color(0xFF333333),
-                          fontSize: 14,
-                          fontFamily: 'Satoshi',
-                          fontWeight: FontWeight.w700,
-                          height: 1.57,
-                          letterSpacing: -0.41,
-                        ),
-                      ),
-                      5.sp.verticalSpace,
-                      AppTextfield(
-                        hintText: 'Enter referral code',
-                        controller: referralCode,
-                      ),
-                      20.sp.verticalSpace,
+                   
                     ],
                   ),
                 ),
@@ -417,7 +400,6 @@ class _CreateAccountViewState extends State<CreateAccountView> {
                             }
                             String email=emailAddress.text.trim();
                             String pass=password.text.trim();
-                            String refCode=referralCode.text.trim();
                             String deviceName=DeviceUtils.getDeviceType();
                             String regVia=regBasic;
                             String deviceId=await DeviceUtils.getDeviceId()??"UNKNOWN_DEVICE_ID";
@@ -437,7 +419,7 @@ class _CreateAccountViewState extends State<CreateAccountView> {
                                 return;
                               }
                               showOverlay(context);
-                              String token=await AuthService.getInstance().registerUser(email: email, password: pass, deviceId: deviceId, deviceName: deviceName, referralCode: refCode, regVia: regVia,otp: input);
+                              String token=await AuthService.getInstance().registerUser(email: email, password: pass, deviceId: deviceId, deviceName: deviceName, regVia: regVia,otp: input);
                               await SecureStorage.getInstance().saveAuthToken(token);
                               hideOverlay(context);
                               Navigate.go(context, name: AppRoutes.setupwalletview);

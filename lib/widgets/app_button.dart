@@ -32,9 +32,7 @@ class _AppButtonState extends State<AppButton> {
       child: Container(
         width: 333.sp,
         height: 50.sp,
-        padding:
-            widget.padding ??
-            const EdgeInsets.symmetric(horizontal: 117, vertical: 9),
+        padding: widget.padding ??const EdgeInsets.symmetric( vertical: 9),
         decoration: ShapeDecoration(
           color: widget.color ?? Colors.white,
           shape: RoundedRectangleBorder(

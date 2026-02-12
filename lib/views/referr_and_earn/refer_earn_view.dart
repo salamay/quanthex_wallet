@@ -33,7 +33,7 @@ class _ReferEarnViewState extends State<ReferEarnView> {
     try {
       _loadingNotifier.value = true;
       _errorNotifier.value = false;
-      await userController.getReferrals();
+      // await userController.getReferrals();
       _loadingNotifier.value = false;
       _errorNotifier.value = false;
     } catch (e) {

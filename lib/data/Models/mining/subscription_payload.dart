@@ -18,7 +18,9 @@ class SubscriptionPayload {
   String? subDuration;
   String? subSignedTx;
   String? subRpc;
-
+  String? subReferralCode;
+  String? subWalletHash;
+  String? subWalletAddress;
   SubscriptionPayload({
     this.email,
     this.subType,
@@ -39,6 +41,9 @@ class SubscriptionPayload {
     this.subDuration,
     this.subSignedTx,
     this.subRpc,
+    this.subReferralCode,
+    required this.subWalletHash,
+    required this.subWalletAddress,
   });
 
   factory SubscriptionPayload.fromJson(Map<String, dynamic> json) {
@@ -62,6 +67,9 @@ class SubscriptionPayload {
       subDuration: json['sub_duration'],
       subSignedTx: json['sub_signed_tx'],
       subRpc: json['sub_rpc'],
+      subReferralCode: json['sub_referral_code'],
+      subWalletHash: json['sub_wallet_hash'],
+      subWalletAddress: json['sub_wallet_address'],
     );
   }
 
@@ -86,6 +94,9 @@ class SubscriptionPayload {
       'sub_duration': subDuration,
       'sub_signed_tx': subSignedTx,
       'sub_rpc': subRpc,
+      'sub_referral_code': subReferralCode,
+      'sub_wallet_hash': subWalletHash,
+      'sub_wallet_address': subWalletAddress,
     };
   }
 
@@ -109,6 +120,9 @@ class SubscriptionPayload {
     String? subDuration,
     String? subSignedTx,
     String? subRpc,
+    String? subReferralCode,
+    String? subWalletHash,
+    String? subWalletAddress,
   }) {
     return SubscriptionPayload(
       email: email ?? this.email,
@@ -122,18 +136,17 @@ class SubscriptionPayload {
       subAssetImage: subAssetImage ?? this.subAssetImage,
       subRewardContract: subRewardContract ?? this.subRewardContract,
       subRewardChainId: subRewardChainId ?? this.subRewardChainId,
-      subRewardAssetName:
-      subRewardAssetName ?? this.subRewardAssetName,
-      subRewardAssetSymbol:
-      subRewardAssetSymbol ?? this.subRewardAssetSymbol,
-      subRewardAssetImage:
-      subRewardAssetImage ?? this.subRewardAssetImage,
-      subRewardAssetDecimals:
-      subRewardAssetDecimals ?? this.subRewardAssetDecimals,
+      subRewardAssetName: subRewardAssetName ?? this.subRewardAssetName,
+      subRewardAssetSymbol: subRewardAssetSymbol ?? this.subRewardAssetSymbol,
+      subRewardAssetImage: subRewardAssetImage ?? this.subRewardAssetImage,
+      subRewardAssetDecimals: subRewardAssetDecimals ?? this.subRewardAssetDecimals,
       subPackageName: subPackageName ?? this.subPackageName,
       subDuration: subDuration ?? this.subDuration,
       subSignedTx: subSignedTx ?? this.subSignedTx,
       subRpc: subRpc ?? this.subRpc,
+      subReferralCode: subReferralCode ?? this.subReferralCode,
+      subWalletHash: subWalletHash ?? this.subWalletHash,
+      subWalletAddress: subWalletAddress ?? this.subWalletAddress,
     );
   }
 }

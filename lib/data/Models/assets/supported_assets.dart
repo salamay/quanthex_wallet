@@ -27,6 +27,8 @@ class SupportedCoin {
   String? contractAddress;
   bool? isImplementedContract;
   String? implementationContractAddress;
+  double? balanceInFiat;
+  double? balanceInCrypto;
 
   SupportedCoin({
     required this.symbol,
@@ -40,6 +42,8 @@ class SupportedCoin {
     required this.contractAddress,
     this.isImplementedContract = false,
     this.implementationContractAddress,
+    this.balanceInFiat,
+    this.balanceInCrypto,
   });
 
   /// -----------------------------
@@ -63,6 +67,8 @@ class SupportedCoin {
     isImplementedContract: json["is_implemented_contract"] ?? false,
     implementationContractAddress:
     json["implementation_contract_address"],
+    balanceInFiat: json["balance_in_fiat"],
+    balanceInCrypto: json["balance_in_crypto"],
   );
 
   /// -----------------------------
@@ -80,5 +86,7 @@ class SupportedCoin {
     "contract_address": contractAddress,
     "is_implemented_contract": isImplementedContract,
     "implementation_contract_address": implementationContractAddress,
+    "balance_in_fiat": balanceInFiat,
+    "balance_in_crypto": balanceInCrypto,
   };
 }

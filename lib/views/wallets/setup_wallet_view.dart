@@ -417,8 +417,7 @@ class _SetupWalletViewState extends State<SetupWalletView> {
       strength: 128,
     );
     // Set default wallet name
-    List<WalletModel> existingWallets = await SecureStorage.getInstance()
-        .getWallets();
+    List<WalletModel> existingWallets = await SecureStorage.getInstance() .getWallets();
     String defaultName = 'Wallet ${existingWallets.length + 1}';
     WalletModel namedWallet = WalletModel(
       mnemonic: walletModel.mnemonic,
@@ -426,6 +425,7 @@ class _SetupWalletViewState extends State<SetupWalletView> {
       walletAddress: walletModel.walletAddress,
       privateKey: walletModel.privateKey,
       name: defaultName,
+      hash: walletModel.hash,
     );
     await SecureStorage.getInstance().saveWallet([namedWallet]);
     walletController.setCurrentWallet(namedWallet);

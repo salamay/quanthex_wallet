@@ -12,17 +12,24 @@ class UserController extends ChangeNotifier{
   UserService userService=UserService.getInstance();
 
 
-  Future<void> getReferrals()async{
-    logger("Getting referrals", runtimeType.toString());
-    List<ReferralDto> results=await userService.getReferrals();
-    referrals=results;
-    notifyListeners();
-  }
+  // Future<void> getReferrals()async{
+  //   logger("Getting referrals", runtimeType.toString());
+  //   List<ReferralDto> results=await userService.getReferrals();
+  //   referrals=results;
+  //   notifyListeners();
+  // }
+  
 
   Future<void> getProfile()async{
     logger("Getting profile", runtimeType.toString());
     ProfileDto result=await userService.getProfile();
     profile=result;
     notifyListeners();
+  }
+
+  
+  void clear(){
+    profile=null;
+    referrals=[];
   }
 }

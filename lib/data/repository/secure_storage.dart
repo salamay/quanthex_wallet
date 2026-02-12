@@ -13,9 +13,9 @@ class SecureStorage {
   AndroidOptions _getAndroidOptions() =>
       const AndroidOptions(encryptedSharedPreferences: true);
   static FlutterSecureStorage? _storage;
-  static const wallets_key = 'wallets';
+  static const wallets_key = 'user_wallets';
   static const current_wallet_key = 'current_wallet';
-  static const custom_tokens = 'custom_tokens';
+  static const custom_tokens = 'user_custom_tokens';
   static const pin_key = 'pin';
   static const _key = 'persistent_device_id';
   static const _auth_token = 'Auth_Token';

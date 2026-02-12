@@ -5,7 +5,10 @@ class MiningInfoDto {
   String? minCreatedAt;
   String? minUpdatedAt;
   String? minSubscriptionId;
+  String? miningTag;
   String? hashRate;
+  String? miningWalletHash;
+  String? miningWalletAddress;
 
   MiningInfoDto({
     this.minId,
@@ -14,7 +17,10 @@ class MiningInfoDto {
     this.minCreatedAt,
     this.minUpdatedAt,
     this.minSubscriptionId,
+    this.miningTag,
     this.hashRate,
+    this.miningWalletHash,
+    this.miningWalletAddress,
   });
 
   factory MiningInfoDto.fromJson(Map<String, dynamic> json) {
@@ -25,7 +31,10 @@ class MiningInfoDto {
       minCreatedAt: json['min_created_at'],
       minUpdatedAt: json['min_updated_at'],
       minSubscriptionId: json['min_subscription_id'],
+      miningTag: json['mining_tag'],
       hashRate: json['hash_rate'],
+      miningWalletHash: json['mining_wallet_hash'],
+      miningWalletAddress: json['mining_wallet_address'],
     );
   }
 
@@ -38,6 +47,9 @@ class MiningInfoDto {
       'min_updated_at': minUpdatedAt,
       'min_subscription_id': minSubscriptionId,
       'hash_rate': hashRate,
+      'mining_tag': miningTag,
+      'mining_wallet_hash': miningWalletHash,
+      'mining_wallet_address': miningWalletAddress,
     };
   }
 
@@ -48,7 +60,10 @@ class MiningInfoDto {
     String? minCreatedAt,
     String? minUpdatedAt,
     String? minSubscriptionId,
+    String? miningTag,
     String? hashRate,
+    String? miningWalletHash,
+    String? miningWalletAddress,
   }) {
     return MiningInfoDto(
       minId: minId ?? this.minId,
@@ -58,7 +73,10 @@ class MiningInfoDto {
       minUpdatedAt: minUpdatedAt ?? this.minUpdatedAt,
       minSubscriptionId:
       minSubscriptionId ?? this.minSubscriptionId,
+      miningTag: miningTag ?? this.miningTag,
       hashRate: hashRate ?? this.hashRate,
+      miningWalletHash: miningWalletHash ?? this.miningWalletHash,
+      miningWalletAddress: miningWalletAddress ?? this.miningWalletAddress,
     );
   }
 }

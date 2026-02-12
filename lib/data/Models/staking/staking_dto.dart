@@ -19,6 +19,8 @@ class StakingDto {
   String? stakingRewardAssetSymbol;
   int? stakingRewardAssetDecimals;
   String? stakingRewardAssetImage;
+  String? stakingWalletHash;
+  String? stakingWalletAddress;
 
   StakingDto({
     this.stakingId,
@@ -41,6 +43,8 @@ class StakingDto {
     this.stakingRewardAssetSymbol,
     this.stakingRewardAssetDecimals,
     this.stakingRewardAssetImage,
+    this.stakingWalletHash,
+    this.stakingWalletAddress,
   });
 
   factory StakingDto.fromJson(Map<String, dynamic> json) {
@@ -61,14 +65,12 @@ class StakingDto {
       stakingRewardContract: json['staking_reward_contract'],
       stakingRewardChainId: json['staking_reward_chain_id'],
       stakingRewardChainName: json['staking_reward_chain_name'],
-      stakingRewardAssetName:
-      json['staking_reward_asset_name'],
-      stakingRewardAssetSymbol:
-      json['staking_reward_asset_symbol'],
-      stakingRewardAssetDecimals:
-      json['staking_reward_asset_decimals'],
-      stakingRewardAssetImage:
-      json['staking_reward_asset_image'],
+      stakingRewardAssetName: json['staking_reward_asset_name'],
+      stakingRewardAssetSymbol: json['staking_reward_asset_symbol'],
+      stakingRewardAssetDecimals: json['staking_reward_asset_decimals'],
+      stakingRewardAssetImage:json['staking_reward_asset_image'],
+      stakingWalletHash: json['staking_wallet_hash'],
+      stakingWalletAddress: json['staking_wallet_address'],
     );
   }
 
@@ -98,6 +100,8 @@ class StakingDto {
       stakingRewardAssetDecimals,
       'staking_reward_asset_image':
       stakingRewardAssetImage,
+      'staking_wallet_hash': stakingWalletHash,
+      'staking_wallet_address': stakingWalletAddress,
     };
   }
 
@@ -122,6 +126,8 @@ class StakingDto {
     String? stakingRewardAssetSymbol,
     int? stakingRewardAssetDecimals,
     String? stakingRewardAssetImage,
+    String? stakingWalletHash,
+    String? stakingWalletAddress,
   }) {
     return StakingDto(
       stakingId: stakingId ?? this.stakingId,
@@ -171,6 +177,8 @@ class StakingDto {
       stakingRewardAssetImage:
       stakingRewardAssetImage ??
           this.stakingRewardAssetImage,
+      stakingWalletHash: stakingWalletHash ?? this.stakingWalletHash,
+      stakingWalletAddress: stakingWalletAddress ?? this.stakingWalletAddress,
     );
   }
 }

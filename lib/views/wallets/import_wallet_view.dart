@@ -320,8 +320,7 @@ class _ImportWalletViewState extends State<ImportWalletView> {
   Future<void> importWallet(BuildContext context, String mnemonic) async {
     try {
       context.loaderOverlay.show();
-      WalletModel walletModel = await WalletServices.getInstance()
-          .importFromMnemonic(mnemonic);
+      WalletModel walletModel = await WalletServices.getInstance() .importFromMnemonic(mnemonic);
       // Set default wallet name
       List<WalletModel> existingWallets = await SecureStorage.getInstance()
           .getWallets();
@@ -332,6 +331,7 @@ class _ImportWalletViewState extends State<ImportWalletView> {
         walletAddress: walletModel.walletAddress,
         privateKey: walletModel.privateKey,
         name: defaultName,
+        hash: walletModel.hash,
       );
       await SecureStorage.getInstance().saveWallet([namedWallet]);
       walletController.setCurrentWallet(namedWallet);

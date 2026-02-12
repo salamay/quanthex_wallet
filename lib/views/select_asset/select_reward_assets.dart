@@ -70,7 +70,7 @@ class _SelectRewardAssetsState extends State<SelectRewardAssets> {
                   builder: (context, assetCtr, child) {
                     return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: assetCtr.assets.where((a)=>a.symbol.toLowerCase()=="doge").map((e){
+                        children: assetCtr.assets.where((a)=>a.symbol.toLowerCase()=="doge"&&a.networkModel?.chainId==56).map((e){
                           return GestureDetector(
                               onTap: (){
                                 context.pop(e);

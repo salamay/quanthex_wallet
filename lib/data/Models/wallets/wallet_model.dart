@@ -4,12 +4,14 @@ class WalletModel {
   String? chainId;
   String? privateKey;
   String? name;
+  String hash;
   WalletModel({
     this.mnemonic,
     required this.chainId,
     required this.walletAddress,
     this.privateKey,
     this.name,
+    required this.hash,
   });
 
   factory WalletModel.fromJson(Map<String, dynamic> json) => WalletModel(
@@ -18,6 +20,7 @@ class WalletModel {
     chainId: json["chain_id"],
     privateKey: json["private_key"],
     name: json["name"],
+    hash:  json["hash"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -26,5 +29,6 @@ class WalletModel {
     "chain_id": chainId,
     "private_key": privateKey,
     "name": name,
+    "hash": hash
   };
 }

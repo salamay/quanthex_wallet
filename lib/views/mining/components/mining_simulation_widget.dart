@@ -96,13 +96,13 @@ class _MiningSimulationWidgetState extends State<MiningSimulationWidget>
           colors: [const Color(0xFF792A90), const Color(0xFF1A1F3A)],
         ),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 20,
-            spreadRadius: 5,
-          ),
-        ],
+        // boxShadow: [
+        //   BoxShadow(
+        //     color: Colors.black.withOpacity(0.3),
+        //     blurRadius: 20,
+        //     spreadRadius: 5,
+        //   ),
+        // ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

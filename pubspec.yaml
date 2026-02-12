@@ -68,6 +68,11 @@ dependencies:
   top_snackbar_flutter: 3.3.0
   url_launcher: ^6.3.1
   graphql_flutter: 5.2.1
+  flutter_local_notifications: 19.5.0
+  flutter_svg: 2.2.3
+  bcrypt: 1.2.0
+  mobile_scanner: 7.1.4
+  
 
 
 dev_dependencies:
@@ -114,6 +119,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/svgs/
     - abi/
     - abi/token/
     - abi/uniswap/

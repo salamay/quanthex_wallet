@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:quanthex/views/home/home_view.dart';
+import 'package:quanthex/views/mining/subscription_home.dart';
 import 'package:quanthex/views/mining/subscription_package.dart';
 import 'package:quanthex/views/settings/settings_view.dart';
 import 'package:quanthex/views/staking/staking_view.dart';
@@ -15,7 +16,7 @@ class HomeController extends ChangeNotifier{
   List<Widget> dashboards=[
     HomeView(),
     SwapTokenView(),
-    SubscriptionPackage(),
+    SubscriptionHome(),
     StakingView(),
     SettingsView(),
   ];
