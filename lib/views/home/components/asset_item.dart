@@ -78,7 +78,7 @@ class AssetItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   balance!=null?Text(
-                    !bCtr.hideBalance?balance.balanceInCrypto!=0?MyCurrencyUtils.format(balance.balanceInCrypto,coin.coinType==CoinType.TOKEN?2:6):"0 ":"****",
+                    !bCtr.hideBalance?balance.balanceInCrypto!=0?MyCurrencyUtils.formatCurrency2(balance.balanceInCrypto):"0 ":"****",
                     style: TextStyle(
                       color: const Color(0xFF2D2D2D),
                       fontSize: 16.sp,
@@ -88,7 +88,7 @@ class AssetItem extends StatelessWidget {
                   ):const SizedBox(),
                   4.verticalSpace,
                   balance!=null?Text(
-                      !bCtr.hideBalance?" ${MyCurrencyUtils.formatCurrency(balance.balanceInFiat)}":"**",
+                      !bCtr.hideBalance?" ${MyCurrencyUtils.format(balance.balanceInFiat,2)}":"**",
                     style: TextStyle(
                       color: const Color(0xFF757575),
                       fontSize: 12.sp,

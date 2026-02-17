@@ -6,7 +6,6 @@ class MiningInfoDto {
   String? minUpdatedAt;
   String? minSubscriptionId;
   String? miningTag;
-  String? hashRate;
   String? miningWalletHash;
   String? miningWalletAddress;
 
@@ -18,7 +17,6 @@ class MiningInfoDto {
     this.minUpdatedAt,
     this.minSubscriptionId,
     this.miningTag,
-    this.hashRate,
     this.miningWalletHash,
     this.miningWalletAddress,
   });
@@ -32,7 +30,6 @@ class MiningInfoDto {
       minUpdatedAt: json['min_updated_at'],
       minSubscriptionId: json['min_subscription_id'],
       miningTag: json['mining_tag'],
-      hashRate: json['hash_rate'],
       miningWalletHash: json['mining_wallet_hash'],
       miningWalletAddress: json['mining_wallet_address'],
     );
@@ -46,7 +43,6 @@ class MiningInfoDto {
       'min_created_at': minCreatedAt,
       'min_updated_at': minUpdatedAt,
       'min_subscription_id': minSubscriptionId,
-      'hash_rate': hashRate,
       'mining_tag': miningTag,
       'mining_wallet_hash': miningWalletHash,
       'mining_wallet_address': miningWalletAddress,
@@ -61,7 +57,6 @@ class MiningInfoDto {
     String? minUpdatedAt,
     String? minSubscriptionId,
     String? miningTag,
-    String? hashRate,
     String? miningWalletHash,
     String? miningWalletAddress,
   }) {
@@ -74,7 +69,6 @@ class MiningInfoDto {
       minSubscriptionId:
       minSubscriptionId ?? this.minSubscriptionId,
       miningTag: miningTag ?? this.miningTag,
-      hashRate: hashRate ?? this.hashRate,
       miningWalletHash: miningWalletHash ?? this.miningWalletHash,
       miningWalletAddress: miningWalletAddress ?? this.miningWalletAddress,
     );

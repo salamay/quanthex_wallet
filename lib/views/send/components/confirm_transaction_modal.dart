@@ -137,7 +137,7 @@ class ConfirmTransactionModal extends StatelessWidget {
               ),
               10.horizontalSpace,
               Text(
-                '${MyCurrencyUtils.format(amount,token.coinType==CoinType.TOKEN?2:6)} ${token.symbol} (${chain.chainSymbol})',
+                '${MyCurrencyUtils.formatCurrency2(amount)} ${token.symbol} (${chain.chainSymbol})',
                 style: TextStyle(
                   color: const Color(0xFF2D2D2D),
                   fontSize: 24.sp,
@@ -149,7 +149,7 @@ class ConfirmTransactionModal extends StatelessWidget {
           ),
           5.sp.verticalSpace,
           Text(
-            '≈ \$${MyCurrencyUtils.format(amountInFiat,token.coinType==CoinType.TOKEN?2:6)} USD',
+            '≈ \$${MyCurrencyUtils.formatCurrency2(amountInFiat)} USD',
             style: TextStyle(
               color: const Color(0xFF757575),
               fontSize: 14.sp,
@@ -226,7 +226,7 @@ class ConfirmTransactionModal extends StatelessWidget {
                 ),
               ),
               fee!=null?Text(
-                '\$ ${MyCurrencyUtils.format(amountInFiat,6)} ${sendPayload.asset!.networkModel!.chainSymbol}',
+                '\$ ${MyCurrencyUtils.formatCurrency2(amountInFiat)} ${sendPayload.asset!.networkModel!.chainSymbol}',
                 style: TextStyle(
                   color: const Color(0xFF2D2D2D),
                   fontSize: 14.sp,
@@ -250,7 +250,7 @@ class ConfirmTransactionModal extends StatelessWidget {
                 ),
               ),
               fee!=null?Text(
-                '${MyCurrencyUtils.format(amount+fee.feeInCrypto,token.coinType==CoinType.TOKEN?4:6)} ${sendPayload.asset!.symbol}',
+                '${MyCurrencyUtils.formatCurrency2(amount+fee.feeInCrypto)} ${sendPayload.asset!.symbol}',
                 style: TextStyle(
                   color: const Color(0xFF2D2D2D),
                   fontSize: 16.sp,
@@ -258,7 +258,7 @@ class ConfirmTransactionModal extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 ),
               ):Text(
-                '${MyCurrencyUtils.format(amount,token.coinType==CoinType.TOKEN?4:6)} ${sendPayload.asset!.symbol}',
+                '${MyCurrencyUtils.formatCurrency2(amount)} ${sendPayload.asset!.symbol}',
                 style: TextStyle(
                   color: const Color(0xFF2D2D2D),
                   fontSize: 16.sp,

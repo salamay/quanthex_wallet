@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:quanthex/core/constants/sub_constants.dart';
 import 'package:quanthex/data/Models/staking/staking_dto.dart';
 import 'package:quanthex/data/Models/staking/staking_payload.dart';
 import 'package:quanthex/data/controllers/mining/mining_controller.dart';
@@ -30,9 +32,6 @@ class StakingView extends StatefulWidget {
 }
 
 class _StakingViewState extends State<StakingView> {
-  ValueNotifier<bool> _loadingNotifier = ValueNotifier(true);
-  ValueNotifier<bool> _errorNotifier = ValueNotifier(false);
-  String _selectedFilter = 'Balance';
   late MiningController miningController;
   late AssetController assetController;
   late WalletController walletController;
@@ -43,21 +42,21 @@ class _StakingViewState extends State<StakingView> {
     miningController = Provider.of<MiningController>(context, listen: false);
     assetController = Provider.of<AssetController>(context, listen: false);
     walletController = Provider.of<WalletController>(context, listen: false);
-    fetchData();
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      fetchData();
+    });
   }
 
   void fetchData() async {
     try {
-      _loadingNotifier.value = true;
-      _errorNotifier.value = false;
-      await miningController.fetchStakings();
-      await miningController.fetchWithdrawals();
-      _loadingNotifier.value = false;
-      _errorNotifier.value = false;
+      String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+      await miningController.fetchStakings(walletAddress, active);
+      List<StakingDto> stakings = miningController.stakings[walletAddress] ?? [];
+      if (stakings.isNotEmpty) {
+        await miningController.fetchWithdrawals(stakings.first.stakingId ?? "");
+      }
     } catch (e) {
       logger("Error fetching data: $e", runtimeType.toString());
-      _errorNotifier.value = true;
-      _loadingNotifier.value = false;
     }
   }
 
@@ -98,112 +97,101 @@ class _StakingViewState extends State<StakingView> {
                   fetchData();
                 },
                 child: SingleChildScrollView(
-                  child: ValueListenableBuilder(
-                    valueListenable: _loadingNotifier,
-                    builder: (context, loading, child) {
-                      return ValueListenableBuilder(
-                        valueListenable: _errorNotifier,
-                        builder: (context, isError, child) {
-                          return Skeletonizer(
-                            ignoreContainers: false,
-                            enabled: loading,
-                            effect: ShimmerEffect(duration: const Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
-                            child: !isError
-                                ? Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // Active Staking Section
-                                      Consumer<MiningController>(
-                                        builder: (context, mCtr, child) {
-                                          List<StakingDto> stakings = mCtr.stakings;
-                                          if (stakings.isNotEmpty) {
-                                            return Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                ActiveStaking(stake: stakings.first),
-                                              ],
-                                            );
-                                          } else {
-                                            // What is Staking Card
-                                            return Column(
-                                              children: [
-                                                WhatIsStakingCard(
-                                                  onLearnMore: () {
-                                                    // Handle learn more action
-                                                    List<SupportedCoin> supportedCoins = assetController.assets.where((e) => e.symbol.toLowerCase() == "usdt" && e.networkModel!.chainId == 56).toList();
-                                                    if (supportedCoins.isEmpty) {
-                                                      showMySnackBar(context: context, message: "You don't have USDT on Bep20 to  stake, Please note that USDT is required for payment", type: SnackBarType.error);
-                                                      return;
-                                                    }
-                                                    SupportedCoin asset = supportedCoins.first;
-                                                    _navigateToStakingView(asset);
-                                                  },
+                  child: Skeletonizer(
+                    ignoreContainers: false,
+                    enabled: miningController.fetchingStakings,
+                    effect: ShimmerEffect(duration: const Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                    child: !miningController.fetchingStakings&&!miningController.fetchingStakingsError
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Active Staking Section
+                              Consumer<MiningController>(
+                                builder: (context, mCtr, child) {
+                                  String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+                                  List<StakingDto> stakings = mCtr.stakings[walletAddress] ?? [];
+                                  if (stakings.isNotEmpty) {
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        ActiveStaking(stake: stakings.first),
+                                      ],
+                                    );
+                                  } else {
+                                    // What is Staking Card
+                                    return Column(
+                                      children: [
+                                        WhatIsStakingCard(
+                                          onLearnMore: () {
+                                            // Handle learn more action
+                                            List<SupportedCoin> supportedCoins = assetController.assets.where((e) => e.symbol.toLowerCase() == "usdt" && e.networkModel!.chainId == 56).toList();
+                                            if (supportedCoins.isEmpty) {
+                                              showMySnackBar(context: context, message: "You don't have USDT on Bep20 to  stake, Please note that USDT is required for payment", type: SnackBarType.error);
+                                              return;
+                                            }
+                                            SupportedCoin asset = supportedCoins.first;
+                                            _navigateToStakingView(asset);
+                                          },
+                                        ),
+                                        20.sp.verticalSpace,
+                                         Align(
+                                          alignment: Alignment.centerLeft,
+                                           child: Text(
+                                            'Stakable Tokens',
+                                            style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                                                                                           ),
+                                         ),
+                                        // Token List
+                                        Consumer<AssetController>(
+                                          builder: (context, assetCtr, child) {
+                                            List<SupportedCoin> tokens = _stakableTokens;
+                                            if (tokens.isEmpty) {
+                                              return Padding(
+                                                padding: EdgeInsets.all(40.sp),
+                                                child: Center(
+                                                  child: Text(
+                                                    'No stakable tokens available',
+                                                    style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                                  ),
                                                 ),
-                                                20.sp.verticalSpace,
-                                                 Align(
-                                                  alignment: Alignment.centerLeft,
-                                                   child: Text(
-                                                    'Stakable Tokens',
-                                                    style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                                                                                                   ),
-                                                 ),
-                                                // Token List
-                                                Consumer<AssetController>(
-                                                  builder: (context, assetCtr, child) {
-                                                    List<SupportedCoin> tokens = _stakableTokens;
-                                                    if (tokens.isEmpty) {
-                                                      return Padding(
-                                                        padding: EdgeInsets.all(40.sp),
-                                                        child: Center(
-                                                          child: Text(
-                                                            'No stakable tokens available',
-                                                            style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                                                          ),
-                                                        ),
+                                              );
+                                            }
+                                            return tokens.isEmpty
+                                                ? EmptyView(message: "No stakable tokens available")
+                                                : Column(
+                                                    children: tokens.map((token) {
+                                                      return StakingTokenItem(
+                                                        coin: token,
+                                                        onTap: () {
+                                                          _navigateToStakingView(token);
+                                                        },
                                                       );
-                                                    }
-                                                    return tokens.isEmpty
-                                                        ? EmptyView(message: "No stakable tokens available")
-                                                        : Column(
-                                                            children: tokens.map((token) {
-                                                              return StakingTokenItem(
-                                                                coin: token,
-                                                                onTap: () {
-                                                                  _navigateToStakingView(token);
-                                                                },
-                                                              );
-                                                            }).toList(),
-                                                          );
-                                                  },
-                                                ),
-                                              ],
-                                            );
-                                          }
-                                        },
-                                      ),
-                                      // Tokens Section
-                                      // TokensSectionHeader(
-                                      //   selectedFilter: _selectedFilter,
-                                      //   onFilterTap: () {
-                                      //     // Show filter options
-                                      //   },
-                                      // ),
-                                      // 10.sp.verticalSpace,
-                                    ],
-                                  )
-                                : Center(
-                                    child: ErrorModal(
-                                      callBack: () {
-                                        _errorNotifier.value = false;
-                                        _loadingNotifier.value = true;
-                                        fetchData();
-                                      },
-                                    ),
-                                  ),
-                          );
-                        },
-                      );
-                    },
+                                                    }).toList(),
+                                                  );
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                },
+                              ),
+                              // Tokens Section
+                              // TokensSectionHeader(
+                              //   selectedFilter: _selectedFilter,
+                              //   onFilterTap: () {
+                              //     // Show filter options
+                              //   },
+                              // ),
+                              // 10.sp.verticalSpace,
+                            ],
+                          )
+                        : Center(
+                            child: ErrorModal(
+                              callBack: () {
+                                fetchData();
+                              },
+                            ),
+                          ),
                   ),
                 ),
               ),

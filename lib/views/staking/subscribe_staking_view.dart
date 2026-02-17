@@ -12,6 +12,7 @@ import 'package:quanthex/data/Models/subscription/subscription_dto.dart';
 import 'package:quanthex/data/controllers/assets/asset_controller.dart';
 import 'package:quanthex/data/controllers/balance/balance_controller.dart';
 import 'package:quanthex/data/controllers/mining/mining_controller.dart';
+import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/services/assets/asset_service.dart';
 import 'package:quanthex/data/services/mining/mining_service.dart';
 import 'package:quanthex/data/utils/date_utils.dart';
@@ -60,6 +61,7 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
   late BalanceController balanceController;
   late MiningController miningController;
   late AssetController assetController;
+  late WalletController walletController;
   int _selectedDurationMonths = 1; // Default to 1 month
 
   @override
@@ -67,6 +69,7 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
     balanceController = Provider.of<BalanceController>(context, listen: false);
     miningController = Provider.of<MiningController>(context, listen: false);
     assetController = Provider.of<AssetController>(context, listen: false);
+    walletController = Provider.of<WalletController>(context, listen: false);
     payload = widget.payload;
     List<SupportedCoin> supportedCoins = assetController.assets.where((e) => e.symbol.toLowerCase() == "usdt" && e.networkModel!.chainId == 56).toList();
     if (supportedCoins.isEmpty) {
@@ -299,7 +302,7 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
                                   ? Text(
                                       'Balance: ${!bCtr.hideBalance
                                           ? balance.balanceInCrypto != 0
-                                                ? "${MyCurrencyUtils.format(balance.balanceInCrypto, pToken.coinType == CoinType.TOKEN ? 2 : 6) ?? ""} ${pToken.symbol}"
+                                                ? "${MyCurrencyUtils.formatCurrency2(balance.balanceInCrypto)} ${pToken.symbol}"
                                                 : "0 ${pToken.symbol}"
                                           : "****"}',
                                       style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
@@ -479,8 +482,9 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
         stake.endDate = _getEndDate().millisecondsSinceEpoch;
         stake.startDate = DateTime.now().millisecondsSinceEpoch;
         StakingDto dto = await PackageService.getInstance().stake(stake: stake);
-        List<StakingDto> stakings = await MiningService.getInstance().getStakings();
-        miningController.setStakings(stakings);
+        String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+        List<StakingDto> stakings = await MiningService.getInstance().getStakings(walletAddress, active);
+        miningController.setStakings(walletAddress, stakings);
         hideOverlay(context);
         await _showPaymentSuccessModal();
         Navigate.back(context, args: true);

@@ -10,3 +10,5 @@ const withrawal_notification = "withdrawal";
 const staking_notification = "staking";
 const subscription_notification = "subscription";
 const mining_notification = "mining";
+const active = "Active";
+const completed = "Completed";

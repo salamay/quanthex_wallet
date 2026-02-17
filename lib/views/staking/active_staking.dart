@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:quanthex/data/Models/staking/withdrawal.dart';
+import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/repository/secure_storage.dart';
 import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/data/utils/security_utils.dart';
@@ -19,6 +20,7 @@ import 'components/withdrawal_success.dart';
 class ActiveStaking extends StatelessWidget {
   ActiveStaking({super.key, required this.stake});
   final StakingDto stake;
+  late WalletController walletController;
 
   void _showWithdrawSuccessModal(BuildContext context, StakingDto stake) {
     showModalBottomSheet(
@@ -42,6 +44,7 @@ class ActiveStaking extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    walletController = Provider.of<WalletController>(context, listen: false);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -121,7 +124,8 @@ class ActiveStaking extends StatelessWidget {
                       try {
                         String? stakeId = stake.stakingId;
                         if (stakeId != null && stakeId.isNotEmpty) {
-                          await miningController.withdraw(stakeId: stakeId);
+                          String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+                          await miningController.withdraw(stakeId: stakeId, walletAddress: walletAddress);
                           _showWithdrawSuccessModal(context, stake);
                         } else {
                           showMySnackBar(context: context, message: "Invalid stake ID", type: SnackBarType.error);

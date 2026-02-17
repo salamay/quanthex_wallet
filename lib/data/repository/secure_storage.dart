@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:quanthex/data/Models/assets/custom_token.dart'
     show CustomToken, customTokenToJson, customTokenFromJson;
 import 'package:quanthex/data/Models/wallets/wallet_model.dart';
+import 'package:quanthex/data/utils/home_nav_resolver.dart';
 import 'package:quanthex/data/utils/logger.dart';
 import 'package:uuid/uuid.dart';
 
@@ -13,8 +14,8 @@ class SecureStorage {
   AndroidOptions _getAndroidOptions() =>
       const AndroidOptions(encryptedSharedPreferences: true);
   static FlutterSecureStorage? _storage;
-  static const wallets_key = 'user_wallets';
-  static const current_wallet_key = 'current_wallet';
+  static const wallets_key = 'user_wallets_v1';
+  static const current_wallet_key = 'current_wallet_v1';
   static const custom_tokens = 'user_custom_tokens';
   static const pin_key = 'pin';
   static const _key = 'persistent_device_id';

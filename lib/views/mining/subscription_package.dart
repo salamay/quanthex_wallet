@@ -78,7 +78,8 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
         padding: EdgeInsets.symmetric(horizontal: 16.sp),
         child: Consumer<MiningController>(
           builder: (context, miningCtr, _) {
-            List<MiningDto> minings = miningCtr.minings;
+            String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+            List<MiningDto> minings = miningCtr.minings[walletAddress] ?? [];
             return SingleChildScrollView(
               physics: AlwaysScrollableScrollPhysics(),
               child: Column(

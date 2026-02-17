@@ -18,7 +18,7 @@ class _WithdrawalsViewState extends State<WithdrawalsView> {
     super.initState();
     // Fetch withdrawals when the view is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MiningController>(context, listen: false).fetchWithdrawals();
+      // Provider.of<MiningController>(context, listen: false).fetchWithdrawals();
     });
   }
 
@@ -111,7 +111,7 @@ class _WithdrawalsViewState extends State<WithdrawalsView> {
 
                   return RefreshIndicator(
                     onRefresh: () async {
-                      await miningController.fetchWithdrawals();
+                      // await miningController.fetchWithdrawals();
                     },
                     child: SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),

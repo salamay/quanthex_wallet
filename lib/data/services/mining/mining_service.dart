@@ -25,12 +25,12 @@ class MiningService{
   }
 
 
-  Future<List<MiningDto>> getMinings()async{
+  Future<List<MiningDto>> getMinings(String walletAddress)async{
     logger("Getting minings", runtimeType.toString());
     Response? response;
     try{
       String accessToken=AuthService.getInstance().authToken;
-      response = await my_api.get(ApiUrls.minings, {"Content-Type": "application/json", "Authorization": "Bearer $accessToken"});
+      response = await my_api.get("${ApiUrls.minings}?walletAddress=$walletAddress", {"Content-Type": "application/json", "Authorization": "Bearer $accessToken"});
     }catch(e){
       logger(e.toString(),runtimeType.toString());
       throw Exception("Unable to establish connection");
@@ -49,18 +49,19 @@ class MiningService{
     }
   }
 
-  Future<List<StakingDto>> getStakings()async{
+  Future<List<StakingDto>> getStakings(String walletAddress, String stakingStatus)async{
     logger("Getting stakings", runtimeType.toString());
     Response? response;
     try{
       String accessToken=AuthService.getInstance().authToken;
-      response = await my_api.get(ApiUrls.stakings, {"Content-Type": "application/json", "Authorization": "Bearer $accessToken"});
+      response = await my_api.get("${ApiUrls.stakings}?walletAddress=$walletAddress&stakingStatus=$stakingStatus", {"Content-Type": "application/json", "Authorization": "Bearer $accessToken"});
     }catch(e){
       logger(e.toString(),runtimeType.toString());
       throw Exception("Unable to establish connection");
     }
     if(response!=null){
       logger("Getting stakings: Response code ${response.statusCode}",runtimeType.toString());
+      
       if(response.statusCode!>=200 && response.statusCode!<300){
         final  data=response.data["data"];
         return List.from(data).map((e) => StakingDto.fromJson(e)).toList();
@@ -73,12 +74,12 @@ class MiningService{
     }
   }
 
-  Future<List<ReferralDto>> getSubscriptionDirectReferrals(String miningTag) async {
+  Future<List<ReferralDto>> getSubscriptionDirectReferrals(String miningSubscriptionId) async {
     logger("Getting mining direct referrals", runtimeType.toString());
     Response? response;
     try {
       String accessToken = AuthService.getInstance().authToken;
-      response = await my_api.get("${ApiUrls.subscriptionDirectReferrals}?subscriptionId=$miningTag", {"Content-Type": "application/json", "Authorization": "Bearer $accessToken"});
+      response = await my_api.get("${ApiUrls.subscriptionDirectReferrals}?subscriptionId=$miningSubscriptionId", {"Content-Type": "application/json", "Authorization": "Bearer $accessToken"});
     } catch (e) {
       logger(e.toString(), runtimeType.toString());
       throw Exception("Unable to establish connection");
@@ -96,12 +97,12 @@ class MiningService{
       throw Exception("Unable to establish connection");
     }
   }
-  Future<List<ReferralDto>> getSubscriptionIndirectReferrals(String miningTag) async {
+  Future<List<ReferralDto>> getSubscriptionIndirectReferrals(String miningSubscriptionId) async {
     logger("Getting mining indirect referrals", runtimeType.toString());
     Response? response;
     try {
       String accessToken = AuthService.getInstance().authToken;
-      response = await my_api.get("${ApiUrls.subscriptionIndirectReferrals}?subscriptionId=$miningTag", {"Content-Type": "application/json", "Authorization": "Bearer $accessToken"});
+      response = await my_api.get("${ApiUrls.subscriptionIndirectReferrals}?subscriptionId=$miningSubscriptionId", {"Content-Type": "application/json", "Authorization": "Bearer $accessToken"});
     } catch (e) {
       logger(e.toString(), runtimeType.toString());
       throw Exception("Unable to establish connection");

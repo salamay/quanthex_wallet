@@ -15,7 +15,7 @@ class SwapController extends ChangeNotifier {
   Map<String, String> chainLink = {
     eth: "https://gateway.thegraph.com/api/7e8b89f52322d9cdf2d03b3c2d135400/subgraphs/id/5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
     bsc: "https://gateway.thegraph.com/api/7e8b89f52322d9cdf2d03b3c2d135400/subgraphs/id/F85MNzUGYqgSHSHRGgeVMNsdnW1KtZSVgFULumXRZTw2",
-    pol: "https://gateway.thegraph.com/api/7e8b89f52322d9cdf2d03b3c2d135400/subgraphs/id/HMcqgvDY6f4MpnRSJqUUsBPHePj8Hq3AxiDBfDUrWs15",
+    pol: "https://gateway.thegraph.com/api/7e8b89f52322d9cdf2d03b3c2d135400/subgraphs/id/3hCPRGf4z88VC5rsBKU5AA9FBBq5nF3jbKJG7VZCbhjm",
   };
   List<SupportedCoin> tokens = [];
   Map<String, String> tokenImages = {};
@@ -26,6 +26,9 @@ class SwapController extends ChangeNotifier {
       int limit = 20;
       //I did this because the bsc subgraph is doesnt get data below 100
       if (network.chainSymbol == bsc) {
+        limit = 100;
+      }
+      if (network.chainSymbol == pol) {
         limit = 100;
       }
       isPoolError = false;
@@ -39,6 +42,8 @@ class SwapController extends ChangeNotifier {
         link: httpLink,
         // The default store is the InMemoryStore, which does NOT persist to disk
         cache: GraphQLCache(store: HiveStore()),
+        queryRequestTimeout: const Duration(seconds: 20),
+
         defaultPolicies: DefaultPolicies(query: Policies(fetch: FetchPolicy.networkOnly)),
       );
 
@@ -77,7 +82,7 @@ class SwapController extends ChangeNotifier {
       notifyListeners();
       return assets;
     } catch (e) {
-      logger(e.toString(), runtimeType.toString());
+      logger(network.chainSymbol.toString()+": "+e.toString(), runtimeType.toString());
       isPoolError = true;
       notifyListeners();
       throw Exception(e);

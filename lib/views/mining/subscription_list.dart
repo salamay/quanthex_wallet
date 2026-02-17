@@ -4,10 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:quanthex/data/Models/mining/mining_dto.dart';
 import 'package:quanthex/data/Models/subscription/subscription_dto.dart';
 import 'package:quanthex/data/controllers/mining/mining_controller.dart';
+import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/utils/date_utils.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/routes/app_routes.dart';
 import 'package:quanthex/views/mining/subscription_package.dart';
+import 'package:quanthex/widgets/app_button.dart';
+import 'package:quanthex/widgets/global/error_modal.dart';
+import 'package:quanthex/widgets/loading_overlay/loading.dart';
 import 'package:quanthex/widgets/quanthex_image_banner.dart';
 
 class SubscriptionList extends StatefulWidget {
@@ -18,6 +22,13 @@ class SubscriptionList extends StatefulWidget {
 }
 
 class _SubscriptionListState extends State<SubscriptionList> {
+  late WalletController walletController;
+  @override
+  void initState() {
+    // TODO: implement initState
+    walletController = Provider.of<WalletController>(context, listen: false);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -27,8 +38,9 @@ class _SubscriptionListState extends State<SubscriptionList> {
         child: Consumer<MiningController>(
           builder: (context, miningController, _) {
             // Extract subscriptions from minings
-            List<MiningDto> minings = miningController.minings.where((mining) => mining.subscription != null).toList();
-            return Column(
+            String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+            List<MiningDto> minings = miningController.minings[walletAddress] ?? [];
+            return miningController.fetchingMinings ? Loading(size: 30.sp,) : Column(
               children: [
                 
                 // Header
@@ -39,7 +51,7 @@ class _SubscriptionListState extends State<SubscriptionList> {
               
               10.sp.verticalSpace,
                 // Grid View
-                Expanded(
+                !miningController.fetchingMinings&&!miningController.fetchingMiningError?Expanded(
                   child: minings.isEmpty
                       ? Center(
                           child: Column(
@@ -54,20 +66,12 @@ class _SubscriptionListState extends State<SubscriptionList> {
                             ],
                           ),
                         )
-                      : GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 12.sp, mainAxisSpacing: 12.sp, childAspectRatio: 0.75),
-                          itemCount: minings.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: (){
-                                MiningDto mining = minings[index];
-                                Navigate.toNamed(context, name: AppRoutes.miningview,args: mining);
-
-                              },
-                              child: _buildSubscriptionCard(minings[index].subscription!)
-                              );
-                          },
-                        ),
+                      : _buildSubscriptionCard(minings.first),
+                ):ErrorModal(
+                  callBack: () {
+                  miningController.fetchMinings(walletAddress);
+                  },
+                  message: "Error fetching minings",
                 ),
               ],
             );
@@ -77,7 +81,9 @@ class _SubscriptionListState extends State<SubscriptionList> {
     );
   }
 
-  Widget _buildSubscriptionCard(SubscriptionDto subscription) {
+  Widget _buildSubscriptionCard(MiningDto mining) {
+    SubscriptionDto subscription = mining.subscription!;
+    
     return Container(
       padding: EdgeInsets.all(16.sp),
       decoration: BoxDecoration(
@@ -87,7 +93,7 @@ class _SubscriptionListState extends State<SubscriptionList> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,7 +158,33 @@ class _SubscriptionListState extends State<SubscriptionList> {
                 ),
             ],
           ),
+          
           // Status indicator
+          GestureDetector(
+            onTap: () {
+              Navigate.toNamed(context, name: AppRoutes.miningview, args: mining);
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 6.sp),
+              decoration: BoxDecoration(color: Colors.greenAccent, borderRadius: BorderRadius.circular(8)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 6.sp,
+                    height: 6.sp,
+                    decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  ),
+                  6.sp.horizontalSpace,
+                  Text(
+                    'View Details',
+                    style: TextStyle(color: Colors.white, fontSize: 11.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const Spacer(),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 6.sp),
             decoration: BoxDecoration(color: const Color(0xFF792A90).withOpacity(0.1), borderRadius: BorderRadius.circular(8)),

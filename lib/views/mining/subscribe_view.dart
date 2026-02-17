@@ -10,6 +10,7 @@ import 'package:quanthex/data/Models/send/send_payload.dart';
 import 'package:quanthex/data/Models/subscription/subscription_dto.dart';
 import 'package:quanthex/data/controllers/balance/balance_controller.dart';
 import 'package:quanthex/data/controllers/mining/mining_controller.dart';
+import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/services/assets/asset_service.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/data/utils/overlay_utils.dart';
@@ -55,12 +56,14 @@ class _SubscribeViewState extends State<SubscribeView> {
   SupportedCoin? rewardCoin;
   late BalanceController balanceController;
   late MiningController miningController;
-  final TextEditingController referralCode=TextEditingController();
+  late WalletController walletController;
+  final TextEditingController referralCode = TextEditingController();
 
   @override
   void initState() {
     balanceController = Provider.of<BalanceController>(context, listen: false);
     miningController = Provider.of<MiningController>(context, listen: false);
+    walletController = Provider.of<WalletController>(context, listen: false);
     payload = widget.payload;
 
     _paymentAmount = widget.payload.subPrice?.toDouble() ?? 0.0;
@@ -70,7 +73,7 @@ class _SubscribeViewState extends State<SubscribeView> {
 
   Future<void> _showPaymentSuccessModal() async {
     print("object");
-     await showModalBottomSheet(
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useRootNavigator: true,
@@ -286,16 +289,13 @@ class _SubscribeViewState extends State<SubscribeView> {
                       ),
                     ),
                     10.sp.verticalSpace,
-                       Text(
+                    Text(
                       'Referral Code',
                       style: TextStyle(color: const Color(0xFF333333), fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 1.57, letterSpacing: -0.41),
                     ),
                     5.sp.verticalSpace,
-                    AppTextfield(
-                      hintText: 'Enter referral code', 
-                      controller: referralCode
-                      ),
-                    20.sp.verticalSpace,                    // Package Details
+                    AppTextfield(hintText: 'Enter referral code', controller: referralCode),
+                    20.sp.verticalSpace, // Package Details
                     Container(
                       padding: EdgeInsets.all(16.sp),
                       decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
@@ -357,7 +357,8 @@ class _SubscribeViewState extends State<SubscribeView> {
                     ),
                     20.sp.verticalSpace,
                     // Total Reward Potential
-                    rewardCoin != null? Builder(
+                    rewardCoin != null
+                        ? Builder(
                             builder: (context) {
                               double? priceQuote = balanceController.priceQuotes[rewardCoin!.symbol] ?? 0;
                               double? estimatedOutput = totalRewardPotential / priceQuote;
@@ -376,15 +377,16 @@ class _SubscribeViewState extends State<SubscribeView> {
                                 ],
                               );
                             },
-                          ) : const SizedBox(),
-                          40.sp.verticalSpace,
+                          )
+                        : const SizedBox(),
+                    40.sp.verticalSpace,
                     AppButton(
                       text: 'Pay Now',
                       textColor: Colors.white,
                       color: canPay ? const Color(0xFF792A90) : const Color(0xFFB5B5B5),
                       onTap: () async {
                         if (canPay) {
-                           String refCode = referralCode.text.trim();
+                          String refCode = referralCode.text.trim();
                           if (refCode.isEmpty) {
                             showMySnackBar(context: context, message: "Referral code is required", type: SnackBarType.error);
                             return;
@@ -410,6 +412,7 @@ class _SubscribeViewState extends State<SubscribeView> {
   Future<void> pay(CoinBalance? balance, SupportedCoin rewardToken) async {
     NetworkFee? fee;
     String refCode = referralCode.text.trim();
+    String walletAddress = walletController.currentWallet!.walletAddress ?? "";
     try {
       if (balance == null) {
         showMySnackBar(context: context, message: "Balance not available, Please try again later", type: SnackBarType.error);
@@ -450,8 +453,8 @@ class _SubscribeViewState extends State<SubscribeView> {
         String txSigned = bytesToHex(signedTransaction, include0x: true);
         payload.subReferralCode = refCode;
         SubscriptionDto dto = await PackageService.getInstance().makeSubscription(sub: payload, paymentToken: asset, rewardToken: rewardToken, signedTx: txSigned, rpc: rpc);
-        List<MiningDto> minings = await miningController.miningService.getMinings();
-        miningController.setMinings(minings);
+        List<MiningDto> minings = await miningController.miningService.getMinings(walletAddress);
+        miningController.setMinings(walletAddress, minings);
         hideOverlay(context);
         await _showPaymentSuccessModal();
         Navigate.back(context, args: true);

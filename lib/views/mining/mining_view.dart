@@ -29,14 +29,12 @@ class MiningView extends StatefulWidget {
   MiningView({super.key, required this.mining});
 
   MiningDto mining;
-  
 
   @override
   State<MiningView> createState() => _MiningViewState();
 }
 
 class _MiningViewState extends State<MiningView> {
-
   late AssetController assetController;
   ValueNotifier<bool> _loadingNotifier = ValueNotifier(true);
   ValueNotifier<bool> _errorNotifier = ValueNotifier(false);
@@ -52,13 +50,13 @@ class _MiningViewState extends State<MiningView> {
     fetchData();
     super.initState();
   }
-  
-    void fetchData() async {
+
+  void fetchData() async {
     try {
       _loadingNotifier.value = true;
       _errorNotifier.value = false;
       String miningSubscriptionId = widget.mining.subscription!.subId ?? "";
-      await miningController.getSubscriptionDirectReferrals(miningSubscriptionId);
+      await miningController.getSubscriptionReferrals(miningSubscriptionId);
       _loadingNotifier.value = false;
       _errorNotifier.value = false;
     } catch (e) {
@@ -67,7 +65,7 @@ class _MiningViewState extends State<MiningView> {
       _loadingNotifier.value = false;
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,8 +80,10 @@ class _MiningViewState extends State<MiningView> {
         ),
         leading: IconButton(
           onPressed: () {
-          Navigate.back(context);
-        }, icon: Icon(Icons.arrow_back, color: Colors.black)),
+            Navigate.back(context);
+          },
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+        ),
       ),
       body: Consumer<UserController>(
         builder: (context, userCtr, child) {
@@ -93,13 +93,12 @@ class _MiningViewState extends State<MiningView> {
             padding: EdgeInsets.all(16.sp),
             color: Colors.white,
             child: SafeArea(
-                child: ValueListenableBuilder(
+              child: ValueListenableBuilder(
                 valueListenable: _loadingNotifier,
                 builder: (context, loading, child) {
-                    return ValueListenableBuilder(
+                  return ValueListenableBuilder(
                     valueListenable: _errorNotifier,
                     builder: (context, isError, child) {
-                      
                       return Skeletonizer(
                         ignoreContainers: false,
                         enabled: loading,
@@ -114,181 +113,185 @@ class _MiningViewState extends State<MiningView> {
                             int noOfIndirectReferrals = indirectReferrals.length;
                             int totalReferrals = noOfDirectReferrals + noOfIndirectReferrals;
                             String packageName = mining.subscription!.subPackageName ?? "";
+                            double hashRate = ProductUtils.getHashRate(noOfReferrals: totalReferrals, packageName: packageName);
                             double amountEarned = SubUtils.calcAmountEarned(packageName: packageName, noOfReferrals: totalReferrals);
-                            return !isError?SingleChildScrollView(
-                              physics: AlwaysScrollableScrollPhysics(),
-                              child: Column(
-                                children: [
-                                  // Quanthex Image Banner
-                                  Center(
-                                    child: SizedBox(
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: [
-                                          MiningSimulationWidget(
-                                            baseHashRate: double.parse(mining.mining!.hashRate ?? "0"), // Static hash rate value
-                                            fluctuationRange: mining.mining!.hashRate != ProductUtils.LEVEL_SIX_HASHRATE.toString() ? 0.12 : 0.0, // 12% fluctuation range
-                                            animationSpeed: Duration(milliseconds: mining.mining!.hashRate != ProductUtils.LEVEL_SIX_HASHRATE.toString() ? 100 : 1000000000), // Animation speed
-                                            hashUnit: "Hex MH/s",
-                                            title: "DIGIT HASH",
-                                            subtitle: "MINING ENGINE",
+                            return !isError
+                                ? SingleChildScrollView(
+                                    physics: AlwaysScrollableScrollPhysics(),
+                                    child: Column(
+                                      children: [
+                                        // Quanthex Image Banner
+                                        Center(
+                                          child: SizedBox(
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                MiningSimulationWidget(
+                                                  baseHashRate: hashRate, // Static hash rate value
+                                                  fluctuationRange: hashRate != ProductUtils.LEVEL_FOUR_HASHRATE ? 0.12 : 0.0, // 12% fluctuation range
+                                                  animationSpeed: Duration(milliseconds: hashRate != ProductUtils.LEVEL_FOUR_HASHRATE ? 100 : 1000000000), // Animation speed
+                                                  hashUnit: "Hex MH/s",
+                                                  title: "DIGIT HASH",
+                                                  subtitle: "MINING ENGINE",
+                                                ),
+                                                // Column(
+                                                //   mainAxisAlignment: MainAxisAlignment.center,
+                                                //   children: [
+                                                //     Text(
+                                                //       'Mining',
+                                                //       style: TextStyle(
+                                                //         color: const Color(0xFF757575),
+                                                //         fontSize: 14.sp,
+                                                //         fontFamily: 'Satoshi',
+                                                //         fontWeight: FontWeight.w500,
+                                                //       ),
+                                                //     ),
+                                                //     5.verticalSpace,
+                                                //     Text(
+                                                //       '${(_miningProgress * 100).toInt()}%',
+                                                //       style: TextStyle(
+                                                //         color: const Color(0xFF2D2D2D),
+                                                //         fontSize: 32.sp,
+                                                //         fontFamily: 'Satoshi',
+                                                //         fontWeight: FontWeight.w700,
+                                                //       ),
+                                                //     ),
+                                                //   ],
+                                                // ),
+                                              ],
+                                            ),
                                           ),
-                                          // Column(
-                                          //   mainAxisAlignment: MainAxisAlignment.center,
-                                          //   children: [
-                                          //     Text(
-                                          //       'Mining',
-                                          //       style: TextStyle(
-                                          //         color: const Color(0xFF757575),
-                                          //         fontSize: 14.sp,
-                                          //         fontFamily: 'Satoshi',
-                                          //         fontWeight: FontWeight.w500,
-                                          //       ),
-                                          //     ),
-                                          //     5.verticalSpace,
-                                          //     Text(
-                                          //       '${(_miningProgress * 100).toInt()}%',
-                                          //       style: TextStyle(
-                                          //         color: const Color(0xFF2D2D2D),
-                                          //         fontSize: 32.sp,
-                                          //         fontFamily: 'Satoshi',
-                                          //         fontWeight: FontWeight.w700,
-                                          //       ),
-                                          //     ),
-                                          //   ],
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  // Earned Amount
-                                      
-                                  // 8.sp.verticalSpace,
-                                  // Center(
-                                  //   child: Text(
-                                  //     'Earned STB',
-                                  //     style: TextStyle(
-                                  //       color: const Color(0xFF792A90),
-                                  //       fontSize: 14.sp,
-                                  //       fontFamily: 'Satoshi',
-                                  //       fontWeight: FontWeight.w500,
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  20.sp.verticalSpace,
-                                  // Referral Link
-                                  Consumer<UserController>(
-                                    builder: (context, userCtr, _) {
-                                      String miningTag = mining.mining!.miningTag ?? "";
-                                      return Container(
-                                        padding: EdgeInsets.all(16.sp),
-                                        decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
+                                        ),
+                                        // Earned Amount
+
+                                        // 8.sp.verticalSpace,
+                                        // Center(
+                                        //   child: Text(
+                                        //     'Earned STB',
+                                        //     style: TextStyle(
+                                        //       color: const Color(0xFF792A90),
+                                        //       fontSize: 14.sp,
+                                        //       fontFamily: 'Satoshi',
+                                        //       fontWeight: FontWeight.w500,
+                                        //     ),
+                                        //   ),
+                                        // ),
+                                        20.sp.verticalSpace,
+                                        // Referral Link
+                                        Consumer<UserController>(
+                                          builder: (context, userCtr, _) {
+                                            String miningTag = mining.mining!.miningTag ?? "";
+                                            return Container(
+                                              padding: EdgeInsets.all(16.sp),
+                                              decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
                                                     child: Text(
                                                       miningTag,
                                                       style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                                                     ),
                                                   ),
-                                            10.horizontalSpace,
-                                            GestureDetector(
-                                              onTap: () {
-                                                Clipboard.setData(ClipboardData(text: miningTag));
-                                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Link copied')));
-                                              },
-                                              child: Icon(Icons.copy, size: 20.sp, color: const Color(0xFF757575)),
+                                                  10.horizontalSpace,
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Clipboard.setData(ClipboardData(text: miningTag));
+                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Link copied')));
+                                                    },
+                                                    child: Icon(Icons.copy, size: 20.sp, color: const Color(0xFF757575)),
+                                                  ),
+                                                  10.horizontalSpace,
+                                                  GestureDetector(
+                                                    onTap: () async {
+                                                      String desc = "Invite your friends and earn mining outputs when they join and start mining. The more you refer, the more you earn!. Start sharing and grow your minigs effortlessly";
+                                                      String miningTag = mining.mining!.miningTag ?? "";
+                                                      ShareUtils.shareContent(title: miningTag, subject: desc, url: ApiUrls.quanthexWebsite);
+                                                    },
+                                                    child: Icon(Icons.share, size: 20.sp, color: const Color(0xFF757575)),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        30.sp.verticalSpace,
+                                        // Statistics Cards
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildStatCard(label: 'Active Members', value: totalReferrals.toString()),
                                             ),
-                                            10.horizontalSpace,
-                                            GestureDetector(
-                                              onTap: () async {
-                                                String desc = "Invite your friends and earn mining outputs when they join and start mining. The more you refer, the more you earn!. Start sharing and grow your minigs effortlessly";
-                                                String miningTag = mining.mining!.miningTag ?? "";
-                                                ShareUtils.shareContent(title: miningTag, subject: desc, url: ApiUrls.quanthexWebsite);
-                                              },
-                                              child: Icon(Icons.share, size: 20.sp, color: const Color(0xFF757575)),
+                                            15.horizontalSpace,
+                                            Expanded(
+                                              child: _buildStatCard(label: 'Package name', value: packageName),
                                             ),
                                           ],
                                         ),
-                                      );
-                                    },
-                                  ),
-                                  30.sp.verticalSpace,
-                                  // Statistics Cards
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: _buildStatCard(label: 'Active Members', value: totalReferrals.toString()),
-                                      ),
-                                      15.horizontalSpace,
-                                      Expanded(
-                                        child: _buildStatCard(label: 'Package name', value: packageName),
-                                      ),
-                                    ],
-                                  ),
-                                  15.sp.verticalSpace,
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: _buildStatCard(label: 'Current Mining Speed', value: "${mining.mining!.hashRate} Hex MH/s", isFullWidth: true, fontSize: 15.sp),
-                                      ),
-                                      15.horizontalSpace,
-                                      Expanded(
-                                        child: Consumer<BalanceController>(
-                                          builder: (context, balanceCtr, child) {
-                                            double rewardPriceQuotes = balanceCtr.priceQuotes[mining.subscription!.subRewardAssetSymbol ?? ""] ?? 0;
-                                            logger("Reward Price Quotes: $rewardPriceQuotes", runtimeType.toString());
-                                            logger("Is Loading Price Quotes: ${balanceCtr.isLoadingPriceQuotes}", runtimeType.toString());
-                                            double amountInCrypto = amountEarned / rewardPriceQuotes;
-                                            return Skeletonizer(
-                                              enabled: balanceCtr.isLoadingPriceQuotes,
-                                              effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
-                                              ignoreContainers: false,
-                                              child: _buildStatCard(label: rewardPriceQuotes == 0 ? "" : mining.subscription!.subRewardAssetSymbol ?? "", value: MyCurrencyUtils.format(amountInCrypto, 4), isFullWidth: true));
-                                          },
+                                        15.sp.verticalSpace,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _buildStatCard(label: 'Current Mining Speed', value: "$hashRate Hex MH/s", isFullWidth: true, fontSize: 15.sp),
+                                            ),
+                                            15.horizontalSpace,
+                                            Expanded(
+                                              child: Consumer<BalanceController>(
+                                                builder: (context, balanceCtr, child) {
+                                                  double rewardPriceQuotes = balanceCtr.priceQuotes[mining.subscription!.subRewardAssetSymbol ?? ""] ?? 0;
+                                                  logger("Reward Price Quotes: $rewardPriceQuotes", runtimeType.toString());
+                                                  logger("Is Loading Price Quotes: ${balanceCtr.isLoadingPriceQuotes}", runtimeType.toString());
+                                                  double amountInCrypto = amountEarned / rewardPriceQuotes;
+                                                  return Skeletonizer(
+                                                    enabled: balanceCtr.isLoadingPriceQuotes,
+                                                    effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                                                    ignoreContainers: false,
+                                                    child: _buildStatCard(label: rewardPriceQuotes == 0 ? "" : mining.subscription!.subRewardAssetSymbol ?? "", value: MyCurrencyUtils.format(amountInCrypto, 4), isFullWidth: true),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  15.sp.verticalSpace,
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: HashCard(label: 'Giga Hash', value: "${mining.mining!.hashRate} Hex MH/s", isInProgress: !(double.parse(mining.mining!.hashRate ?? "0") >= ProductUtils.LEVEL_ONE_HASHRATE), fontSize: 15.sp),
-                                      ),
-                                      15.horizontalSpace,
-                                      Expanded(
-                                        child: HashCard(label: "Tera Hash", value: "${mining.mining!.hashRate} Hex MH/s", isInProgress: !(double.parse(mining.mining!.hashRate ?? "0") >= ProductUtils.LEVEL_TWO_HASHRATE)),
-                                      ),
-                                    ],
-                                  ),
-                                  15.sp.verticalSpace,
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: HashCard(label: "Peta Hash", value: "${mining.mining!.hashRate} Hex MH/s", isInProgress: !(double.parse(mining.mining!.hashRate ?? "0") >= ProductUtils.LEVEL_THREE_HASHRATE)),
-                                      ),
-                                    ],
-                                  ),
-                                  40.sp.verticalSpace,
-                                ],
-                              ),
-                            ):Center(
-                                child: ErrorModal(
-                                  callBack: () {
-                                    _errorNotifier.value = false;
-                                    _loadingNotifier.value = true;
-                                    fetchData();
-                                  },
-                                ),
-                              );
-                          }
+                                        15.sp.verticalSpace,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: HashCard(label: 'Giga Hash', value: "$hashRate Hex MH/s", isInProgress: !(hashRate >= ProductUtils.LEVEL_ONE_HASHRATE), fontSize: 15.sp),
+                                            ),
+                                            15.horizontalSpace,
+                                            Expanded(
+                                              child: HashCard(label: "Tera Hash", value: "$hashRate Hex MH/s", isInProgress: !(hashRate >= ProductUtils.LEVEL_TWO_HASHRATE)),
+                                            ),
+                                          ],
+                                        ),
+                                        15.sp.verticalSpace,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: HashCard(label: "Peta Hash", value: "$hashRate Hex MH/s", isInProgress: !(hashRate >= ProductUtils.LEVEL_THREE_HASHRATE)),
+                                            ),
+                                          ],
+                                        ),
+                                        40.sp.verticalSpace,
+                                      ],
+                                    ),
+                                  )
+                                : Center(
+                                    child: ErrorModal(
+                                      callBack: () {
+                                        _errorNotifier.value = false;
+                                        _loadingNotifier.value = true;
+                                        fetchData();
+                                      },
+                                    ),
+                                  );
+                          },
                         ),
                       );
                     },
-                                  );
-                  }
-                ),
+                  );
+                },
+              ),
             ),
           );
         },

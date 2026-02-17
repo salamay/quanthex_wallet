@@ -146,12 +146,12 @@ class PackageService {
     }
   }
 
-  Future<List<WithdrawalDto>> getWithdrawals() async {
+  Future<List<WithdrawalDto>> getWithdrawals(String stakingId) async {
     logger("Getting withdrawals", runtimeType.toString());
     Response? response;
     try {
       String accessToken = AuthService.getInstance().authToken;
-      response = await my_api.get(ApiUrls.withdrawals, {
+      response = await my_api.get("${ApiUrls.withdrawals}?stakingId=$stakingId", {
         "Content-Type": "application/json",
         "Authorization": "Bearer $accessToken",
       });

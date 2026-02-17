@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:quanthex/core/constants/sub_constants.dart';
 import 'package:quanthex/data/Models/wallets/wallet_model.dart';
+import 'package:quanthex/data/controllers/mining/mining_controller.dart';
 import 'package:quanthex/data/controllers/notification/notification_controller.dart';
 import 'package:quanthex/data/controllers/swap/swap_controller.dart';
 import 'package:quanthex/data/controllers/user/user_controller.dart';
@@ -44,6 +46,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   ValueNotifier<bool> balanceLoadingNotifier = ValueNotifier(true);
   late AssetController assetController;
   late WalletController walletController;
+  late MiningController miningController;
   late BalanceController balanceController;
   late NotificationController notificationController;
   late UserController userController;
@@ -121,6 +124,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     // TODO: implement initState
     _balanceTimer = Timer.periodic(Duration(seconds: 30), (timer) async {});
     assetController = Provider.of<AssetController>(context, listen: false);
+    miningController = Provider.of<MiningController>(context, listen: false);
     balanceController = Provider.of<BalanceController>(context, listen: false);
     walletController = Provider.of<WalletController>(context, listen: false);
     userController = Provider.of<UserController>(context, listen: false);
@@ -680,13 +684,17 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   Future<void> _switchWallet(WalletModel wallet) async {
     try {
       await walletController.switchWallet(wallet);
+      String walletAddress = wallet.walletAddress ?? "";
+      miningController.refresh();
+       miningController.fetchMinings(walletAddress);
+       miningController.fetchStakings(walletAddress, active);
       // Refresh data after switching wallet
       _stopBalanceTimer();
       _startBalanceTimer();
       assetController.assets = [];
       balanceController.balances = {};
       balanceController.overallBalance = 0;
-      await reload();
+      reload();
       if (mounted) {
         showMySnackBar(context: context, message: 'Wallet switched successfully', type: SnackBarType.success);
       }

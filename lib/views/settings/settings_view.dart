@@ -38,7 +38,7 @@ class SettingsView extends StatelessWidget {
           ),
         ),
         // Quanthex Image Banner
-        QuanthexImageBanner(),
+        QuanthexImageBanner(width: 110.sp, height: 30.sp),
         Expanded(
           child: SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 20),
@@ -53,15 +53,15 @@ class SettingsView extends StatelessWidget {
                   },
                   context: context,
                 ),
-                _buildSettingItem(
-                  icon: Icons.call_made,
-                  iconColor: Colors.blue,
-                  title: 'Withdrawals',
-                  onTap: () {
-                    Navigate.toNamed(context, name: AppRoutes.withdrawalsview);
-                  },
-                  context: context,
-                ),
+                // _buildSettingItem(
+                //   icon: Icons.call_made,
+                //   iconColor: Colors.blue,
+                //   title: 'Withdrawals',
+                //   onTap: () {
+                //     Navigate.toNamed(context, name: AppRoutes.withdrawalsview);
+                //   },
+                //   context: context,
+                // ),
                 // _buildSettingItem(
                 //   icon: Icons.grid_view,
                 //   iconColor: Colors.orange,

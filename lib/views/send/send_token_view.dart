@@ -146,7 +146,7 @@ class _SendTokenViewState extends State<SendTokenView> {
                                     ? Text(
                                         'Balance: ${!bCtr.hideBalance
                                             ? balance.balanceInCrypto != 0
-                                                  ? "${MyCurrencyUtils.format(balance.balanceInCrypto, _selectedCoin.coinType == CoinType.TOKEN ? 2 : 6) ?? ""} ${_selectedCoin.symbol}"
+                                                  ? "${MyCurrencyUtils.formatCurrency2(balance.balanceInCrypto)} ${_selectedCoin.symbol}"
                                                   : "0 ${_selectedCoin.symbol}"
                                             : "****"}',
                                         style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
@@ -233,7 +233,7 @@ class _SendTokenViewState extends State<SendTokenView> {
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Text(
-                            _amountInFiat > 0 ? '\$${MyCurrencyUtils.format(_amountInFiat, _selectedCoin.coinType == CoinType.TOKEN ? 2 : 6)}' : '',
+                            _amountInFiat > 0 ? '\$${MyCurrencyUtils.formatCurrency2(_amountInFiat)}' : '',
                             style: TextStyle(color: const Color(0xFF515151), fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -355,7 +355,7 @@ class _SendTokenViewState extends State<SendTokenView> {
         double? priceQuote = balanceController.priceQuotes[asset.symbol] ?? 0;
         fee = await TransactionService().getTxInfo(priceQuote: priceQuote, asset: asset, sendPayload: sendPayload!);
         sendPayload!.fee = fee;
-        logger("Estimated fee: ${fee != null ? MyCurrencyUtils.format(fee.feeInFiat, 2) : "N/A"} USD", runtimeType.toString());
+        logger("Estimated fee: ${fee != null ? MyCurrencyUtils.formatCurrency2(fee.feeInFiat) : "N/A"} USD", runtimeType.toString());
         // Proceed with sending the transaction using the sendPayload
       } catch (e) {
         showMySnackBar(context: context, message: "An error occurred when estimating gas, Please check the address and make sure you have good internet or enough gas fee", type: SnackBarType.error);

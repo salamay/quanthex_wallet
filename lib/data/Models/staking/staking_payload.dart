@@ -20,6 +20,8 @@ class StakingPayload {
   int? startDate;
   String? stakingWalletHash;
   String? stakingWalletAddress;
+  String? stakingStatus;
+
   StakingPayload({
     this.stakedAssetSymbol,
     this.stakedAssetContract,
@@ -42,6 +44,7 @@ class StakingPayload {
     this.startDate,
     required this.stakingWalletHash,
     required this.stakingWalletAddress,
+    this.stakingStatus,
   });
 
   factory StakingPayload.fromJson(Map<String, dynamic> json) {
@@ -71,6 +74,7 @@ class StakingPayload {
       startDate: json['start_date'],
       stakingWalletHash: json['staking_wallet_hash'],
       stakingWalletAddress: json['staking_wallet_address'],
+      stakingStatus: json['staking_status'],
     );
   }
 
@@ -101,6 +105,7 @@ class StakingPayload {
       'start_date': startDate,
       'staking_wallet_hash': stakingWalletHash,
       'staking_wallet_address': stakingWalletAddress,
+      'staking_status': stakingStatus,
     };
   }
 
@@ -126,6 +131,7 @@ class StakingPayload {
     int? startDate,
     String? stakingWalletHash,
     String? stakingWalletAddress,
+    String? stakingStatus,
   }) {
     return StakingPayload(
       stakedAssetSymbol:
@@ -170,6 +176,7 @@ class StakingPayload {
       startDate: startDate ?? this.startDate,
       stakingWalletHash: stakingWalletHash ?? this.stakingWalletHash,
       stakingWalletAddress: stakingWalletAddress ?? this.stakingWalletAddress,
+      stakingStatus: stakingStatus ?? this.stakingStatus,
     );
   }
 }

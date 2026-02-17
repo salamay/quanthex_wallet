@@ -39,7 +39,7 @@ class _MiningSimulationWidgetState extends State<MiningSimulationWidget>
   void initState() {
     super.initState();
     _currentHashRate = widget.baseHashRate;
-    _progress = (_currentHashRate / ProductUtils.LEVEL_SIX_HASHRATE) + (_random.nextDouble() * 0.1); // Start between 85-95%
+    _progress = (_currentHashRate / ProductUtils.LEVEL_FOUR_HASHRATE) + (_random.nextDouble() * 0.1); // Start between 85-95%
     print("progress: $_progress");
     _controller = AnimationController(
       duration: widget.animationSpeed,
@@ -72,7 +72,7 @@ class _MiningSimulationWidgetState extends State<MiningSimulationWidget>
               minValue + (_random.nextDouble() * (maxValue - minValue));
 
           // Update progress bar slightly
-          _progress = (_currentHashRate / ProductUtils.LEVEL_SIX_HASHRATE) + (_random.nextDouble() * 0.1);
+          _progress = (_currentHashRate / ProductUtils.LEVEL_FOUR_HASHRATE) + (_random.nextDouble() * 0.1);
         });
         _updateHashRate();
       }

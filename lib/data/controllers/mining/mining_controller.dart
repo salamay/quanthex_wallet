@@ -10,53 +10,82 @@ import 'package:quanthex/data/utils/logger.dart';
 class MiningController extends ChangeNotifier {
   MiningService miningService = MiningService.getInstance();
   PackageService packageService = PackageService.getInstance();
+  bool fetchingMinings = false;
+  bool fetchingMiningError = false;
+  bool fetchingStakings = false;
+  bool fetchingStakingsError = false;
   Map<String, List<ReferralDto>> miningDirectReferrals = {};
   Map<String, List<ReferralDto>> miningIndirectReferrals = {};
-  List<MiningDto> minings = [];
-  List<StakingDto> stakings = [];
+  Map<String, List<MiningDto>> minings = {};
+  Map<String, List<StakingDto>> stakings = {};
   List<WithdrawalDto> withdrawals = [];
 
-  Future<void> fetchMinings() async {
-    logger("Getting minings", runtimeType.toString());
-    List<MiningDto> results = await miningService.getMinings();
-    minings = results;
-    notifyListeners();
+  Future<void> fetchMinings(String walletAddress) async {
+    try {
+     fetchingMinings = true;
+     fetchingMiningError = false;
+      notifyListeners();
+      logger("Getting minings", runtimeType.toString());
+      List<MiningDto> results = await miningService.getMinings(walletAddress);
+      minings[walletAddress] = results;
+      fetchingMinings = false;
+      fetchingMiningError = false;
+      notifyListeners();
+    } catch (e) {
+      logger("Error fetching minings: $e", runtimeType.toString());
+      fetchingMinings = false;
+      fetchingMiningError = true;
+      notifyListeners();
+      throw Exception(e);
+    }
   }
-    Future<void> getSubscriptionDirectReferrals(String miningId) async {
+    Future<void> getSubscriptionReferrals(String miningSubscriptionId) async {
     logger("Getting referrals", runtimeType.toString());
-    List<ReferralDto> results = await miningService.getSubscriptionDirectReferrals(miningId);
-    List<ReferralDto> indirectResults = await miningService.getSubscriptionIndirectReferrals(miningId);
-    miningDirectReferrals[miningId] = results;
-    miningIndirectReferrals[miningId] = indirectResults;
+    List<ReferralDto> results = await miningService.getSubscriptionDirectReferrals(miningSubscriptionId);
+    List<ReferralDto> indirectResults = await miningService.getSubscriptionIndirectReferrals(miningSubscriptionId);
+    miningDirectReferrals[miningSubscriptionId] = results;
+    miningIndirectReferrals[miningSubscriptionId] = indirectResults;
     notifyListeners();
   }
 
-  Future<void> fetchStakings() async {
-    logger("Getting stakings", runtimeType.toString());
-    List<StakingDto> results = await miningService.getStakings();
-
-    stakings = results;
+  Future<void> fetchStakings(String walletAddress, String stakingStatus) async {
+   try {
+    fetchingStakings = true;
+    fetchingStakingsError = false;
+      notifyListeners();
+      logger("Getting stakings", runtimeType.toString());
+      List<StakingDto> results = await miningService.getStakings(walletAddress, stakingStatus);
+      stakings[walletAddress] = results;
+      fetchingStakings = false;
+      fetchingStakingsError = false;
+      notifyListeners();
+   } catch (e) {
+    logger("Error fetching stakings: $e", runtimeType.toString());
+    fetchingStakings = false;
+    fetchingStakingsError = true;
     notifyListeners();
+    throw Exception(e);
+   }
   }
 
-  Future<void> fetchWithdrawals() async {
+  Future<void> fetchWithdrawals(String stakingId) async {
     logger("Getting withdrawals", runtimeType.toString());
-    List<WithdrawalDto> results = await packageService.getWithdrawals();
+    List<WithdrawalDto> results = await packageService.getWithdrawals(stakingId);
     withdrawals = results;
     notifyListeners();
   }
 
-  void setMinings(List<MiningDto> newMinings) {
-    minings = newMinings;
+  void setMinings(String walletAddress, List<MiningDto> newMinings) {
+    minings[walletAddress] = newMinings;
     notifyListeners();
   }
 
-  void setStakings(List<StakingDto> newStakings) {
-    stakings = newStakings;
+  void setStakings(String walletAddress, List<StakingDto> newStakings) {
+    stakings[walletAddress] = newStakings;
     notifyListeners();
   }
 
-  Future<WithdrawalDto> withdraw({required String stakeId}) async {
+  Future<WithdrawalDto> withdraw({required String stakeId, required String walletAddress}) async {
     logger("Making withdrawal for stake id: $stakeId", runtimeType.toString());
     try {
       WithdrawalDto withdrawal = await packageService.withdraw(
@@ -64,7 +93,7 @@ class MiningController extends ChangeNotifier {
       );
       withdrawals.add(withdrawal);
       // Remove the staking after successful withdrawal
-      stakings.removeWhere((staking) => staking.stakingId == stakeId);
+      stakings[walletAddress]?.removeWhere((staking) => staking.stakingId == stakeId);
       notifyListeners();
       return withdrawal;
     } catch (e) {
@@ -85,8 +114,11 @@ class MiningController extends ChangeNotifier {
     notifyListeners();
   }
   void clear(){
-    minings=[];
-    stakings=[];
+    minings={};
+    stakings={};
     withdrawals=[];
+  }
+  void refresh() {
+    notifyListeners();
   }
 }
