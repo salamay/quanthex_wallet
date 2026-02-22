@@ -8,6 +8,10 @@ class ProductUtils {
   static const double LEVEL_THREE_HASHRATE = 563696.961;
   static const double LEVEL_FOUR_HASHRATE = 751595.948;
 
+  static const int LEVEL_ONE_REFERRALS = 6;
+  static const int LEVEL_TWO_REFERRALS = 36;
+  static const int LEVEL_THREE_REFERRALS = 216;
+
 
   static const starterFactor = 1.00;
     static const growthFactor = 2.00;

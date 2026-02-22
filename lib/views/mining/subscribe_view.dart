@@ -410,61 +410,61 @@ class _SubscribeViewState extends State<SubscribeView> {
   }
 
   Future<void> pay(CoinBalance? balance, SupportedCoin rewardToken) async {
-    NetworkFee? fee;
+    // NetworkFee? fee;
     String refCode = referralCode.text.trim();
     String walletAddress = walletController.currentWallet!.walletAddress ?? "";
     try {
-      if (balance == null) {
-        showMySnackBar(context: context, message: "Balance not available, Please try again later", type: SnackBarType.error);
-        return;
-      }
-      if (balance.balanceInCrypto >= _paymentAmount) {
-      } else {
-        showMySnackBar(context: context, message: "Insufficient balance", type: SnackBarType.error);
-        return;
-      }
+      // if (balance == null) {
+      //   showMySnackBar(context: context, message: "Balance not available, Please try again later", type: SnackBarType.error);
+      //   return;
+      // }
+      // if (balance.balanceInCrypto >= _paymentAmount) {
+      // } else {
+      //   showMySnackBar(context: context, message: "Insufficient balance", type: SnackBarType.error);
+      //   return;
+      // }
       showOverlay(context);
       SupportedCoin asset = widget.paymentToken;
       double? priceQuote = balanceController.priceQuotes[asset.symbol] ?? 0;
       double _amountInFiat = _paymentAmount * (priceQuote ?? 0);
       String address = adminAddress;
       SendPayload sendPayload = SendPayload(amount: _paymentAmount, asset: asset, amountInFiat: _amountInFiat, recipient_address: address);
-      fee = await TransactionService().getTxInfo(priceQuote: priceQuote, asset: asset, sendPayload: sendPayload!);
-      sendPayload.fee = fee;
-      if (fee == null) {
-        showMySnackBar(context: context, message: "Unable to estimate transaction, Ensure you have enough gas fee for this transaction", type: SnackBarType.error);
-        hideOverlay(context);
-        return;
-      }
-      logger("Estimated fee: ${fee != null ? MyCurrencyUtils.format(fee.feeInFiat, 2) : "N/A"} USD", runtimeType.toString());
+      // fee = await TransactionService().getTxInfo(priceQuote: priceQuote, asset: asset, sendPayload: sendPayload!);
+      // sendPayload.fee = fee;
+      // if (fee == null) {
+      //   showMySnackBar(context: context, message: "Unable to estimate transaction, Ensure you have enough gas fee for this transaction", type: SnackBarType.error);
+      //   hideOverlay(context);
+      //   return;
+      // }
+      // logger("Estimated fee: ${fee != null ? MyCurrencyUtils.format(fee.feeInFiat, 2) : "N/A"} USD", runtimeType.toString());
       NetworkModel network = widget.paymentToken.networkModel!;
       int decimal = asset.decimal!;
-      bool isGas = GasFeeCheck.gasFeeCheck(bCtr: balanceController, feeInCrypto: fee.feeInCrypto, chainCurrency: network.chainCurrency);
-      if (isGas) {
+      // bool isGas = GasFeeCheck.gasFeeCheck(bCtr: balanceController, feeInCrypto: fee.feeInCrypto, chainCurrency: network.chainCurrency);
+      // if (isGas) {
         double totalAmount = ((_paymentAmount) * math.pow(10, decimal));
         logger("Total amount: $totalAmount", runtimeType.toString());
-        Transaction tx = await TransactionService().getTransferTx(context, sendPayload);
+        // Transaction tx = await TransactionService().getTransferTx(context, sendPayload);
         String rpc = network.rpcUrl;
         int chainId = network.chainId;
         Web3Client webClient = await ClientResolver.resolveClient(rpcUrl: rpc);
         String privateKey = asset.privateKey!;
         final credentials = await TokenFactory().getCredentials(privateKey);
-        Uint8List signedTransaction = await webClient.signTransaction(credentials, tx, chainId: chainId, fetchChainIdFromNetworkId: false);
-        String txSigned = bytesToHex(signedTransaction, include0x: true);
+        // Uint8List signedTransaction = await webClient.signTransaction(credentials, tx, chainId: chainId, fetchChainIdFromNetworkId: false);
+        // String txSigned = bytesToHex(signedTransaction, include0x: true);
         payload.subReferralCode = refCode;
-        SubscriptionDto dto = await PackageService.getInstance().makeSubscription(sub: payload, paymentToken: asset, rewardToken: rewardToken, signedTx: txSigned, rpc: rpc);
+        SubscriptionDto dto = await PackageService.getInstance().makeSubscription(sub: payload, paymentToken: asset, rewardToken: rewardToken, signedTx: "txSigned", rpc: rpc);
         List<MiningDto> minings = await miningController.miningService.getMinings(walletAddress);
         miningController.setMinings(walletAddress, minings);
         hideOverlay(context);
         await _showPaymentSuccessModal();
         Navigate.back(context, args: true);
-      } else {
-        String nativeCoin = sendPayload.asset!.networkModel!.chainCurrency;
-        logger("Insufficient $nativeCoin for gas, top up your balance $nativeCoin to proceed", runtimeType.toString());
-        showMySnackBar(context: context, message: "Insufficient $nativeCoin for gas, top up your balance $nativeCoin to proceed", type: SnackBarType.error);
-        hideOverlay(context);
-        return;
-      }
+      // } else {
+      //   String nativeCoin = sendPayload.asset!.networkModel!.chainCurrency;
+      //   logger("Insufficient $nativeCoin for gas, top up your balance $nativeCoin to proceed", runtimeType.toString());
+      //   showMySnackBar(context: context, message: "Insufficient $nativeCoin for gas, top up your balance $nativeCoin to proceed", type: SnackBarType.error);
+      //   hideOverlay(context);
+      //   return;
+      // }
       // Proceed with sending the transaction using the sendPayload
     } catch (e) {
       logger(e.toString(), runtimeType.toString());

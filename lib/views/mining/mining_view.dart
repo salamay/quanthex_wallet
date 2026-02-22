@@ -108,10 +108,7 @@ class _MiningViewState extends State<MiningView> {
                             MiningDto mining = widget.mining;
                             String miningSubscriptionId = mining.subscription!.subId ?? "";
                             List<ReferralDto> directReferrals = miningController.miningDirectReferrals[miningSubscriptionId] ?? [];
-                            List<ReferralDto> indirectReferrals = miningController.miningIndirectReferrals[miningSubscriptionId] ?? [];
-                            int noOfDirectReferrals = directReferrals.length;
-                            int noOfIndirectReferrals = indirectReferrals.length;
-                            int totalReferrals = noOfDirectReferrals + noOfIndirectReferrals;
+                            int totalReferrals = directReferrals.length;
                             String packageName = mining.subscription!.subPackageName ?? "";
                             double hashRate = ProductUtils.getHashRate(noOfReferrals: totalReferrals, packageName: packageName);
                             double amountEarned = SubUtils.calcAmountEarned(packageName: packageName, noOfReferrals: totalReferrals);
@@ -256,11 +253,11 @@ class _MiningViewState extends State<MiningView> {
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: HashCard(label: 'Giga Hash', value: "$hashRate Hex MH/s", isInProgress: !(hashRate >= ProductUtils.LEVEL_ONE_HASHRATE), fontSize: 15.sp),
+                                              child: HashCard(label: 'Giga Hash', value: "$hashRate Hex MH/s", isInProgress: !(totalReferrals >= ProductUtils.LEVEL_ONE_REFERRALS), fontSize: 15.sp),
                                             ),
                                             15.horizontalSpace,
                                             Expanded(
-                                              child: HashCard(label: "Tera Hash", value: "$hashRate Hex MH/s", isInProgress: !(hashRate >= ProductUtils.LEVEL_TWO_HASHRATE)),
+                                              child: HashCard(label: "Tera Hash", value: "$hashRate Hex MH/s", isInProgress: !(totalReferrals >= ProductUtils.LEVEL_TWO_REFERRALS)),
                                             ),
                                           ],
                                         ),
@@ -268,7 +265,7 @@ class _MiningViewState extends State<MiningView> {
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: HashCard(label: "Peta Hash", value: "$hashRate Hex MH/s", isInProgress: !(hashRate >= ProductUtils.LEVEL_THREE_HASHRATE)),
+                                              child: HashCard(label: "Peta Hash", value: "$hashRate Hex MH/s", isInProgress: !(totalReferrals >= ProductUtils.LEVEL_THREE_REFERRALS)),
                                             ),
                                           ],
                                         ),

@@ -15,7 +15,6 @@ class MiningController extends ChangeNotifier {
   bool fetchingStakings = false;
   bool fetchingStakingsError = false;
   Map<String, List<ReferralDto>> miningDirectReferrals = {};
-  Map<String, List<ReferralDto>> miningIndirectReferrals = {};
   Map<String, List<MiningDto>> minings = {};
   Map<String, List<StakingDto>> stakings = {};
   List<WithdrawalDto> withdrawals = [];
@@ -42,9 +41,7 @@ class MiningController extends ChangeNotifier {
     Future<void> getSubscriptionReferrals(String miningSubscriptionId) async {
     logger("Getting referrals", runtimeType.toString());
     List<ReferralDto> results = await miningService.getSubscriptionDirectReferrals(miningSubscriptionId);
-    List<ReferralDto> indirectResults = await miningService.getSubscriptionIndirectReferrals(miningSubscriptionId);
     miningDirectReferrals[miningSubscriptionId] = results;
-    miningIndirectReferrals[miningSubscriptionId] = indirectResults;
     notifyListeners();
   }
 
