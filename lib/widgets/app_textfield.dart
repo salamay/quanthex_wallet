@@ -110,11 +110,7 @@ class _AppTextfieldState extends State<AppTextfield> {
         errorText: widget.errorText,
         prefixIcon: widget.prefixIcon,
         filled: widget.useFill ?? true,
-        fillColor: widget.filledColor != null
-            ? widget.useFill == true
-                  ? widget.filledColor
-                  : Color(0xFFF5F5F5)
-            : Color(0xFFF5F5F5),
+        fillColor: widget.filledColor ?? Colors.white,
         prefixIconColor: const Color(0xffBEC1CD),
         suffixIcon: widget.isPassword
             ? GestureDetector(

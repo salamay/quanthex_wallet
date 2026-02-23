@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quanthex/views/mining/mining_view.dart';
 import 'package:quanthex/widgets/loading_overlay/loading.dart';
 
 class HashCard extends StatelessWidget {
@@ -15,7 +16,11 @@ class HashCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.sp),
       height: 80.sp,
-      decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.35),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: greenColor.withOpacity(0.2), width: 1),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -35,7 +40,7 @@ class HashCard extends StatelessWidget {
                 child: AutoSizeText(
                   value,
                   maxLines: 1,
-                  style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: fontSize ?? 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                  style: TextStyle(color: Colors.white70, fontSize: 10.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                 ),
               ):const SizedBox.shrink(),
               4.horizontalSpace,
@@ -47,7 +52,7 @@ class HashCard extends StatelessWidget {
                     children: [
                       isInProgress?Text(
                       "In Progress",
-                      style: TextStyle(color: const Color(0xFF757575), fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                      style: TextStyle(color: Colors.white, fontSize: 11.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
                     ):const SizedBox.shrink(),
                     4.horizontalSpace,
                     Loading(size: 16.sp),

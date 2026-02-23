@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quanthex/data/Models/mining/mining_dto.dart';
 import 'package:quanthex/data/Models/subscription/subscription_dto.dart';
 import 'package:quanthex/data/controllers/mining/mining_controller.dart';
 import 'package:quanthex/data/controllers/wallet_controller.dart';
 import 'package:quanthex/data/utils/date_utils.dart';
+import 'package:quanthex/data/utils/date_utils.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/routes/app_routes.dart';
+import 'package:quanthex/views/home/components/coin_image.dart';
+import 'package:quanthex/views/mining/components/horizontal_divider.dart';
+import 'package:quanthex/views/mining/mining_view.dart';
+import 'package:quanthex/views/mining/subscription_package.dart';
+import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/views/mining/subscription_package.dart';
 import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/widgets/global/error_modal.dart';
 import 'package:quanthex/widgets/loading_overlay/loading.dart';
-import 'package:quanthex/widgets/quanthex_image_banner.dart';
+
+const Color _kAccentPurple = Color(0xFF792A90);
 
 class SubscriptionList extends StatefulWidget {
   const SubscriptionList({super.key});
@@ -29,6 +37,7 @@ class _SubscriptionListState extends State<SubscriptionList> {
     walletController = Provider.of<WalletController>(context, listen: false);
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -40,41 +49,60 @@ class _SubscriptionListState extends State<SubscriptionList> {
             // Extract subscriptions from minings
             String walletAddress = walletController.currentWallet!.walletAddress ?? "";
             List<MiningDto> minings = miningController.minings[walletAddress] ?? [];
-            return miningController.fetchingMinings ? Loading(size: 30.sp,) : Column(
-              children: [
-                
-                // Header
-                // Align(
-                //   alignment: Alignment.centerLeft,
-                //   child: QuanthexImageBanner(width: 110.sp, height: 30.sp),
-                // ),
-              
-              10.sp.verticalSpace,
-                // Grid View
-                !miningController.fetchingMinings&&!miningController.fetchingMiningError?Expanded(
-                  child: minings.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.subscriptions_outlined, size: 64.sp, color: const Color(0xFF757575)),
-                              16.sp.verticalSpace,
-                              Text(
-                                'No subscriptions yet',
-                                style: TextStyle(color: const Color(0xFF757575), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                        )
-                      : _buildSubscriptionCard(minings.first),
-                ):ErrorModal(
-                  callBack: () {
-                  miningController.fetchMinings(walletAddress);
-                  },
-                  message: "Error fetching minings",
-                ),
-              ],
-            );
+            return miningController.fetchingMinings
+                ? Loading(size: 30.sp)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      10.sp.verticalSpace,
+                      // Header: "> ACTIVE MINING PACKAGE"
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.sp),
+                        child: Row(
+                          children: [
+                            Icon(Icons.arrow_forward_ios, size: 14.sp, color: Colors.white),
+                            6.sp.horizontalSpace,
+                            Text(
+                              'ACTIVE MINING PACKAGE',
+                              style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                            ),
+                          ],
+                        ),
+                      ),
+                      16.sp.verticalSpace,
+                      !miningController.fetchingMinings && !miningController.fetchingMiningError
+                          ? Expanded(
+                              child: minings.isEmpty
+                                  ? Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.subscriptions_outlined, size: 64.sp, color: const Color(0xFF757575)),
+                                          16.sp.verticalSpace,
+                                          Text(
+                                            'No subscriptions yet',
+                                            style: TextStyle(color: const Color(0xFF757575), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        return SingleChildScrollView(
+                                          padding: EdgeInsets.symmetric(horizontal: 16.sp),
+                                          child: SizedBox(height: constraints.maxHeight, child: _buildSubscriptionCard(minings.first)),
+                                        );
+                                      },
+                                    ),
+                            )
+                          : ErrorModal(
+                              callBack: () {
+                                miningController.fetchMinings(walletAddress);
+                              },
+                              message: "Error fetching minings",
+                            ),
+                    ],
+                  );
           },
         ),
       ),
@@ -83,129 +111,156 @@ class _SubscriptionListState extends State<SubscriptionList> {
 
   Widget _buildSubscriptionCard(MiningDto mining) {
     SubscriptionDto subscription = mining.subscription!;
-    
+    final rewardSymbol = subscription.subRewardAssetSymbol ?? '—';
+    final expiryDate = subscription.subDuration != null ? DateFormat('dd MMM yyyy').format(DateTime.fromMillisecondsSinceEpoch(int.parse(subscription.subDuration!))) : '—';
+    // Placeholder stats until API provides hash power / earnings
+    const String hashPower = '800 H/s';
+    const String totalEarned = '50';
+    const String todayEarned = '0.45';
+    const double progressPercent = 0.65;
+
     return Container(
-      padding: EdgeInsets.all(16.sp),
+      padding: EdgeInsets.all(20.sp),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+        border: Border.all(color: greenColor.withOpacity(0.6), width: 1.5),
+        boxShadow: [BoxShadow(color: Colors.black87.withOpacity(0.25), blurRadius: 20, spreadRadius: 0)],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Top row: Package name + ACTIVE badge
+          Row(
             children: [
-              // Package Name and Price
-              Text(
-                subscription.subPackageName ?? 'Unknown Package',
-                style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              Icon(Icons.rocket_launch_outlined, size: 22.sp, color: Colors.white70),
+              8.sp.horizontalSpace,
+              Expanded(
+                child: Text(
+                  subscription.subPackageName ?? '',
+                  style: TextStyle(color: Colors.white, fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              8.sp.verticalSpace,
-              if (subscription.subPrice != null)
-                Text(
-                  '\$${subscription.subPrice!.toStringAsFixed(0)}',
-                  style: TextStyle(color: const Color(0xFF792A90), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                ),
-              12.sp.verticalSpace,
-              // Subscription Type
-              if (subscription.subType != null)
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 4.sp),
-                  decoration: BoxDecoration(color: const Color(0xFF792A90).withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                  child: Text(
-                    subscription.subType!.toUpperCase(),
-                    style: TextStyle(color: const Color(0xFF792A90), fontSize: 10.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
-                  ),
-                ),
-              12.sp.verticalSpace,
-              // Duration
-              if (subscription.subDuration != null)
-                Row(
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 6.sp),
+                decoration: BoxDecoration(color: greenColor.withOpacity(0.2).withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.access_time, size: 14.sp, color: const Color(0xFF757575)),
-                    4.sp.horizontalSpace,
-                    Expanded(
-                      child: Text(
-                        MyDateUtils.dateToSingleFormat(DateTime.fromMillisecondsSinceEpoch(int.parse(subscription.subDuration!))),
-                        style: TextStyle(color: const Color(0xFF757575), fontSize: 11.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Container(
+                      width: 6.sp,
+                      height: 6.sp,
+                      decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                    ),
+                    6.sp.horizontalSpace,
+                    Text(
+                      'ACTIVE',
+                      style: TextStyle(color: Colors.white, fontSize: 11.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
-              8.sp.verticalSpace,
-              // Reward Asset
-              if (subscription.subRewardAssetSymbol != null)
-                Row(
-                  children: [
-                    Icon(Icons.monetization_on_outlined, size: 14.sp, color: const Color(0xFF757575)),
-                    4.sp.horizontalSpace,
-                    Expanded(
-                      child: Text(
-                        'Reward: ${subscription.subRewardAssetSymbol}',
-                        style: TextStyle(color: const Color(0xFF757575), fontSize: 11.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
+              ),
             ],
           ),
-          
-          // Status indicator
-          GestureDetector(
-            onTap: () {
-              Navigate.toNamed(context, name: AppRoutes.miningview, args: mining);
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 6.sp),
-              decoration: BoxDecoration(color: Colors.greenAccent, borderRadius: BorderRadius.circular(8)),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 6.sp,
-                    height: 6.sp,
-                    decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                  ),
-                  6.sp.horizontalSpace,
-                  Text(
-                    'View Details',
-                    style: TextStyle(color: Colors.white, fontSize: 11.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
+          16.sp.verticalSpace,
+          // Price
+          if (subscription.subPrice != null)
+            Text(
+              '\$${subscription.subPrice!.toStringAsFixed(0)}',
+              style: TextStyle(color: Colors.white, fontSize: 28.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
             ),
-          ),
-          const Spacer(),
+          12.sp.verticalSpace,
+          // Divider
+          HorizontalDivider(),
+          16.sp.verticalSpace,
+          // Stats: Hash Power, Total Earned, Today
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 6.sp),
-            decoration: BoxDecoration(color: const Color(0xFF792A90).withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+            padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 12.sp),
+            decoration: BoxDecoration(color: Colors.black.withOpacity(0.3), borderRadius: BorderRadius.circular(12)),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 6.sp,
-                  height: 6.sp,
-                  decoration: BoxDecoration(color: const Color(0xFF792A90), shape: BoxShape.circle),
+                Expanded(
+                  child: _StatItem(icon: Icons.bolt, label: 'Hash Power', value: hashPower, accentColor: _kAccentPurple),
                 ),
-                6.sp.horizontalSpace,
-                Text(
-                  'Active',
-                  style: TextStyle(color: const Color(0xFF792A90), fontSize: 11.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                Container(width: 1, height: 36.sp, color: Colors.white24),
+                Expanded(
+                  child: _StatItem(icon: Icons.monetization_on_outlined, label: 'Total Earned', value: '$totalEarned $rewardSymbol', accentColor: _kAccentPurple),
+                ),
+                Container(width: 1, height: 36.sp, color: Colors.white24),
+                Expanded(
+                  child: _StatItem(icon: Icons.trending_up, label: 'Today', value: '$todayEarned $rewardSymbol', accentColor: _kAccentPurple),
                 ),
               ],
             ),
           ),
+          10.sp.verticalSpace,
+          // Mining Progress
+          Row(
+            children: [
+              CoinImage(imageUrl: mining.subscription?.subRewardAssetImage ?? "", height: 20.sp, width: 20.sp),
+              4.sp.horizontalSpace,
+              Text(
+                'Reward: $rewardSymbol',
+                style: TextStyle(color: Colors.white, fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+              ),
+              const Spacer(),
+            ],
+          ),
+          const Spacer(),
+          20.sp.verticalSpace,
+          // VIEW FULL DETAILS button
+          GestureDetector(
+            onTap: () => Navigate.toNamed(context, name: AppRoutes.miningview, args: mining),
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 14.sp),
+              decoration: BoxDecoration(
+                color: greenColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  'VIEW FULL DETAILS',
+                  style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  const _StatItem({required this.icon, required this.label, required this.value, required this.accentColor});
+
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Icon(icon, size: 18.sp, color: accentColor),
+        4.sp.verticalSpace,
+        Text(
+          label,
+          style: TextStyle(color: Colors.white70, fontSize: 10.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+          textAlign: TextAlign.center,
+        ),
+        2.sp.verticalSpace,
+        Text(
+          value,
+          style: TextStyle(color: Colors.white, fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }

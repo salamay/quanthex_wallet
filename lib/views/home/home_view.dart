@@ -96,6 +96,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     }
   }
 
+
+  
   Future<void> refreshData() async {
     List<SupportedCoin> assets = await assetController.assets;
     logger("Assets ${assets.length}", runtimeType.toString());

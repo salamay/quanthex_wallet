@@ -11,6 +11,7 @@ import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/routes/app_routes.dart';
 import 'package:quanthex/views/mining/components/how_it_works_item.dart';
+import 'package:quanthex/views/mining/mining_view.dart';
 import 'package:quanthex/views/mining/subscription_list.dart';
 import 'package:quanthex/views/mining/subscription_package.dart';
 import 'package:quanthex/widgets/app_button.dart';
@@ -52,6 +53,8 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
       await miningController.fetchMinings(walletAddress);
     } catch (e) {
       logger("Error fetching data: $e", runtimeType.toString());
+      miningController.fetchingMiningError = true;
+      miningController.refresh();
     }
   }
 
@@ -60,6 +63,10 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
     return Container(
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.all(8.sp),
+       decoration: BoxDecoration(
+        image: DecorationImage(colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken), image: AssetImage('assets/images/green_astro_bg.jpg'), fit: BoxFit.cover),
+      ),
       child: Consumer<MiningController>(
         builder: (context, miningCtr, _) {
           String walletAddress = walletController.currentWallet!.walletAddress ?? "";
@@ -67,7 +74,11 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
           return Skeletonizer(
             ignoreContainers: false,
             enabled: miningCtr.fetchingMinings,
-            effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+            effect: ShimmerEffect(
+              duration: Duration(milliseconds: 1000),
+               baseColor: Colors.grey.withOpacity(0.4), 
+               highlightColor: Colors.white54
+               ),
             child: RefreshIndicator(
               onRefresh: () async {
                 fetchData();
@@ -80,24 +91,23 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
                           children: [
                             Text(
                               'Subscriptions',
-                              style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                              style: TextStyle(color: Colors.white, fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
                             ),
-                            TextButton(
-                              onPressed: () {
-                                Navigate.toNamed(context, name: AppRoutes.packageview);
-                              },
-                              child: Text(
-                                'Activate Package',
-                                style: TextStyle(color: const Color(0xFF792A90), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                              ),
-                            ),
+                            // TextButton(
+                            //   onPressed: () {
+                            //     Navigate.toNamed(context, name: AppRoutes.packageview);
+                            //   },
+                            //   child: Text(
+                            //     'Activate Package',
+                            //     style: TextStyle(color: Colors.white, fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                            //   ),
+                            // ),
                           ],
                         ),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: QuanthexImageBanner(width: 110.sp, height: 30.sp),
                         ),
-
                         minings.isEmpty
                             ? Expanded(
                                 child: Container(
@@ -116,18 +126,18 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
                                         ),
                                         child: Icon(Icons.subscriptions_outlined, size: 60.sp, color: const Color(0xFF792A90)),
                                       ),
-                                      32.sp.verticalSpace,
+                                      20.sp.verticalSpace,
                                       // Title
                                       Text(
                                         'No Subscriptions Yet',
-                                        style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                                        style: TextStyle(color: Colors.white, fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
                                         textAlign: TextAlign.center,
                                       ),
                                       12.sp.verticalSpace,
                                       // Description
                                       Text(
                                         'Start your mining journey by subscribing to a package. Choose from our available plans and begin mining.',
-                                        style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.5),
+                                        style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.5),
                                         textAlign: TextAlign.center,
                                       ),
                                       40.sp.verticalSpace,
@@ -135,12 +145,12 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
                                       Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(50),
-                                          boxShadow: [BoxShadow(color: const Color(0xFF792A90).withOpacity(0.3), blurRadius: 12, offset: Offset(0, 4))],
+                                          boxShadow: [BoxShadow(color: greenColor.withOpacity(0.3), blurRadius: 12, offset: Offset(0, 4))],
                                         ),
                                         child: AppButton(
                                           text: 'Browse Packages',
                                           textColor: Colors.white,
-                                          color: const Color(0xFF792A90),
+                                          color: greenColor.withOpacity(0.2),
                                           onTap: () async {
                                             bool? result = await Navigate.awaitToNamed(context, name: AppRoutes.packageview);
                                             if (result == true) {
@@ -158,6 +168,8 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
                     )
                   : Center(
                       child: ErrorModal(
+                        textColor: Colors.white,
+                        buttonColor: greenColor.withOpacity(0.2),
                         callBack: () {
                           fetchData();
                         },

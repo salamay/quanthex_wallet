@@ -2,10 +2,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quanthex/core/network/Api_url.dart';
 import 'package:quanthex/data/Models/mining/mining_dto.dart';
-import 'package:quanthex/data/Models/users/profile_dto.dart';
 import 'package:quanthex/data/Models/users/referral_dto.dart';
 import 'package:quanthex/data/controllers/assets/asset_controller.dart';
 import 'package:quanthex/data/controllers/balance/balance_controller.dart';
@@ -18,12 +18,17 @@ import 'package:quanthex/data/utils/product_utils.dart';
 import 'package:quanthex/data/utils/share/share_utils.dart';
 import 'package:quanthex/data/utils/sub/sub_utils.dart';
 import 'package:quanthex/views/mining/components/hash_card.dart';
+import 'package:quanthex/views/mining/components/horizontal_divider.dart';
 import 'package:quanthex/views/mining/components/mining_simulation_widget.dart';
+import 'package:quanthex/views/mining/components/mining_stat_item.dart';
+import 'package:quanthex/views/mining/components/referral_card.dart';
+import 'package:quanthex/views/mining/components/stat_card.dart';
+import 'package:quanthex/views/mining/components/summary_card.dart';
 import 'package:quanthex/widgets/global/error_modal.dart';
-import 'package:quanthex/widgets/quanthex_image_banner.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import 'earning_breakdown_modal.dart';
+const Color kAccentPurple = Color(0xFF792A90);
+const Color greenColor = Color(0xffA8EBCF);
 
 class MiningView extends StatefulWidget {
   MiningView({super.key, required this.mining});
@@ -69,20 +74,14 @@ class _MiningViewState extends State<MiningView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
+      extendBody: true,
       appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(
-          'Mining',
-          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-        ),
         leading: IconButton(
-          onPressed: () {
-            Navigate.back(context);
-          },
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigate.back(context),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20.sp),
         ),
       ),
       body: Consumer<UserController>(
@@ -90,8 +89,14 @@ class _MiningViewState extends State<MiningView> {
           return Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken),
+                image: AssetImage('assets/images/green_astro_bg.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
             padding: EdgeInsets.all(16.sp),
-            color: Colors.white,
             child: SafeArea(
               child: ValueListenableBuilder(
                 valueListenable: _loadingNotifier,
@@ -102,7 +107,11 @@ class _MiningViewState extends State<MiningView> {
                       return Skeletonizer(
                         ignoreContainers: false,
                         enabled: loading,
-                        effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                        effect: ShimmerEffect(
+                          duration: Duration(milliseconds: 1000),
+                          baseColor: Colors.grey.withOpacity(0.4),
+                          highlightColor: Colors.white54,
+                        ),
                         child: Builder(
                           builder: (context) {
                             MiningDto mining = widget.mining;
@@ -112,160 +121,94 @@ class _MiningViewState extends State<MiningView> {
                             String packageName = mining.subscription!.subPackageName ?? "";
                             double hashRate = ProductUtils.getHashRate(noOfReferrals: totalReferrals, packageName: packageName);
                             double amountEarned = SubUtils.calcAmountEarned(packageName: packageName, noOfReferrals: totalReferrals);
+                            double progressPercent = (totalReferrals / ProductUtils.LEVEL_THREE_REFERRALS).clamp(0.0, 1.0);
                             return !isError
                                 ? SingleChildScrollView(
                                     physics: AlwaysScrollableScrollPhysics(),
                                     child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
-                                        // Quanthex Image Banner
-                                        Center(
-                                          child: SizedBox(
-                                            child: Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                MiningSimulationWidget(
-                                                  baseHashRate: hashRate, // Static hash rate value
-                                                  fluctuationRange: hashRate != ProductUtils.LEVEL_FOUR_HASHRATE ? 0.12 : 0.0, // 12% fluctuation range
-                                                  animationSpeed: Duration(milliseconds: hashRate != ProductUtils.LEVEL_FOUR_HASHRATE ? 100 : 1000000000), // Animation speed
-                                                  hashUnit: "Hex MH/s",
-                                                  title: "DIGIT HASH",
-                                                  subtitle: "MINING ENGINE",
-                                                ),
-                                                // Column(
-                                                //   mainAxisAlignment: MainAxisAlignment.center,
-                                                //   children: [
-                                                //     Text(
-                                                //       'Mining',
-                                                //       style: TextStyle(
-                                                //         color: const Color(0xFF757575),
-                                                //         fontSize: 14.sp,
-                                                //         fontFamily: 'Satoshi',
-                                                //         fontWeight: FontWeight.w500,
-                                                //       ),
-                                                //     ),
-                                                //     5.verticalSpace,
-                                                //     Text(
-                                                //       '${(_miningProgress * 100).toInt()}%',
-                                                //       style: TextStyle(
-                                                //         color: const Color(0xFF2D2D2D),
-                                                //         fontSize: 32.sp,
-                                                //         fontFamily: 'Satoshi',
-                                                //         fontWeight: FontWeight.w700,
-                                                //       ),
-                                                //     ),
-                                                //   ],
-                                                // ),
-                                              ],
-                                            ),
-                                          ),
+                                        // Main summary card
+                                        SummaryCard(
+                                          mining: mining,
+                                          hashRate: hashRate,
+                                          amountEarned: amountEarned,
+                                          progressPercent: progressPercent,
+                                          totalReferrals: totalReferrals,
                                         ),
-                                        // Earned Amount
-
-                                        // 8.sp.verticalSpace,
-                                        // Center(
-                                        //   child: Text(
-                                        //     'Earned STB',
-                                        //     style: TextStyle(
-                                        //       color: const Color(0xFF792A90),
-                                        //       fontSize: 14.sp,
-                                        //       fontFamily: 'Satoshi',
-                                        //       fontWeight: FontWeight.w500,
-                                        //     ),
-                                        //   ),
-                                        // ),
                                         20.sp.verticalSpace,
-                                        // Referral Link
-                                        Consumer<UserController>(
-                                          builder: (context, userCtr, _) {
-                                            String miningTag = mining.mining!.miningTag ?? "";
-                                            return Container(
-                                              padding: EdgeInsets.all(16.sp),
-                                              decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      miningTag,
-                                                      style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                                                    ),
-                                                  ),
-                                                  10.horizontalSpace,
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      Clipboard.setData(ClipboardData(text: miningTag));
-                                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Link copied')));
-                                                    },
-                                                    child: Icon(Icons.copy, size: 20.sp, color: const Color(0xFF757575)),
-                                                  ),
-                                                  10.horizontalSpace,
-                                                  GestureDetector(
-                                                    onTap: () async {
-                                                      String desc = "Invite your friends and earn mining outputs when they join and start mining. The more you refer, the more you earn!. Start sharing and grow your minigs effortlessly";
-                                                      String miningTag = mining.mining!.miningTag ?? "";
-                                                      ShareUtils.shareContent(title: miningTag, subject: desc, url: ApiUrls.quanthexWebsite);
-                                                    },
-                                                    child: Icon(Icons.share, size: 20.sp, color: const Color(0xFF757575)),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        30.sp.verticalSpace,
-                                        // Statistics Cards
+                                        // Referral link card (dark)
+                                        ReferralCard(miningTag: mining.mining!.miningTag ?? ""),
+                                        20.sp.verticalSpace,
+                                        // Stat cards (dark)
                                         Row(
                                           children: [
-                                            Expanded(
-                                              child: _buildStatCard(label: 'Active Members', value: totalReferrals.toString()),
-                                            ),
-                                            15.horizontalSpace,
-                                            Expanded(
-                                              child: _buildStatCard(label: 'Package name', value: packageName),
-                                            ),
+                                            Expanded(child: StatCard(label: 'Active Members', value: totalReferrals.toString())),
+                                            12.horizontalSpace,
+                                            Expanded(child: StatCard(label: 'Package', value: packageName)),
                                           ],
                                         ),
-                                        15.sp.verticalSpace,
+                                        12.sp.verticalSpace,
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: _buildStatCard(label: 'Current Mining Speed', value: "$hashRate Hex MH/s", isFullWidth: true, fontSize: 15.sp),
+                                              child: StatCard(
+                                                label: 'Mining Speed',
+                                                value: "$hashRate Hex MH/s",
+                                                fontSize: 13.sp,
+                                              ),
                                             ),
-                                            15.horizontalSpace,
+                                            12.horizontalSpace,
                                             Expanded(
                                               child: Consumer<BalanceController>(
                                                 builder: (context, balanceCtr, child) {
                                                   double rewardPriceQuotes = balanceCtr.priceQuotes[mining.subscription!.subRewardAssetSymbol ?? ""] ?? 0;
-                                                  logger("Reward Price Quotes: $rewardPriceQuotes", runtimeType.toString());
-                                                  logger("Is Loading Price Quotes: ${balanceCtr.isLoadingPriceQuotes}", runtimeType.toString());
-                                                  double amountInCrypto = amountEarned / rewardPriceQuotes;
+                                                  double amountInCrypto = rewardPriceQuotes > 0 ? amountEarned / rewardPriceQuotes : 0;
                                                   return Skeletonizer(
                                                     enabled: balanceCtr.isLoadingPriceQuotes,
                                                     effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
                                                     ignoreContainers: false,
-                                                    child: _buildStatCard(label: rewardPriceQuotes == 0 ? "" : mining.subscription!.subRewardAssetSymbol ?? "", value: MyCurrencyUtils.format(amountInCrypto, 4), isFullWidth: true),
+                                                    child: StatCard(
+                                                      label: mining.subscription!.subRewardAssetSymbol ?? "",
+                                                      value: MyCurrencyUtils.format(amountInCrypto, 4),
+                                                      fontSize: 14.sp,
+                                                    ),
                                                   );
                                                 },
                                               ),
                                             ),
                                           ],
                                         ),
-                                        15.sp.verticalSpace,
+                                        12.sp.verticalSpace,
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: HashCard(label: 'Giga Hash', value: "$hashRate Hex MH/s", isInProgress: !(totalReferrals >= ProductUtils.LEVEL_ONE_REFERRALS), fontSize: 15.sp),
+                                              child: HashCard(
+                                                label: 'Giga Hash',
+                                                value: "$hashRate Hex MH/s",
+                                                isInProgress: !(totalReferrals >= ProductUtils.LEVEL_ONE_REFERRALS),
+                                                fontSize: 15.sp,
+                                              ),
                                             ),
-                                            15.horizontalSpace,
+                                            12.horizontalSpace,
                                             Expanded(
-                                              child: HashCard(label: "Tera Hash", value: "$hashRate Hex MH/s", isInProgress: !(totalReferrals >= ProductUtils.LEVEL_TWO_REFERRALS)),
+                                              child: HashCard(
+                                                label: "Tera Hash",
+                                                value: "$hashRate Hex MH/s",
+                                                isInProgress: !(totalReferrals >= ProductUtils.LEVEL_TWO_REFERRALS),
+                                              ),
                                             ),
                                           ],
                                         ),
-                                        15.sp.verticalSpace,
+                                        12.sp.verticalSpace,
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: HashCard(label: "Peta Hash", value: "$hashRate Hex MH/s", isInProgress: !(totalReferrals >= ProductUtils.LEVEL_THREE_REFERRALS)),
+                                              child: HashCard(
+                                                label: "Peta Hash",
+                                                value: "$hashRate Hex MH/s",
+                                                isInProgress: !(totalReferrals >= ProductUtils.LEVEL_THREE_REFERRALS),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -296,28 +239,5 @@ class _MiningViewState extends State<MiningView> {
     );
   }
 
-  Widget _buildStatCard({required String label, required String value, double? fontSize, bool isFullWidth = false}) {
-    return Container(
-      padding: EdgeInsets.all(16.sp),
-      height: 80.sp,
-      decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(12)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            label,
-            style: TextStyle(color: const Color(0xFF757575), fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-          ),
-          2.sp.verticalSpace,
-          AutoSizeText(
-            value,
-            maxLines: 1,
-            style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: fontSize ?? 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-          ),
-        ],
-      ),
-    );
-  }
 }
+

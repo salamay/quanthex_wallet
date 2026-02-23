@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quanthex/views/mining/mining_view.dart';
 class HowItWorksItem extends StatelessWidget {
   HowItWorksItem({super.key,required this.text, required this.onInfoTap} );
   String text;
@@ -18,7 +19,7 @@ class HowItWorksItem extends StatelessWidget {
           child: Icon(
             Icons.check_circle_outline,
             size: 20.sp,
-            color: Color(0xff6d6d6d),
+            color: Colors.white70,
           ),
         ),
         10.horizontalSpace,
@@ -26,7 +27,7 @@ class HowItWorksItem extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              color: const Color(0xFF2D2D2D),
+              color: Colors.white70,
               fontSize: 14.sp,
               fontFamily: 'Satoshi',
               fontWeight: FontWeight.w500,
@@ -46,7 +47,7 @@ class HowItWorksItem extends StatelessWidget {
               child: Icon(
                 Icons.help_outline,
                 size: 16.sp,
-                color: const Color(0xFF792A90),
+                color: greenColor,
               ),
             ),
           ),

@@ -2,7 +2,6 @@ import 'package:quanthex/core/constants/sub_constants.dart';
 
 class SubUtils{
 
-  static int maxOfReferrals=1296;
 
 
   static double STARTER_AMOUNT_MAX=498.0;
@@ -10,6 +9,8 @@ class SubUtils{
   static double ADVANCE_AMOUNT_MAX=4602.0;
   static double PRO_AMOUNT_MAX=10644.0;
   static double MEGA_AMOUNT_MAX = 21300.0;
+
+
 
   static double calculateRewardPotential(String packageName){
     if(packageName==starter){
@@ -26,6 +27,20 @@ class SubUtils{
   }
 
   static double calcAmountEarned({required String packageName, required int noOfReferrals}){
+    if(noOfReferrals==0){
+      double baseDefault = 0.1;
+      if (packageName == starter) {
+        return baseDefault * 2;
+      } else if (packageName == growth) {
+        return baseDefault * 4;
+      } else if (packageName == advance) {
+        return baseDefault * 6;
+      } else if (packageName == pro) {
+        return baseDefault * 8;
+      } else {
+        return 0.0;
+      }
+    }
     if(packageName==starter){
       double totalReward= STARTER_AMOUNT_MAX;
       return calPrice(noOfReferrals: noOfReferrals, totalReward: totalReward, packageName: packageName);

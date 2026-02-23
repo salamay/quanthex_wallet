@@ -55,119 +55,124 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
+      extendBody: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         centerTitle: true,
-        backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
           'Mining',
-          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+          style: TextStyle(color: Colors.white, fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
         ),
         leading: IconButton(
           onPressed: () {
-            
             Navigate.back(context);
           },
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
         ),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         padding: EdgeInsets.symmetric(horizontal: 16.sp),
-        child: Consumer<MiningController>(
-          builder: (context, miningCtr, _) {
-            String walletAddress = walletController.currentWallet!.walletAddress ?? "";
-            List<MiningDto> minings = miningCtr.minings[walletAddress] ?? [];
-            return SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  // Quanthex Image Banner
-                  Center(
-                    child: QuanthexImageBanner(width: 110.sp, height: 20.sp),
-                  ),
-                  10.sp.verticalSpace,
-                  // Introduction Section
-                  Text(
-                    'Ignite Your Mining Power Let the Blockchain Work for You.',
-                    style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                  ),
-                  15.sp.verticalSpace,
-                  Text(
-                    'Activate any mining package and begin generating rewards instantly. The higher your package and network growth, the more you earn.',
-                    style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.5),
-                  ),
-                  30.sp.verticalSpace,
-                  // How It Works
-                  Text(
-                    'How It Works',
-                    style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                  ),
-                  15.sp.verticalSpace,
-                  HowItWorksItem(text: 'Choose a package', onInfoTap: () {}),
-                  10.sp.verticalSpace,
-                  HowItWorksItem(text: 'Get your HexaPower referral link', onInfoTap: () {}),
-                  10.sp.verticalSpace,
-                  HowItWorksItem(text: 'Share & grow your earnings', onInfoTap: () {}),
-                  30.sp.verticalSpace,
-                  // Available Packages
-                  Text(
-                    'Available Packages',
-                    style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                  ),
-                  10.sp.verticalSpace,
-                  Text(
-                    'Pick a plan that matches your budget and unlock mining rewards.',
-                    style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                  ),
-                  20.sp.verticalSpace,
-                  GestureDetector(
-                    onTap: () {
-                      selectedIndex = 0;
-                      setState(() {});
-                    },
-                    child: _buildPackageCard(price: 50, name: starter, isSelected: selectedIndex == 0 ? true : false),
-                  ),
-                  15.sp.verticalSpace,
-                  GestureDetector(
-                    onTap: () {
-                      selectedIndex = 1;
-                      setState(() {});
-                    },
-                    child: _buildPackageCard(price: 200, name: growth, isSelected: selectedIndex == 1 ? true : false),
-                  ),
-                  15.sp.verticalSpace,
-                  GestureDetector(
-                    onTap: () {
-                      selectedIndex = 2;
-                      setState(() {});
-                    },
-                    child: _buildPackageCard(price: 500, name: advance, isSelected: selectedIndex == 2 ? true : false),
-                  ),
-                  15.sp.verticalSpace,
-                  GestureDetector(
-                    onTap: () {
-                      selectedIndex = 3;
-                      setState(() {});
-                    },
-                    child: _buildPackageCard(price: 1000, name: pro, isSelected: selectedIndex == 3 ? true : false),
-                  ),
-               15.sp.verticalSpace,
-                  GestureDetector(
-                    onTap: () {
-                      selectedIndex = 4;
-                      setState(() {});
-                    },
-                    child: _buildPackageCard(price: 2000, name: mega, isSelected: selectedIndex == 4 ? true : false),
-                  ),
-              
-                  40.sp.verticalSpace,
-                ],
-              ),
-            );
-          },
+        decoration: BoxDecoration(
+          image: DecorationImage(colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken), image: AssetImage('assets/images/green_astro_bg.jpg'), fit: BoxFit.cover),
+        ),
+        child: SafeArea(
+          child: Consumer<MiningController>(
+            builder: (context, miningCtr, _) {
+              String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+              List<MiningDto> minings = miningCtr.minings[walletAddress] ?? [];
+              return SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    // Quanthex Image Banner
+                    Center(
+                      child: QuanthexImageBanner(width: 110.sp, height: 20.sp),
+                    ),
+                    10.sp.verticalSpace,
+                    // Introduction Section
+                    Text(
+                      'Ignite Your Mining Power Let the Blockchain Work for You.',
+                      style: TextStyle(color: Colors.white, fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                    ),
+                    15.sp.verticalSpace,
+                    Text(
+                      'Activate any mining package and begin generating rewards instantly. The higher your package and network growth, the more you earn.',
+                      style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.5),
+                    ),
+                    10.sp.verticalSpace,
+                    // How It Works
+                    Text(
+                      'How It Works',
+                      style: TextStyle(color: Colors.white, fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                    ),
+                    15.sp.verticalSpace,
+                    HowItWorksItem(text: 'Choose a package', onInfoTap: () {}),
+                    10.sp.verticalSpace,
+                    HowItWorksItem(text: 'Get your HexaPower referral link', onInfoTap: () {}),
+                    10.sp.verticalSpace,
+                    HowItWorksItem(text: 'Share & grow your earnings', onInfoTap: () {}),
+                    30.sp.verticalSpace,
+                    // Available Packages
+                    Text(
+                      'Available Packages',
+                      style: TextStyle(color: Colors.white, fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                    ),
+                    10.sp.verticalSpace,
+                    Text(
+                      'Pick a plan that matches your budget and unlock mining rewards.',
+                      style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                    ),
+                    20.sp.verticalSpace,
+                    GestureDetector(
+                      onTap: () {
+                        selectedIndex = 0;
+                        setState(() {});
+                      },
+                      child: _buildPackageCard(price: 50, name: starter, isSelected: selectedIndex == 0 ? true : false),
+                    ),
+                    15.sp.verticalSpace,
+                    GestureDetector(
+                      onTap: () {
+                        selectedIndex = 1;
+                        setState(() {});
+                      },
+                      child: _buildPackageCard(price: 200, name: growth, isSelected: selectedIndex == 1 ? true : false),
+                    ),
+                    15.sp.verticalSpace,
+                    GestureDetector(
+                      onTap: () {
+                        selectedIndex = 2;
+                        setState(() {});
+                      },
+                      child: _buildPackageCard(price: 500, name: advance, isSelected: selectedIndex == 2 ? true : false),
+                    ),
+                    15.sp.verticalSpace,
+                    GestureDetector(
+                      onTap: () {
+                        selectedIndex = 3;
+                        setState(() {});
+                      },
+                      child: _buildPackageCard(price: 1000, name: pro, isSelected: selectedIndex == 3 ? true : false),
+                    ),
+                 15.sp.verticalSpace,
+                    GestureDetector(
+                      onTap: () {
+                        selectedIndex = 4;
+                        setState(() {});
+                      },
+                      child: _buildPackageCard(price: 2000, name: mega, isSelected: selectedIndex == 4 ? true : false),
+                    ),
+                
+                    40.sp.verticalSpace,
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -198,10 +203,10 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
         return Container(
           padding: EdgeInsets.all(16.sp),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFAE9FF) : const Color(0xFFF5F5F5),
+            color: isSelected ? greenColor.withOpacity(0.2) : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isSelected ? const Color(0xFF792A90) : const Color(0xFFE0E0E0),
+              color: isSelected ? greenColor.withOpacity(0.2) : Colors.transparent,
               width: isSelected ? 1 : 1,
             ),
           ),
@@ -214,7 +219,7 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
                   Text(
                     '\$$price $name',
                     style: TextStyle(
-                      color: const Color(0xFF2D2D2D),
+                      color: Colors.white,
                       fontSize: 18.sp,
                       fontFamily: 'Satoshi',
                       fontWeight: FontWeight.w700,
@@ -227,13 +232,13 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
                         width: 24.sp,
                         height: 24.sp,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF792A90).withOpacity(0.1),
+                          color: greenColor.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.help_outline,
                           size: 16.sp,
-                          color: const Color(0xFF792A90),
+                          color: greenColor,
                         ),
                       ),
                     ),
@@ -243,7 +248,7 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
               Text(
                 description,
                 style: TextStyle(
-                  color: const Color(0xFF757575),
+                  color: Colors.white70,
                   fontSize: 12.sp,
                   fontFamily: 'Satoshi',
                   fontWeight: FontWeight.w400,
@@ -255,7 +260,7 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
                 AppButton(
                   text: 'Subscribe',
                   textColor: Colors.white,
-                  color: const Color(0xFF792A90),
+                  color: greenColor.withOpacity(0.2),
                   onTap: () async{
                     double subPrice = price.toDouble();
                     String subWalletHash = walletController.currentWallet!.hash;

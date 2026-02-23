@@ -38,9 +38,9 @@ class ProductUtils {
     }
         if(noOfReferrals==0){
             return LEVEL_ZERO_HASHRATE;
-        }else if(noOfReferrals>1 && noOfReferrals<6){
+        }else if(noOfReferrals>0 && noOfReferrals<6){
             return LEVEL_ONE_HASHRATE * factor;
-        }else if(noOfReferrals>6 && noOfReferrals<36){
+        }else if(noOfReferrals>=6 && noOfReferrals<36){
             return LEVEL_TWO_HASHRATE * factor;
         } else if(noOfReferrals>=36 && noOfReferrals<216){
             return LEVEL_THREE_HASHRATE * factor;

@@ -6,9 +6,11 @@ import 'MyFadeSlideEffect.dart';
 
 
 class ErrorModal extends StatelessWidget {
-  ErrorModal({super.key,required this.callBack, this.message});
+  ErrorModal({super.key,required this.callBack, this.message, this.textColor, this.buttonColor});
   String? message;
   Function callBack;
+  Color? textColor;
+  Color? buttonColor;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,7 +26,7 @@ class ErrorModal extends StatelessWidget {
                 child: Text(
                   'An error occurred, check your internet connection and try again. If the problem persists, please contact support.',
                   style: TextStyle(
-                    color: const Color(0xFF757575),
+                    color: textColor ?? Colors.white70,
                     fontSize: 14.sp,
                     fontFamily: 'Satoshi',
                     fontWeight: FontWeight.w400,
@@ -36,7 +38,7 @@ class ErrorModal extends StatelessWidget {
               AppButton(
                   text: 'Retry',
                   textColor: Colors.white,
-                  color: const Color(0xFF792A90),
+                  color: buttonColor ?? Color(0xFF792A90),
                   onTap: ()async {
                     callBack();
                   }
