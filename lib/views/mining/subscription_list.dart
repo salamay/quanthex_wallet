@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quanthex/data/Models/mining/mining_dto.dart';
+import 'package:quanthex/data/Models/mining/mining_info_dto.dart';
 import 'package:quanthex/data/Models/subscription/subscription_dto.dart';
 import 'package:quanthex/data/controllers/mining/mining_controller.dart';
 import 'package:quanthex/data/controllers/wallet_controller.dart';
@@ -111,14 +112,7 @@ class _SubscriptionListState extends State<SubscriptionList> {
 
   Widget _buildSubscriptionCard(MiningDto mining) {
     SubscriptionDto subscription = mining.subscription!;
-    final rewardSymbol = subscription.subRewardAssetSymbol ?? '—';
-    final expiryDate = subscription.subDuration != null ? DateFormat('dd MMM yyyy').format(DateTime.fromMillisecondsSinceEpoch(int.parse(subscription.subDuration!))) : '—';
-    // Placeholder stats until API provides hash power / earnings
-    const String hashPower = '800 H/s';
-    const String totalEarned = '50';
-    const String todayEarned = '0.45';
-    const double progressPercent = 0.65;
-
+    MiningInfoDto miningInfo = mining.mining!;
     return Container(
       padding: EdgeInsets.all(20.sp),
       decoration: BoxDecoration(
@@ -182,15 +176,11 @@ class _SubscriptionListState extends State<SubscriptionList> {
             child: Row(
               children: [
                 Expanded(
-                  child: _StatItem(icon: Icons.bolt, label: 'Hash Power', value: hashPower, accentColor: _kAccentPurple),
+                  child: _StatItem(icon: Icons.lock_clock, label: 'Date created', value: MyDateUtils.dateToSingleFormat(DateTime.fromMillisecondsSinceEpoch(int.parse(mining.mining!.minCreatedAt!))), accentColor: _kAccentPurple),
                 ),
                 Container(width: 1, height: 36.sp, color: Colors.white24),
                 Expanded(
-                  child: _StatItem(icon: Icons.monetization_on_outlined, label: 'Total Earned', value: '$totalEarned $rewardSymbol', accentColor: _kAccentPurple),
-                ),
-                Container(width: 1, height: 36.sp, color: Colors.white24),
-                Expanded(
-                  child: _StatItem(icon: Icons.trending_up, label: 'Today', value: '$todayEarned $rewardSymbol', accentColor: _kAccentPurple),
+                  child: _StatItem(icon: Icons.wallet, label: 'Wallet', value: mining.mining?.miningWalletAddress ?? '', accentColor: _kAccentPurple),
                 ),
               ],
             ),
@@ -202,7 +192,7 @@ class _SubscriptionListState extends State<SubscriptionList> {
               CoinImage(imageUrl: mining.subscription?.subRewardAssetImage ?? "", height: 20.sp, width: 20.sp),
               4.sp.horizontalSpace,
               Text(
-                'Reward: $rewardSymbol',
+                'Reward: ${mining.subscription?.subRewardAssetSymbol ?? ''}',
                 style: TextStyle(color: Colors.white, fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
               ),
               const Spacer(),
@@ -251,6 +241,7 @@ class _StatItem extends StatelessWidget {
           label,
           style: TextStyle(color: Colors.white70, fontSize: 10.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
           textAlign: TextAlign.center,
+          maxLines: 1,
         ),
         2.sp.verticalSpace,
         Text(

@@ -168,7 +168,7 @@ class _SubscribeViewState extends State<SubscribeView> {
                                     Expanded(
                                       child: Text(
                                         rewardCoin == null ? 'Choose your preferred payout currency' : "${rewardCoin!.symbol} - (${rewardCoin!.networkModel!.chainSymbol.toUpperCase()})",
-                                        style: TextStyle(color: rewardCoin == null ? const Color(0xFF9E9E9E) : const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                                        style: TextStyle(color: Colors.white, fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                                       ),
                                     ),
                                   ],
@@ -429,7 +429,7 @@ class _SubscribeViewState extends State<SubscribeView> {
         Uint8List signedTransaction = await webClient.signTransaction(credentials, tx, chainId: chainId, fetchChainIdFromNetworkId: false);
         String txSigned = bytesToHex(signedTransaction, include0x: true);
         payload.subReferralCode = refCode;
-        SubscriptionDto dto = await PackageService.getInstance().makeSubscription(sub: payload, paymentToken: asset, rewardToken: rewardToken, signedTx: "txSigned", rpc: rpc);
+        SubscriptionDto dto = await PackageService.getInstance().makeSubscription(sub: payload, paymentToken: asset, rewardToken: rewardToken, signedTx: txSigned, rpc: rpc);
         List<MiningDto> minings = await miningController.miningService.getMinings(walletAddress);
         miningController.setMinings(walletAddress, minings);
         hideOverlay(context);
