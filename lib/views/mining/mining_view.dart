@@ -14,7 +14,7 @@ import 'package:quanthex/data/controllers/user/user_controller.dart';
 import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/data/utils/my_currency_utils.dart';
 import 'package:quanthex/data/utils/navigator.dart';
-import 'package:quanthex/data/utils/product_utils.dart';
+import 'package:quanthex/data/utils/sub/product_utils.dart';
 import 'package:quanthex/data/utils/share/share_utils.dart';
 import 'package:quanthex/data/utils/sub/sub_utils.dart';
 import 'package:quanthex/views/mining/components/hash_card.dart';
@@ -117,11 +117,16 @@ class _MiningViewState extends State<MiningView> {
                             MiningDto mining = widget.mining;
                             String miningSubscriptionId = mining.subscription!.subId ?? "";
                             List<ReferralDto> directReferrals = miningController.miningDirectReferrals[miningSubscriptionId] ?? [];
-                            int totalReferrals = directReferrals.length;
+                            List<ReferralDto> indirectReferrals = miningController.miningIndirectReferrals[miningSubscriptionId] ?? [];
+                            logger("Direct referrals: ${directReferrals.length}", runtimeType.toString());
+                            logger("Indirect referrals: ${indirectReferrals.length}", runtimeType.toString());
+                            int totalDirectReferrals = directReferrals.length;
+                            int totalIndirectReferrals = indirectReferrals.length;
                             String packageName = mining.subscription!.subPackageName ?? "";
-                            double hashRate = ProductUtils.getHashRate(noOfReferrals: totalReferrals, packageName: packageName);
-                            double amountEarned = SubUtils.calcAmountEarned(packageName: packageName, noOfReferrals: totalReferrals);
-                            double progressPercent = (totalReferrals / ProductUtils.LEVEL_THREE_REFERRALS).clamp(0.0, 1.0);
+                            double hashRate = ProductUtils.getHashRate(noOfReferrals: totalDirectReferrals, packageName: packageName);
+                            double amountEarned = SubUtils.calcAmountEarned(packageName: packageName, noOfReferrals: totalDirectReferrals);
+                            double indirectAmountEarned = SubUtils.calcAmountEarned(packageName: packageName, noOfReferrals: totalIndirectReferrals);
+                            double progressPercent = (totalDirectReferrals / ProductUtils.LEVEL_THREE_REFERRALS).clamp(0.0, 1.0);
                             return !isError
                                 ? SingleChildScrollView(
                                     physics: AlwaysScrollableScrollPhysics(),
@@ -134,7 +139,7 @@ class _MiningViewState extends State<MiningView> {
                                           hashRate: hashRate,
                                           amountEarned: amountEarned,
                                           progressPercent: progressPercent,
-                                          totalReferrals: totalReferrals,
+                                          totalReferrals: totalDirectReferrals,
                                         ),
                                         20.sp.verticalSpace,
                                         // Referral link card (dark)
@@ -143,22 +148,26 @@ class _MiningViewState extends State<MiningView> {
                                         // Stat cards (dark)
                                         Row(
                                           children: [
-                                            Expanded(child: StatCard(label: 'Active Members', value: totalReferrals.toString())),
+                                            Expanded(child: StatCard(label: 'Direct Members', value: totalDirectReferrals.toString())),
                                             12.horizontalSpace,
-                                            Expanded(child: StatCard(label: 'Package', value: packageName)),
+                                            Expanded(child: StatCard(label: 'Indirect members', value: indirectReferrals.length.toString())),
+                                          ],
+                                        ),
+                                        12.sp.verticalSpace,
+                                         Row(
+                                          children: [
+                                           Expanded(
+                                              child: StatCard(label: 'Package', value: packageName),
+                                            ),
+                                            12.horizontalSpace,
+                                           Expanded(
+                                              child: StatCard(label: 'Mining Speed', value: "$hashRate Hex MH/s", fontSize: 13.sp),
+                                            ),
                                           ],
                                         ),
                                         12.sp.verticalSpace,
                                         Row(
                                           children: [
-                                            Expanded(
-                                              child: StatCard(
-                                                label: 'Mining Speed',
-                                                value: "$hashRate Hex MH/s",
-                                                fontSize: 13.sp,
-                                              ),
-                                            ),
-                                            12.horizontalSpace,
                                             Expanded(
                                               child: Consumer<BalanceController>(
                                                 builder: (context, balanceCtr, child) {
@@ -169,7 +178,7 @@ class _MiningViewState extends State<MiningView> {
                                                     effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
                                                     ignoreContainers: false,
                                                     child: StatCard(
-                                                      label: mining.subscription!.subRewardAssetSymbol ?? "",
+                                                      label: "Direct earnings",
                                                       value: MyCurrencyUtils.format(amountInCrypto, 4),
                                                       fontSize: 14.sp,
                                                     ),
@@ -177,41 +186,51 @@ class _MiningViewState extends State<MiningView> {
                                                 },
                                               ),
                                             ),
+                                            12.horizontalSpace,
+                                            Expanded(
+                                              child: Consumer<BalanceController>(
+                                                builder: (context, balanceCtr, child) {
+                                                  logger("Indirect amount earned: $indirectAmountEarned", runtimeType.toString());
+                                                  double rewardPriceQuotes = balanceCtr.priceQuotes[mining.subscription!.subRewardAssetSymbol ?? ""] ?? 0;
+                                                  double amountInCrypto = rewardPriceQuotes > 0 ? indirectAmountEarned / rewardPriceQuotes : 0;
+                                                  return Skeletonizer(
+                                                    enabled: balanceCtr.isLoadingPriceQuotes,
+                                                    effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                                                    ignoreContainers: false,
+                                                    child: StatCard(label: "Under your structure earnings", value: totalIndirectReferrals<6?"N/A": "${MyCurrencyUtils.format(amountInCrypto, 4)} ${mining.subscription!.subRewardAssetSymbol ?? ""}",infoText: totalIndirectReferrals < 6 ? "Refer 6 direct members to reveal this earnings":null,fontSize: 14.sp),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                           
                                           ],
                                         ),
                                         12.sp.verticalSpace,
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: HashCard(
-                                                label: 'Giga Hash',
-                                                value: "$hashRate Hex MH/s",
-                                                isInProgress: !(totalReferrals >= ProductUtils.LEVEL_ONE_REFERRALS),
-                                                fontSize: 15.sp,
-                                              ),
+                                              child: HashCard(label: 'Giga Hash', value: "$hashRate Hex MH/s", isInProgress: !(totalDirectReferrals >= ProductUtils.LEVEL_ONE_REFERRALS), fontSize: 15.sp),
                                             ),
-                                            12.horizontalSpace,
+                                          ],
+                                        ),
+                                        12.sp.verticalSpace,
+                                        Row(
+                                          children: [
+                                           
                                             Expanded(
                                               child: HashCard(
                                                 label: "Tera Hash",
                                                 value: "$hashRate Hex MH/s",
-                                                isInProgress: !(totalReferrals >= ProductUtils.LEVEL_TWO_REFERRALS),
+                                                isInProgress: !(totalDirectReferrals >= ProductUtils.LEVEL_TWO_REFERRALS),
                                               ),
+                                            ),
+                                            12.horizontalSpace,
+                                             Expanded(
+                                              child: HashCard(label: "Peta Hash", value: "$hashRate Hex MH/s", isInProgress: !(totalDirectReferrals >= ProductUtils.LEVEL_THREE_REFERRALS)),
                                             ),
                                           ],
                                         ),
-                                        12.sp.verticalSpace,
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: HashCard(
-                                                label: "Peta Hash",
-                                                value: "$hashRate Hex MH/s",
-                                                isInProgress: !(totalReferrals >= ProductUtils.LEVEL_THREE_REFERRALS),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                        
                                         40.sp.verticalSpace,
                                       ],
                                     ),

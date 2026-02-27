@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:quanthex/data/utils/product_utils.dart';
+import 'package:quanthex/data/utils/sub/product_utils.dart';
 
 class MiningSimulationWidget extends StatefulWidget {
   final int totalReferrals; // Static hash rate value

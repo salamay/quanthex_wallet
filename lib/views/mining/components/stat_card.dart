@@ -4,16 +4,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quanthex/views/mining/mining_view.dart';
 
 class StatCard extends StatelessWidget {
-  StatCard({super.key, required this.label, required this.value, this.fontSize});
+  StatCard({super.key, required this.label, required this.value, this.fontSize, this.infoText});
   String label;
   String value;
+  String? infoText;
   double? fontSize;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.sp),
-      height: 80.sp,
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      height: 90.sp,
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.35),
         borderRadius: BorderRadius.circular(12),
@@ -26,7 +27,7 @@ class StatCard extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(color: Colors.white70, fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+            style: TextStyle(color: Colors.white70, fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400,height: 1),
           ),
           2.sp.verticalSpace,
           AutoSizeText(
@@ -34,6 +35,12 @@ class StatCard extends StatelessWidget {
             maxLines: 1,
             style: TextStyle(color: Colors.white, fontSize: fontSize ?? 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
           ),
+           2.sp.verticalSpace,
+          infoText!=null?AutoSizeText(
+            infoText!,
+            maxLines: 3,
+            style: TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'Satoshi', fontWeight: FontWeight.w400,height: 1),
+          ):SizedBox.shrink(),
         ],
       ),
     );

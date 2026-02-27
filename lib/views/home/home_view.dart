@@ -124,7 +124,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void initState() {
     // TODO: implement initState
-    _balanceTimer = Timer.periodic(Duration(seconds: 30), (timer) async {});
+    _balanceTimer = Timer.periodic(Duration(seconds: 60), (timer) async {});
     assetController = Provider.of<AssetController>(context, listen: false);
     miningController = Provider.of<MiningController>(context, listen: false);
     balanceController = Provider.of<BalanceController>(context, listen: false);
@@ -159,328 +159,331 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        reload();
-      },
-      child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            20.sp.verticalSpace,
-            // Header
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 20.sp,
-                  backgroundColor: const Color(0xFFF5F5F5),
-                  backgroundImage: AssetImage('assets/images/logo.png'),
-                  // child: Icon(
-                  //   Icons.person,
-                  //   size: 24.sp,
-                  //   color: const Color(0xFF792A90),
-                  // ),
-                ),
-                10.horizontalSpace,
-                Consumer<WalletController>(
-                  builder: (context, walletCtr, child) {
-                    String walletName = walletCtr.currentWallet?.name ?? 'Wallet ${walletCtr.currentWallet?.walletAddress?.substring(0, 6) ?? 'Unknown'}';
-                    return GestureDetector(
-                      onTap: () => _showWalletSelector(context),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 6.sp),
-                        decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(20)),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              walletName,
-                              style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 13.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                            ),
-                            5.horizontalSpace,
-                            Icon(Icons.keyboard_arrow_down, size: 16.sp, color: const Color(0xFF2D2D2D)),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                Spacer(),
-                Consumer<NotificationController>(
-                  builder: (context, notiCtr, child) {
-                    int unreadCount = notiCtr.unreadCount;
-
-                    return Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        IconButton(
-                          icon: Container(
-                            width: 41.sp,
-                            height: 41.sp,
-                            padding: const EdgeInsets.all(10),
-                            decoration: ShapeDecoration(
-                              color: const Color(0x7CDADADA),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.50)),
-                            ),
-                            child: Image.asset('assets/images/noti_icon.png', width: 19.sp, height: 19.sp),
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.sp),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          reload();
+        },
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              20.sp.verticalSpace,
+              // Header
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20.sp,
+                    backgroundColor: const Color(0xFFF5F5F5),
+                    backgroundImage: AssetImage('assets/images/logo.png'),
+                    // child: Icon(
+                    //   Icons.person,
+                    //   size: 24.sp,
+                    //   color: const Color(0xFF792A90),
+                    // ),
+                  ),
+                  10.horizontalSpace,
+                  Consumer<WalletController>(
+                    builder: (context, walletCtr, child) {
+                      String walletName = walletCtr.currentWallet?.name ?? 'Wallet ${walletCtr.currentWallet?.walletAddress?.substring(0, 6) ?? 'Unknown'}';
+                      return GestureDetector(
+                        onTap: () => _showWalletSelector(context),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12.sp, vertical: 6.sp),
+                          decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(20)),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                walletName,
+                                style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 13.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                              ),
+                              5.horizontalSpace,
+                              Icon(Icons.keyboard_arrow_down, size: 16.sp, color: const Color(0xFF2D2D2D)),
+                            ],
                           ),
-                          onPressed: () {
-                            Navigate.toNamed(context, name: AppRoutes.notificationlistview);
-                          },
                         ),
-                        if (unreadCount > 0)
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(
-                              width: 15.sp,
-                              height: 15.sp,
-                              padding: EdgeInsets.all(2.sp),
-                              decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                              child: Center(
-                                child: Text(
-                                  unreadCount.toString(),
-                                  style: TextStyle(color: Colors.white, fontSize: 10.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                      );
+                    },
+                  ),
+                  Spacer(),
+                  Consumer<NotificationController>(
+                    builder: (context, notiCtr, child) {
+                      int unreadCount = notiCtr.unreadCount;
+      
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          IconButton(
+                            icon: Container(
+                              width: 41.sp,
+                              height: 41.sp,
+                              padding: const EdgeInsets.all(10),
+                              decoration: ShapeDecoration(
+                                color: const Color(0x7CDADADA),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.50)),
+                              ),
+                              child: Image.asset('assets/images/noti_icon.png', width: 19.sp, height: 19.sp),
+                            ),
+                            onPressed: () {
+                              Navigate.toNamed(context, name: AppRoutes.notificationlistview);
+                            },
+                          ),
+                          if (unreadCount > 0)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Container(
+                                width: 15.sp,
+                                height: 15.sp,
+                                padding: EdgeInsets.all(2.sp),
+                                decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                                child: Center(
+                                  child: Text(
+                                    unreadCount.toString(),
+                                    style: TextStyle(color: Colors.white, fontSize: 10.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
-            // Quanthex Image Banner
-            10.sp.verticalSpace,
-            // Search Bar
-            GestureDetector(
-              onTap: () {
-                final assetCtr = Provider.of<AssetController>(context, listen: false);
-                showSearch(context: context, delegate: TokenSearchDelegate(assetCtr.assets));
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: const Color(0xFFF5F5F5), width: 1),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.search, size: 20.sp, color: const Color(0xFF9E9E9E)),
-                    10.horizontalSpace,
-                    Text(
-                      'Search token',
-                      style: TextStyle(color: const Color(0xFF9E9E9E), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                    ),
-                  ],
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+              // Quanthex Image Banner
+              10.sp.verticalSpace,
+              // Search Bar
+              GestureDetector(
+                onTap: () {
+                  final assetCtr = Provider.of<AssetController>(context, listen: false);
+                  showSearch(context: context, delegate: TokenSearchDelegate(assetCtr.assets));
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 12.sp),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(color: const Color(0xFFF5F5F5), width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search, size: 20.sp, color: const Color(0xFF9E9E9E)),
+                      10.horizontalSpace,
+                      Text(
+                        'Search token',
+                        style: TextStyle(color: const Color(0xFF9E9E9E), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            15.sp.verticalSpace,
-            // Portfolio Value
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Portfolio Value',
-                  style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                ),
-                8.horizontalSpace,
-                Consumer<BalanceController>(
-                  builder: (context, balanceCtr, child) {
-                    return GestureDetector(
-                      onTap: () {
-                        balanceCtr.toggleHideBalance();
-                      },
-                      child: Icon(!balanceCtr.hideBalance ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 18.sp, color: const Color(0xFF757575)),
-                    );
-                  },
-                ),
-              ],
-            ),
-            10.sp.verticalSpace,
-            ValueListenableBuilder(
-              valueListenable: balanceLoadingNotifier,
-              builder: (context, balanceLoading, _) {
-                return Consumer<BalanceController>(
-                  builder: (context, balanceCtr, child) {
-                    return Skeletonizer(
-                      ignoreContainers: false,
-                      enabled: balanceLoading,
-                      effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
-                      child: AutoSizeText(
-                        balanceCtr.hideBalance ? '****' : MyCurrencyUtils.formatCurrency(balanceCtr.overallBalance),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 32.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                        maxLines: 1,
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-            8.sp.verticalSpace,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Icon(
-                //   Icons.trending_up,
-                //   size: 16.sp,
-                //   color: const Color(0xFF4CAF50),
-                // ),
-                // 5.horizontalSpace,
-                // Text(
-                //   '+\$214.67 (1.74%)',
-                //   style: TextStyle(
-                //     color: const Color(0xFF4CAF50),
-                //     fontSize: 14.sp,
-                //     fontFamily: 'Satoshi',
-                //     fontWeight: FontWeight.w600,
-                //   ),
-                // ),
-              ],
-            ),
-            10.sp.verticalSpace,
-            // Quick Actions
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    SupportedCoin? coin = await AssetUtils.selectAssets(context: context);
-                    if (coin != null) {
-                      logger("Selected Coin: ${coin.name}", runtimeType.toString());
-                      Navigate.toNamed(context, name: AppRoutes.receiveview, args: coin);
-                    }
-                  },
-                  child: QuickAction(icon: Icons.arrow_downward, label: 'Deposit'),
-                ),
-                20.horizontalSpace,
-                GestureDetector(
-                  onTap: () async {
-                    SupportedCoin? coin = await AssetUtils.selectAssets(context: context);
-                    if (coin != null) {
-                      logger("Selected Coin: ${coin.name}", runtimeType.toString());
-                      Navigate.toNamed(context, name: AppRoutes.sendtokenview, args: coin);
-                    }
-                  },
-                  child: QuickAction(icon: Icons.arrow_upward, label: 'Send'),
-                ),
-                // GestureDetector(
-                //   onTap: () {
-                //     Navigate.toNamed(context, name: AppRoutes.swaptokenview);
-                //   },
-                //   child: QuickAction(
-                //     icon: Icons.swap_horiz,
-                //     label: 'Swap',
-                //   ),
-                // ),
-                // GestureDetector(
-                //   onTap: () {
-                //     Navigate.toNamed(
-                //       context,
-                //       name: AppRoutes.transactionhistoryview,
-                //     );
-                //   },
-                //   child: QuickAction(
-                //     icon: Image.asset(
-                //       'assets/images/history.png',
-                //       width: 24.sp,
-                //       height: 24.sp,
-                //       fit: BoxFit.contain,
-                //     ),
-                //     label: 'History',
-                //   ),
-                // ),
-              ],
-            ),
-            20.sp.verticalSpace,
-            // My Assets
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'My Assets',
-                  style: TextStyle(color: const Color(0xFF757575), fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                ),
-                // Container(
-                //   padding: EdgeInsets.symmetric(
-                //     horizontal: 12.sp,
-                //     vertical: 6.sp,
-                //   ),
-                //   decoration: BoxDecoration(
-                //     // color: const Color(0xFFF5F5F5),
-                //     border: Border.all(color: Color(0xFFF5F5F5)),
-                //     borderRadius: BorderRadius.circular(20),
-                //   ),
-                //   child: Row(
-                //     mainAxisSize: MainAxisSize.min,
-                //     children: [
-                //       Icon(
-                //         Icons.add,
-                //         size: 16.sp,
-                //         color: const Color(0xFF2D2D2D),
-                //       ),
-                //       5.horizontalSpace,
-                //       Text(
-                //         'Add token',
-                //         style: TextStyle(
-                //           color: const Color(0xFF2D2D2D),
-                //           fontSize: 12.sp,
-                //           fontFamily: 'Satoshi',
-                //           fontWeight: FontWeight.w500,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-              ],
-            ),
-            5.sp.verticalSpace,
-            // Assets List
-            ValueListenableBuilder(
-              valueListenable: _errorNotifier,
-              builder: (context, isError, _) {
-                return !isError
-                    ? ValueListenableBuilder(
-                        valueListenable: _loadingNotifier,
-                        builder: (context, loading, _) {
-                          return Skeletonizer(
-                            ignoreContainers: false,
-                            enabled: loading,
-                            effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
-                            child: Consumer<AssetController>(
-                              builder: (context, assetCtr, child) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: assetCtr.assets.map((e) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        Navigate.toNamed(context, name: AppRoutes.ethereumdetailview, args: e);
-                                      },
-                                      child: AssetItem(coin: e),
-                                    );
-                                  }).toList(),
-                                );
-                              },
-                            ),
-                          );
+              15.sp.verticalSpace,
+              // Portfolio Value
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Portfolio Value',
+                    style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                  ),
+                  8.horizontalSpace,
+                  Consumer<BalanceController>(
+                    builder: (context, balanceCtr, child) {
+                      return GestureDetector(
+                        onTap: () {
+                          balanceCtr.toggleHideBalance();
                         },
-                      )
-                    : ErrorModal(
-                        callBack: () {
-                          _errorNotifier.value = false;
-                          _loadingNotifier.value = true;
-                          reload();
-                        },
+                        child: Icon(!balanceCtr.hideBalance ? Icons.visibility_outlined : Icons.visibility_off_outlined, size: 18.sp, color: const Color(0xFF757575)),
                       );
-              },
-            ),
-            10.sp.verticalSpace,
-          ],
+                    },
+                  ),
+                ],
+              ),
+              10.sp.verticalSpace,
+              ValueListenableBuilder(
+                valueListenable: balanceLoadingNotifier,
+                builder: (context, balanceLoading, _) {
+                  return Consumer<BalanceController>(
+                    builder: (context, balanceCtr, child) {
+                      return Skeletonizer(
+                        ignoreContainers: false,
+                        enabled: balanceLoading,
+                        effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                        child: AutoSizeText(
+                          balanceCtr.hideBalance ? '****' : MyCurrencyUtils.formatCurrency(balanceCtr.overallBalance),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 32.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                          maxLines: 1,
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+              8.sp.verticalSpace,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Icon(
+                  //   Icons.trending_up,
+                  //   size: 16.sp,
+                  //   color: const Color(0xFF4CAF50),
+                  // ),
+                  // 5.horizontalSpace,
+                  // Text(
+                  //   '+\$214.67 (1.74%)',
+                  //   style: TextStyle(
+                  //     color: const Color(0xFF4CAF50),
+                  //     fontSize: 14.sp,
+                  //     fontFamily: 'Satoshi',
+                  //     fontWeight: FontWeight.w600,
+                  //   ),
+                  // ),
+                ],
+              ),
+              10.sp.verticalSpace,
+              // Quick Actions
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      SupportedCoin? coin = await AssetUtils.selectAssets(context: context);
+                      if (coin != null) {
+                        logger("Selected Coin: ${coin.name}", runtimeType.toString());
+                        Navigate.toNamed(context, name: AppRoutes.receiveview, args: coin);
+                      }
+                    },
+                    child: QuickAction(icon: Icons.arrow_downward, label: 'Deposit'),
+                  ),
+                  20.horizontalSpace,
+                  GestureDetector(
+                    onTap: () async {
+                      SupportedCoin? coin = await AssetUtils.selectAssets(context: context);
+                      if (coin != null) {
+                        logger("Selected Coin: ${coin.name}", runtimeType.toString());
+                        Navigate.toNamed(context, name: AppRoutes.sendtokenview, args: coin);
+                      }
+                    },
+                    child: QuickAction(icon: Icons.arrow_upward, label: 'Send'),
+                  ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     Navigate.toNamed(context, name: AppRoutes.swaptokenview);
+                  //   },
+                  //   child: QuickAction(
+                  //     icon: Icons.swap_horiz,
+                  //     label: 'Swap',
+                  //   ),
+                  // ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     Navigate.toNamed(
+                  //       context,
+                  //       name: AppRoutes.transactionhistoryview,
+                  //     );
+                  //   },
+                  //   child: QuickAction(
+                  //     icon: Image.asset(
+                  //       'assets/images/history.png',
+                  //       width: 24.sp,
+                  //       height: 24.sp,
+                  //       fit: BoxFit.contain,
+                  //     ),
+                  //     label: 'History',
+                  //   ),
+                  // ),
+                ],
+              ),
+              20.sp.verticalSpace,
+              // My Assets
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'My Assets',
+                    style: TextStyle(color: const Color(0xFF757575), fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                  ),
+                  // Container(
+                  //   padding: EdgeInsets.symmetric(
+                  //     horizontal: 12.sp,
+                  //     vertical: 6.sp,
+                  //   ),
+                  //   decoration: BoxDecoration(
+                  //     // color: const Color(0xFFF5F5F5),
+                  //     border: Border.all(color: Color(0xFFF5F5F5)),
+                  //     borderRadius: BorderRadius.circular(20),
+                  //   ),
+                  //   child: Row(
+                  //     mainAxisSize: MainAxisSize.min,
+                  //     children: [
+                  //       Icon(
+                  //         Icons.add,
+                  //         size: 16.sp,
+                  //         color: const Color(0xFF2D2D2D),
+                  //       ),
+                  //       5.horizontalSpace,
+                  //       Text(
+                  //         'Add token',
+                  //         style: TextStyle(
+                  //           color: const Color(0xFF2D2D2D),
+                  //           fontSize: 12.sp,
+                  //           fontFamily: 'Satoshi',
+                  //           fontWeight: FontWeight.w500,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                ],
+              ),
+              5.sp.verticalSpace,
+              // Assets List
+              ValueListenableBuilder(
+                valueListenable: _errorNotifier,
+                builder: (context, isError, _) {
+                  return !isError
+                      ? ValueListenableBuilder(
+                          valueListenable: _loadingNotifier,
+                          builder: (context, loading, _) {
+                            return Skeletonizer(
+                              ignoreContainers: false,
+                              enabled: loading,
+                              effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                              child: Consumer<AssetController>(
+                                builder: (context, assetCtr, child) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: assetCtr.assets.map((e) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          Navigate.toNamed(context, name: AppRoutes.ethereumdetailview, args: e);
+                                        },
+                                        child: AssetItem(coin: e),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        )
+                      : ErrorModal(
+                          callBack: () {
+                            _errorNotifier.value = false;
+                            _loadingNotifier.value = true;
+                            reload();
+                          },
+                        );
+                },
+              ),
+              10.sp.verticalSpace,
+            ],
+          ),
         ),
       ),
     );

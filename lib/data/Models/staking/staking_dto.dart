@@ -21,6 +21,7 @@ class StakingDto {
   String? stakingRewardAssetImage;
   String? stakingWalletHash;
   String? stakingWalletAddress;
+  String? stakingReferralCode;
 
   StakingDto({
     this.stakingId,
@@ -45,6 +46,7 @@ class StakingDto {
     this.stakingRewardAssetImage,
     this.stakingWalletHash,
     this.stakingWalletAddress,
+    this.stakingReferralCode,
   });
 
   factory StakingDto.fromJson(Map<String, dynamic> json) {
@@ -71,6 +73,7 @@ class StakingDto {
       stakingRewardAssetImage:json['staking_reward_asset_image'],
       stakingWalletHash: json['staking_wallet_hash'],
       stakingWalletAddress: json['staking_wallet_address'],
+      stakingReferralCode: json['staking_referral_code'],
     );
   }
 
@@ -102,6 +105,7 @@ class StakingDto {
       stakingRewardAssetImage,
       'staking_wallet_hash': stakingWalletHash,
       'staking_wallet_address': stakingWalletAddress,
+      'staking_referral_code': stakingReferralCode,
     };
   }
 
@@ -128,6 +132,7 @@ class StakingDto {
     String? stakingRewardAssetImage,
     String? stakingWalletHash,
     String? stakingWalletAddress,
+    String? stakingReferralCode,
   }) {
     return StakingDto(
       stakingId: stakingId ?? this.stakingId,
@@ -179,6 +184,7 @@ class StakingDto {
           this.stakingRewardAssetImage,
       stakingWalletHash: stakingWalletHash ?? this.stakingWalletHash,
       stakingWalletAddress: stakingWalletAddress ?? this.stakingWalletAddress,
+      stakingReferralCode: stakingReferralCode ?? this.stakingReferralCode,
     );
   }
 }

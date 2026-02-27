@@ -41,72 +41,77 @@ class _SubscriptionListState extends State<SubscriptionList> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      child: SafeArea(
-        child: Consumer<MiningController>(
-          builder: (context, miningController, _) {
-            // Extract subscriptions from minings
-            String walletAddress = walletController.currentWallet!.walletAddress ?? "";
-            List<MiningDto> minings = miningController.minings[walletAddress] ?? [];
-            return miningController.fetchingMinings
-                ? Loading(size: 30.sp)
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      10.sp.verticalSpace,
-                      // Header: "> ACTIVE MINING PACKAGE"
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.sp),
-                        child: Row(
-                          children: [
-                            Icon(Icons.arrow_forward_ios, size: 14.sp, color: Colors.white),
-                            6.sp.horizontalSpace,
-                            Text(
-                              'ACTIVE MINING PACKAGE',
-                              style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600, letterSpacing: 0.5),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Container(
+            height: constraints.maxHeight,
+            width: constraints.maxWidth,
+            child: Consumer<MiningController>(
+              builder: (context, miningController, _) {
+                // Extract subscriptions from minings
+                String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+                List<MiningDto> minings = miningController.minings[walletAddress] ?? [];
+                return miningController.fetchingMinings
+                    ? Loading(size: 30.sp)
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          10.sp.verticalSpace,
+                          // Header: "> ACTIVE MINING PACKAGE"
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.sp),
+                            child: Row(
+                              children: [
+                                Icon(Icons.arrow_forward_ios, size: 14.sp, color: Colors.white),
+                                6.sp.horizontalSpace,
+                                Text(
+                                  'ACTIVE MINING PACKAGE',
+                                  style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600, letterSpacing: 0.5),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      16.sp.verticalSpace,
-                      !miningController.fetchingMinings && !miningController.fetchingMiningError
-                          ? Expanded(
-                              child: minings.isEmpty
-                                  ? Center(
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(Icons.subscriptions_outlined, size: 64.sp, color: const Color(0xFF757575)),
-                                          16.sp.verticalSpace,
-                                          Text(
-                                            'No subscriptions yet',
-                                            style: TextStyle(color: const Color(0xFF757575), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                          ),
+                          16.sp.verticalSpace,
+                          !miningController.fetchingMinings && !miningController.fetchingMiningError
+                              ? Expanded(
+                                  child: minings.isEmpty
+                                      ? Center(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.subscriptions_outlined, size: 64.sp, color: const Color(0xFF757575)),
+                                              16.sp.verticalSpace,
+                                              Text(
+                                                'No subscriptions yet',
+                                                style: TextStyle(color: const Color(0xFF757575), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    )
-                                  : LayoutBuilder(
-                                      builder: (context, constraints) {
-                                        return SingleChildScrollView(
-                                          padding: EdgeInsets.symmetric(horizontal: 16.sp),
-                                          child: SizedBox(height: constraints.maxHeight, child: _buildSubscriptionCard(minings.first)),
-                                        );
-                                      },
-                                    ),
-                            )
-                          : ErrorModal(
-                              callBack: () {
-                                miningController.fetchMinings(walletAddress);
-                              },
-                              message: "Error fetching minings",
-                            ),
-                    ],
-                  );
-          },
-        ),
-      ),
+                                        )
+                                      : LayoutBuilder(
+                                          builder: (context, constraints) {
+                                            return SingleChildScrollView(
+                                              padding: EdgeInsets.symmetric(horizontal: 16.sp),
+                                              child: SizedBox(child: _buildSubscriptionCard(minings.first)),
+                                            );
+                                          },
+                                        ),
+                                )
+                              : ErrorModal(
+                                  callBack: () {
+                                    miningController.fetchMinings(walletAddress);
+                                  },
+                                  message: "Error fetching minings",
+                                ),
+                        ],
+                      );
+              },
+            ),
+          ),
+        );
+      }
     );
   }
 
@@ -121,8 +126,8 @@ class _SubscriptionListState extends State<SubscriptionList> {
         boxShadow: [BoxShadow(color: Colors.black87.withOpacity(0.25), blurRadius: 20, spreadRadius: 0)],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Top row: Package name + ACTIVE badge
           Row(
@@ -198,7 +203,6 @@ class _SubscriptionListState extends State<SubscriptionList> {
               const Spacer(),
             ],
           ),
-          const Spacer(),
           20.sp.verticalSpace,
           // VIEW FULL DETAILS button
           GestureDetector(

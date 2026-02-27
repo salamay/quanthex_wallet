@@ -23,6 +23,7 @@ import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/views/mining/components/subscription_success_modal.dart';
 import 'package:quanthex/views/staking/components/staking_success_modal.dart';
 import 'package:quanthex/widgets/app_button.dart';
+import 'package:quanthex/widgets/app_textfield.dart';
 import 'package:quanthex/widgets/confirm_pin_modal.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -63,6 +64,7 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
   late AssetController assetController;
   late WalletController walletController;
   int _selectedDurationMonths = 1; // Default to 1 month
+  final TextEditingController referralCode = TextEditingController();
 
   @override
   void initState() {
@@ -83,28 +85,29 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
   }
 
   //
-  Future<void> _showPaymentSuccessModal() async{
+  Future<void> _showPaymentSuccessModal() async {
     print("object");
-      await showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        useRootNavigator: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) => StakingSuccessModal(
-          token: widget.paymentToken,
-          chain: widget.paymentToken.networkModel!,
-          stake: payload,
-          onDoneTap: () {
-            Navigate.back(context);
-                        // this is for back to the mine screen (i returned to true as a key to indicate the guy is subscribed)
-          },
-        ),
-      );
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StakingSuccessModal(
+        token: widget.paymentToken,
+        chain: widget.paymentToken.networkModel!,
+        stake: payload,
+        onDoneTap: () {
+          Navigate.back(context);
+          // this is for back to the mine screen (i returned to true as a key to indicate the guy is subscribed)
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final canPay = rewardCoin != null;
+    
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -246,7 +249,7 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
                         isExpanded: true,
                         dropdownColor: Colors.white,
                         underline: const SizedBox(),
-                        
+
                         icon: Icon(Icons.keyboard_arrow_down, size: 24.sp, color: const Color(0xFF757575)),
                         style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                         items: [1, 6, 12].map((int months) {
@@ -274,7 +277,7 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
                             style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
                           ),
                           Text(
-                            MyDateUtils.dateToSingleFormatWithTime( _getEndDate(),false),
+                            MyDateUtils.dateToSingleFormatWithTime(_getEndDate(), false),
                             style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
                           ),
                         ],
@@ -355,6 +358,20 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
                         ],
                       ),
                     ),
+                    10.sp.verticalSpace,
+                    Text(
+                      'Referral Code',
+                      style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                    ),
+                    5.sp.verticalSpace,
+                    AppTextfield(
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xffEAEAEA)),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      hintText: 'Enter referral code',
+                      controller: referralCode,
+                    ),
                     30.sp.verticalSpace,
                     // Package Details
                     Container(
@@ -426,8 +443,13 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
   }
 
   Future<void> pay(CoinBalance? balance, SupportedCoin rewardToken) async {
-    NetworkFee? fee;
-    try {
+   try{
+     NetworkFee? fee;
+     String refCode = referralCode.text.trim();
+     if (refCode.isEmpty) {
+       showMySnackBar(context: context, message: "Referral code is required", type: SnackBarType.error);
+       return;
+     }
       if (balance == null) {
         showMySnackBar(context: context, message: "Balance not available, Please try again later", type: SnackBarType.error);
         return;
@@ -441,10 +463,17 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
       SupportedCoin asset = widget.paymentToken;
       double? priceQuote = balanceController.priceQuotes[asset.symbol] ?? 0;
       double _amountInFiat = _paymentAmount * (priceQuote ?? 0);
-      String address=adminAddress;
+      String address = adminAddress;
       SendPayload sendPayload = SendPayload(amount: _paymentAmount, asset: asset, amountInFiat: _amountInFiat, recipient_address: address);
-      fee = await TransactionService().getTxInfo(priceQuote: priceQuote, asset: asset, sendPayload: sendPayload!);
-      sendPayload.fee = fee;
+      try {
+        fee = await TransactionService().getTxInfo(priceQuote: priceQuote, asset: asset, sendPayload: sendPayload!);
+        sendPayload.fee = fee;
+      } catch (e) {
+        logger(e.toString(), runtimeType.toString());
+        showMySnackBar(context: context, message: "An error occurred when estimating gas, Please check the address and make sure you have good internet or enough gas fee", type: SnackBarType.error);
+        hideOverlay(context);
+        return;
+      }
       if (fee == null) {
         showMySnackBar(context: context, message: "Unable to estimate transaction, Ensure you have enough gas fee for this transaction", type: SnackBarType.error);
         hideOverlay(context);
@@ -455,40 +484,49 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
       int decimal = asset.decimal!;
       bool isGas = GasFeeCheck.gasFeeCheck(bCtr: balanceController, feeInCrypto: fee.feeInCrypto, chainCurrency: network.chainCurrency);
       if (isGas) {
-        double totalAmount = ((_paymentAmount) * math.pow(10, decimal));
-        logger("Total amount: $totalAmount", runtimeType.toString());
-        Transaction tx = await TransactionService().getTransferTx(context, sendPayload);
-        String rpc = network.rpcUrl;
-        int chainId = network.chainId;
-        Web3Client webClient = await ClientResolver.resolveClient(rpcUrl: rpc);
-        String privateKey = asset.privateKey!;
-        final credentials = await TokenFactory().getCredentials(privateKey);
-        Uint8List signedTransaction = await webClient.signTransaction(credentials, tx, chainId: chainId, fetchChainIdFromNetworkId: false);
-        String txSigned = bytesToHex(signedTransaction, include0x: true);
-        StakingPayload stake = payload;
-        stake.stakedAssetSymbol = asset.symbol ?? "";
-        stake.stakedAssetContract = asset.contractAddress ?? "";
-        stake.stackedAssetDecimals = asset.decimal ?? 18;
-        stake.stakedAssetName = asset.name ?? "";
-        stake.stakedAssetImage = asset.image ?? "";
-        stake.stakingRewardContract = rewardToken.contractAddress ?? "";
-        stake.stakingRewardChainId = rewardToken.networkModel!.chainId ?? 56;
-        stake.stakingRewardAssetName = rewardToken.name ?? "";
-        stake.stakedAmountCrypto = _paymentAmount.toString();
-        stake.stakedAmountFiat = _amountInFiat.toString();
-        stake.signedTx = txSigned;
-        stake.rpc = rpc;
-        stake.duration = _selectedDurationMonths;
-        stake.endDate = _getEndDate().millisecondsSinceEpoch;
-        stake.startDate = DateTime.now().millisecondsSinceEpoch;
-        StakingDto dto = await PackageService.getInstance().stake(stake: stake);
-        String walletAddress = walletController.currentWallet!.walletAddress ?? "";
-        List<StakingDto> stakings = await MiningService.getInstance().getStakings(walletAddress, active);
-        miningController.setStakings(walletAddress, stakings);
+      double totalAmount = ((_paymentAmount) * math.pow(10, decimal));
+      logger("Total amount: $totalAmount", runtimeType.toString());
+      Transaction tx = await TransactionService().getTransferTx(context, sendPayload);
+      String rpc = network.rpcUrl;
+      int chainId = network.chainId;
+      Web3Client webClient = await ClientResolver.resolveClient(rpcUrl: rpc);
+      String privateKey = asset.privateKey!;
+      final credentials = await TokenFactory().getCredentials(privateKey);
+      Uint8List signedTransaction;
+      String txSigned;
+      try {
+        signedTransaction = await webClient.signTransaction(credentials, tx, chainId: chainId, fetchChainIdFromNetworkId: false);
+        txSigned = bytesToHex(signedTransaction, include0x: true);
+      } catch (e) {
+        logger(e.toString(), runtimeType.toString());
+        showMySnackBar(context: context, message: "An error occurred when signing transaction, Please check the address and make sure you have good internet or enough gas fee", type: SnackBarType.error);
         hideOverlay(context);
-        await _showPaymentSuccessModal();
-        Navigate.back(context, args: true);
-
+        return;
+      }
+      StakingPayload stake = payload;
+      stake.stakedAssetSymbol = asset.symbol ?? "";
+      stake.stakedAssetContract = asset.contractAddress ?? "";
+      stake.stackedAssetDecimals = asset.decimal ?? 18;
+      stake.stakedAssetName = asset.name ?? "";
+      stake.stakedAssetImage = asset.image ?? "";
+      stake.stakingRewardContract = rewardToken.contractAddress ?? "";
+      stake.stakingRewardChainId = rewardToken.networkModel!.chainId ?? 56;
+      stake.stakingRewardAssetName = rewardToken.name ?? "";
+      stake.stakedAmountCrypto = _paymentAmount.toString();
+      stake.stakedAmountFiat = _amountInFiat.toString();
+      stake.signedTx = txSigned;
+      stake.rpc = rpc;
+      stake.duration = _selectedDurationMonths;
+      stake.endDate = _getEndDate().millisecondsSinceEpoch;
+      stake.startDate = DateTime.now().millisecondsSinceEpoch;
+      stake.stakingReferralCode = refCode;
+      StakingDto dto = await PackageService.getInstance().stake(stake: stake);
+      String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+      List<StakingDto> stakings = await MiningService.getInstance().getStakings(walletAddress, active);
+      miningController.setStakings(walletAddress, stakings);
+      hideOverlay(context);
+      await _showPaymentSuccessModal();
+      Navigate.back(context, args: true);
       } else {
         String nativeCoin = sendPayload.asset!.networkModel!.chainCurrency;
         logger("Insufficient $nativeCoin for gas, top up your balance $nativeCoin to proceed", runtimeType.toString());
@@ -496,17 +534,15 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
         return;
       }
       // Proceed with sending the transaction using the sendPayload
-    } catch (e) {
-      logger(e.toString(), runtimeType.toString());
-      showMySnackBar(context: context, message: "An error occurred when estimating gas, Please check the address and make sure you have good internet or enough gas fee", type: SnackBarType.error);
-      hideOverlay(context);
-      return;
-    }
+   }catch(e){
+    logger(e.toString(), runtimeType.toString());
+    hideOverlay(context);
+    return;
+   }
   }
 
   DateTime _getEndDate() {
     DateTime now = DateTime.now();
     return DateTime(now.year, now.month + _selectedDurationMonths, now.day, now.hour, now.minute, now.second);
   }
-  
 }

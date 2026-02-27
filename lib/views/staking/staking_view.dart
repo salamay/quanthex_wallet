@@ -54,6 +54,8 @@ class _StakingViewState extends State<StakingView> {
       List<StakingDto> stakings = miningController.stakings[walletAddress] ?? [];
       if (stakings.isNotEmpty) {
         await miningController.fetchWithdrawals(stakings.first.stakingId ?? "");
+        await miningController.fetchReferrals(stakings.first.stakingId ?? "");
+        
       }
     } catch (e) {
       logger("Error fetching data: $e", runtimeType.toString());

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:quanthex/data/Models/mining/mining_dto.dart';
 import 'package:quanthex/data/controllers/balance/balance_controller.dart';
 import 'package:quanthex/data/utils/my_currency_utils.dart';
-import 'package:quanthex/data/utils/product_utils.dart';
+import 'package:quanthex/data/utils/sub/product_utils.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/views/mining/components/horizontal_divider.dart';
 import 'package:quanthex/views/mining/components/mining_simulation_widget.dart';

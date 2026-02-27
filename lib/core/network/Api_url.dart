@@ -49,6 +49,7 @@ class ApiUrls{
   static String minings="$baseUrl/products/minings";
   static String stakings="$baseUrl/products/stakings";
   static String referrals="$baseUrl/users/referrals";
+  static String stakingReferrals="$baseUrl/products/staking-referrals";
   static String subscriptionDirectReferrals="$baseUrl/products/subscription-direct-referrals";
   static String subscriptionIndirectReferrals="$baseUrl/products/subscription-indirect-referrals";
   static String profile="$baseUrl/users/profile";

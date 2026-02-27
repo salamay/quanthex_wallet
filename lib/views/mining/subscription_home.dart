@@ -85,6 +85,8 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
               },
               child: !miningCtr.fetchingMiningError
                   ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,56 +112,59 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
                         ),
                         minings.isEmpty
                             ? Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 24.sp),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      // Icon with gradient background
-                                      Container(
-                                        width: 120.sp,
-                                        height: 120.sp,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF792A90).withOpacity(0.1), const Color(0xFF792A90).withOpacity(0.05)]),
+                                child: SingleChildScrollView(
+                                  physics: AlwaysScrollableScrollPhysics(),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 24.sp),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        // Icon with gradient background
+                                        Container(
+                                          width: 120.sp,
+                                          height: 120.sp,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xFF792A90).withOpacity(0.1), const Color(0xFF792A90).withOpacity(0.05)]),
+                                          ),
+                                          child: Icon(Icons.subscriptions_outlined, size: 60.sp, color: const Color(0xFF792A90)),
                                         ),
-                                        child: Icon(Icons.subscriptions_outlined, size: 60.sp, color: const Color(0xFF792A90)),
-                                      ),
-                                      20.sp.verticalSpace,
-                                      // Title
-                                      Text(
-                                        'No Subscriptions Yet',
-                                        style: TextStyle(color: Colors.white, fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      12.sp.verticalSpace,
-                                      // Description
-                                      Text(
-                                        'Start your mining journey by subscribing to a package. Choose from our available plans and begin mining.',
-                                        style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.5),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      40.sp.verticalSpace,
-                                      // Subscribe Button with enhanced styling
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(50),
-                                          boxShadow: [BoxShadow(color: greenColor.withOpacity(0.3), blurRadius: 12, offset: Offset(0, 4))],
+                                        20.sp.verticalSpace,
+                                        // Title
+                                        Text(
+                                          'No Subscriptions Yet',
+                                          style: TextStyle(color: Colors.white, fontSize: 24.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                                          textAlign: TextAlign.center,
                                         ),
-                                        child: AppButton(
-                                          text: 'Browse Packages',
-                                          textColor: Colors.white,
-                                          color: greenColor.withOpacity(0.2),
-                                          onTap: () async {
-                                            bool? result = await Navigate.awaitToNamed(context, name: AppRoutes.packageview);
-                                            if (result == true) {
-                                              fetchData();
-                                            }
-                                          },
+                                        12.sp.verticalSpace,
+                                        // Description
+                                        Text(
+                                          'Start your mining journey by subscribing to a package. Choose from our available plans and begin mining.',
+                                          style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.5),
+                                          textAlign: TextAlign.center,
                                         ),
-                                      ),
-                                    ],
+                                        40.sp.verticalSpace,
+                                        // Subscribe Button with enhanced styling
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(50),
+                                            boxShadow: [BoxShadow(color: greenColor.withOpacity(0.3), blurRadius: 12, offset: Offset(0, 4))],
+                                          ),
+                                          child: AppButton(
+                                            text: 'Browse Packages',
+                                            textColor: Colors.white,
+                                            color: greenColor.withOpacity(0.2),
+                                            onTap: () async {
+                                              bool? result = await Navigate.awaitToNamed(context, name: AppRoutes.packageview);
+                                              if (result == true) {
+                                                fetchData();
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               )

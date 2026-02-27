@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:quanthex/data/Models/mining/mining_dto.dart';
 import 'package:quanthex/data/Models/staking/staking_dto.dart';
+import 'package:quanthex/data/Models/staking/staking_referral_dto.dart';
 import 'package:quanthex/data/Models/staking/withdrawal.dart';
 import 'package:quanthex/data/Models/users/referral_dto.dart';
 import 'package:quanthex/data/services/mining/mining_service.dart';
@@ -15,10 +16,11 @@ class MiningController extends ChangeNotifier {
   bool fetchingStakings = false;
   bool fetchingStakingsError = false;
   Map<String, List<ReferralDto>> miningDirectReferrals = {};
+  Map<String, List<ReferralDto>> miningIndirectReferrals = {};
   Map<String, List<MiningDto>> minings = {};
   Map<String, List<StakingDto>> stakings = {};
   List<WithdrawalDto> withdrawals = [];
-
+  Map<String, List<StakingReferralDto>> stakingReferrals = {};
   Future<void> fetchMinings(String walletAddress) async {
     try {
      fetchingMinings = true;
@@ -38,10 +40,13 @@ class MiningController extends ChangeNotifier {
       throw Exception(e);
     }
   }
-    Future<void> getSubscriptionReferrals(String miningSubscriptionId) async {
+
+  Future<void> getSubscriptionReferrals(String miningSubscriptionId) async {
     logger("Getting referrals", runtimeType.toString());
     List<ReferralDto> results = await miningService.getSubscriptionDirectReferrals(miningSubscriptionId);
     miningDirectReferrals[miningSubscriptionId] = results;
+    List<ReferralDto> indirectResults = await miningService.getSubscriptionIndirectReferrals(miningSubscriptionId);
+    miningIndirectReferrals[miningSubscriptionId] = indirectResults;
     notifyListeners();
   }
 
@@ -69,6 +74,12 @@ class MiningController extends ChangeNotifier {
     logger("Getting withdrawals", runtimeType.toString());
     List<WithdrawalDto> results = await packageService.getWithdrawals(stakingId);
     withdrawals = results;
+    notifyListeners();
+  }
+  Future<void> fetchReferrals(String stakingId) async {
+    logger("Getting referrals", runtimeType.toString());
+    List<StakingReferralDto> results = await miningService.getStakingReferrals(stakingId: stakingId);
+    stakingReferrals[stakingId] = results;
     notifyListeners();
   }
 
