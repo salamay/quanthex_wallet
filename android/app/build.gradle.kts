@@ -34,7 +34,7 @@ android {
  signingConfigs {
        
         create("release") {
-            storeFile = file("/Users/mac/Desktop/quanthex_key.jks")
+            storeFile = file("/Users/mac/Desktop/quanthex/playstore/quanthex_key.jks")
             storePassword = "quanthex"
             keyAlias = "quanthex"
             keyPassword = "quanthex"
