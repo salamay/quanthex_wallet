@@ -37,6 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
       decoration: BoxDecoration(
         image: DecorationImage(
           image: AssetImage('assets/images/splash.png'), //landingbgimage
+          fit: BoxFit.fill,
         ),
       ),
       child: Center(

@@ -15,13 +15,14 @@ class StakingPayload {
   String? stakingRewardAssetImage;
   String? signedTx;
   String? rpc;
-  int? duration;
-  int? endDate;
-  int? startDate;
+  String? duration;
+  String? endDate;
+  String? startDate;
   String? stakingWalletHash;
   String? stakingWalletAddress;
   String? stakingStatus;
   String? stakingReferralCode;
+  String? stakingPlan;
   StakingPayload({
     this.stakedAssetSymbol,
     this.stakedAssetContract,
@@ -46,6 +47,7 @@ class StakingPayload {
     required this.stakingWalletAddress,
     this.stakingStatus,
     this.stakingReferralCode,
+    this.stakingPlan,
   });
 
   factory StakingPayload.fromJson(Map<String, dynamic> json) {
@@ -77,6 +79,7 @@ class StakingPayload {
       stakingWalletAddress: json['staking_wallet_address'],
       stakingStatus: json['staking_status'],
       stakingReferralCode: json['staking_referral_code'],
+      stakingPlan: json['staking_plan'],
     );
   }
 
@@ -109,6 +112,7 @@ class StakingPayload {
       'staking_wallet_address': stakingWalletAddress,
       'staking_status': stakingStatus,
       'staking_referral_code': stakingReferralCode,
+      'staking_plan': stakingPlan,
     };
   }
 
@@ -129,13 +133,14 @@ class StakingPayload {
     String? stakingRewardAssetImage,
     String? signedTx,
     String? rpc,
-    int? duration,
-    int? endDate,
-    int? startDate,
+    String? duration,
+    String? endDate,
+    String? startDate,
     String? stakingWalletHash,
     String? stakingWalletAddress,
     String? stakingStatus,
     String? stakingReferralCode,
+    String? stakingPlan,
   }) {
     return StakingPayload(
       stakedAssetSymbol:
@@ -182,6 +187,7 @@ class StakingPayload {
       stakingWalletAddress: stakingWalletAddress ?? this.stakingWalletAddress,
       stakingStatus: stakingStatus ?? this.stakingStatus,
       stakingReferralCode: stakingReferralCode ?? this.stakingReferralCode,
+      stakingPlan: stakingPlan ?? this.stakingPlan,
     );
   }
 }

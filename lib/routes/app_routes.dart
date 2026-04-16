@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:quanthex/data/Models/mining/mining_dto.dart';
+import 'package:quanthex/data/Models/staking/staking_dto.dart';
 import 'package:quanthex/data/Models/staking/staking_payload.dart';
 import 'package:quanthex/data/Models/wallets/wallet_model.dart';
 import 'package:quanthex/views/change_password_view.dart';
@@ -23,6 +25,8 @@ import 'package:quanthex/views/settings/pin/set_pin_view.dart';
 import 'package:quanthex/views/settings/pin/set_new_pin_view.dart';
 import 'package:quanthex/views/settings/settings_view.dart';
 import 'package:quanthex/views/settings/pin/verify_current_pin_view.dart';
+import 'package:quanthex/views/staking/active_staking.dart';
+import 'package:quanthex/views/staking/staking_earning_page.dart';
 import 'package:quanthex/views/staking/staking_view.dart';
 import 'package:quanthex/views/staking/subscribe_staking_view.dart';
 import 'package:quanthex/views/mining/subscribe_view.dart';
@@ -64,11 +68,13 @@ class AppRoutes {
   static String ethereumdetailview = '/ethereumdetailview';
   static String sendtokenview = '/sendtokenview';
   static String receiveview = '/receiveview';
-    static String packageview = '/packageview';
+  static String packageview = '/packageview';
 
   static String miningview = '/miningview';
   static String subscribeview = '/subscribeview';
   static String stakingview = '/stakingview';
+  static String stakingEarningPage = '/stakingEarningPage';
+  static String activeStakingview = '/activeStakingview';
   static String subscribestakingview = '/subscribestakingview';
   static String settingsview = '/settingsview';
   static String walletsview = '/walletsview';
@@ -169,10 +175,13 @@ class AppRoutes {
           return ReceiveView(coin: args);
         },
       ),
-      GoRoute(path: miningview, builder: (context, state) {
-        final args = state.extra as MiningDto;
-        return MiningView(mining: args);
-      }),
+      GoRoute(
+        path: miningview,
+        builder: (context, state) {
+          final args = state.extra as MiningDto;
+          return MiningView(mining: args);
+        },
+      ),
       GoRoute(path: packageview, builder: (context, state) => SubscriptionPackage()),
       GoRoute(
         path: subscribeview,
@@ -184,6 +193,20 @@ class AppRoutes {
         },
       ),
       GoRoute(path: stakingview, builder: (context, state) => StakingView()),
+      GoRoute(
+        path: stakingEarningPage,
+        builder: (context, state) {
+          final args = state.extra as String;
+          return StakingEarningPage(stakingId: args);
+        },
+      ),
+      GoRoute(
+        path: activeStakingview,
+        builder: (context, state) {
+          final args = state.extra as StakingDto;
+          return ActiveStaking(stake: args);
+        },
+      ),
       GoRoute(
         path: subscribestakingview,
         builder: (context, state) {

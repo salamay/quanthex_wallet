@@ -40,7 +40,7 @@ class _SubscriptionHomeState extends State<SubscriptionHome> {
     miningController = Provider.of<MiningController>(context, listen: false);
     userController = Provider.of<UserController>(context, listen: false);
     walletController = Provider.of<WalletController>(context, listen: false);
-    SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+    SchedulerBinding.instance.addPostFrameCallback((timeStamp) async{
       fetchData();
     });
     super.initState();

@@ -5,6 +5,7 @@ import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/data/utils/security_utils.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
+import 'package:quanthex/views/mining/mining_view.dart';
 import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 
 import '../../../widgets/app_button.dart';
@@ -28,6 +29,10 @@ class ConfirmWithdrawalModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(24.sp),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(20.sp), topRight: Radius.circular(20.sp)),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -61,7 +66,7 @@ class ConfirmWithdrawalModal extends StatelessWidget {
           Text(
             'Confirm Withdrawal',
             style: TextStyle(
-              color: const Color(0xFF2D2D2D),
+              color: Colors.white,
               fontSize: 20.sp,
               fontFamily: 'Satoshi',
               fontWeight: FontWeight.w700,
@@ -74,7 +79,7 @@ class ConfirmWithdrawalModal extends StatelessWidget {
               'You\'re about to withdraw \$$amount $token to your selected wallet address, Please review the details below before proceeding.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: const Color(0xFF757575),
+                color: Colors.white60,
                 fontSize: 14.sp,
                 fontFamily: 'Satoshi',
                 fontWeight: FontWeight.w400,
@@ -86,7 +91,7 @@ class ConfirmWithdrawalModal extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(16.sp),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+              color: greenColor.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -97,8 +102,8 @@ class ConfirmWithdrawalModal extends StatelessWidget {
                     Text(
                       'Amount',
                       style: TextStyle(
-                        color: const Color(0xFF757575),
-                        fontSize: 14.sp,
+                        color: Colors.white,
+                        fontSize: 14,
                         fontFamily: 'Satoshi',
                         fontWeight: FontWeight.w400,
                       ),
@@ -106,7 +111,7 @@ class ConfirmWithdrawalModal extends StatelessWidget {
                     Text(
                       '\$$amount $token',
                       style: TextStyle(
-                        color: const Color(0xFF2D2D2D),
+                        color: Colors.white60,
                         fontSize: 16.sp,
                         fontFamily: 'Satoshi',
                         fontWeight: FontWeight.w700,
@@ -118,15 +123,23 @@ class ConfirmWithdrawalModal extends StatelessWidget {
             ),
           ),
           30.sp.verticalSpace,
-          AppButton(
-            text: 'Confirm Withdraw',
-            textColor: Colors.white,
-            color: const Color(0xFF792A90),
-            padding: EdgeInsets.zero,
+          GestureDetector(
             onTap: () async {
-              Navigate.back(context, args: true);
+               Navigate.back(context, args: true);
+
             },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 14.sp),
+              decoration: BoxDecoration(color: greenColor.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+              child: Center(
+                child: Text(
+                  'Confirm Withdraw',
+                  style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                ),
+              ),
+            ),
           ),
+         
           20.sp.verticalSpace,
         ],
       ),

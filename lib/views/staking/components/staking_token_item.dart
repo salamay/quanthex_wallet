@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:quanthex/data/controllers/balance/balance_controller.dart';
 import 'package:quanthex/core/constants/network_constants.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
+import 'package:quanthex/views/mining/mining_view.dart';
 
 class StakingTokenItem extends StatelessWidget {
   final SupportedCoin coin;
@@ -22,9 +23,7 @@ class StakingTokenItem extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 6.sp),
         padding: EdgeInsets.symmetric(vertical: 12.sp, horizontal: 16.sp),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE0E0E0).withOpacity(0.5), width: 1),
+          color: greenColor.withOpacity(0.1),
         ),
         child: Consumer<BalanceController>(
           builder: (context, bCtr, child) {

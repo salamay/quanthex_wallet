@@ -257,89 +257,89 @@ class _CreateAccountViewState extends State<CreateAccountView> {
                   ),
                 ),
 
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          height: 1.5.sp,
-                          // width: double.infinity,
-                          color: Color(0xffEBEBEB),
-                        ),
-                      ),
-                      // 20.sp.verticalSpace,
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Text(
-                          'Or',
-                          style: TextStyle(
-                            color: const Color(0xFF959595),
-                            fontSize: 11.sp,
-                            fontFamily: 'Satoshi',
-                            fontWeight: FontWeight.w700,
-                            height: 2.sp,
-                            letterSpacing: -0.41,
-                          ),
-                        ),
-                      ),
-                      // 20.sp.verticalSpace,
-                      Expanded(
-                        child: Container(
-                          height: 1.5.sp,
-                          // width: double.infinity,
-                          color: Color(0xffEBEBEB),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // SizedBox(
+                //   width: MediaQuery.sizeOf(context).width,
+                //   child: Row(
+                //     children: [
+                //       Expanded(
+                //         child: Container(
+                //           height: 1.5.sp,
+                //           // width: double.infinity,
+                //           color: Color(0xffEBEBEB),
+                //         ),
+                //       ),
+                //       // 20.sp.verticalSpace,
+                //       Padding(
+                //         padding: const EdgeInsets.symmetric(horizontal: 10),
+                //         child: Text(
+                //           'Or',
+                //           style: TextStyle(
+                //             color: const Color(0xFF959595),
+                //             fontSize: 11.sp,
+                //             fontFamily: 'Satoshi',
+                //             fontWeight: FontWeight.w700,
+                //             height: 2.sp,
+                //             letterSpacing: -0.41,
+                //           ),
+                //         ),
+                //       ),
+                //       // 20.sp.verticalSpace,
+                //       Expanded(
+                //         child: Container(
+                //           height: 1.5.sp,
+                //           // width: double.infinity,
+                //           color: Color(0xffEBEBEB),
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
-                15.sp.verticalSpace,
+                // 15.sp.verticalSpace,
 
-                Container(
-                  width: 333.sp,
-                  height: 45.sp,
-                  padding: const EdgeInsets.symmetric(
-                    // horizontal: 131,
-                    // vertical: 18,
-                  ),
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFF323232),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    spacing: 7,
-                    children: [
-                      Container(
-                        width: 17.sp,
-                        height: 17.sp,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage("assets/images/googleimage.png"),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        'Sign in using Google',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13.sp,
-                          fontFamily: 'Satoshi',
-                          fontWeight: FontWeight.w700,
-                          height: 1.69,
-                          letterSpacing: -0.41,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // Container(
+                //   width: 333.sp,
+                //   height: 45.sp,
+                //   padding: const EdgeInsets.symmetric(
+                //     // horizontal: 131,
+                //     // vertical: 18,
+                //   ),
+                //   decoration: ShapeDecoration(
+                //     color: const Color(0xFF323232),
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(50),
+                //     ),
+                //   ),
+                //   child: Row(
+                //     mainAxisSize: MainAxisSize.min,
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     crossAxisAlignment: CrossAxisAlignment.center,
+                //     spacing: 7,
+                //     children: [
+                //       Container(
+                //         width: 17.sp,
+                //         height: 17.sp,
+                //         decoration: BoxDecoration(
+                //           image: DecorationImage(
+                //             image: AssetImage("assets/images/googleimage.png"),
+                //             fit: BoxFit.cover,
+                //           ),
+                //         ),
+                //       ),
+                //       Text(
+                //         'Sign in using Google',
+                //         style: TextStyle(
+                //           color: Colors.white,
+                //           fontSize: 13.sp,
+                //           fontFamily: 'Satoshi',
+                //           fontWeight: FontWeight.w700,
+                //           height: 1.69,
+                //           letterSpacing: -0.41,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
                 Row(
                   children: [

@@ -22,6 +22,8 @@ class StakingDto {
   String? stakingWalletHash;
   String? stakingWalletAddress;
   String? stakingReferralCode;
+  String? planName;
+  String? duration;
 
   StakingDto({
     this.stakingId,
@@ -47,6 +49,8 @@ class StakingDto {
     this.stakingWalletHash,
     this.stakingWalletAddress,
     this.stakingReferralCode,
+    this.planName,
+    this.duration
   });
 
   factory StakingDto.fromJson(Map<String, dynamic> json) {
@@ -70,10 +74,12 @@ class StakingDto {
       stakingRewardAssetName: json['staking_reward_asset_name'],
       stakingRewardAssetSymbol: json['staking_reward_asset_symbol'],
       stakingRewardAssetDecimals: json['staking_reward_asset_decimals'],
-      stakingRewardAssetImage:json['staking_reward_asset_image'],
+      stakingRewardAssetImage: json['staking_reward_asset_image'],
       stakingWalletHash: json['staking_wallet_hash'],
       stakingWalletAddress: json['staking_wallet_address'],
       stakingReferralCode: json['staking_referral_code'],
+      planName: json['plan_name'],
+      duration: json['duration']
     );
   }
 
@@ -95,17 +101,15 @@ class StakingDto {
       'staking_reward_contract': stakingRewardContract,
       'staking_reward_chain_id': stakingRewardChainId,
       'staking_reward_chain_name': stakingRewardChainName,
-      'staking_reward_asset_name':
-      stakingRewardAssetName,
-      'staking_reward_asset_symbol':
-      stakingRewardAssetSymbol,
-      'staking_reward_asset_decimals':
-      stakingRewardAssetDecimals,
-      'staking_reward_asset_image':
-      stakingRewardAssetImage,
+      'staking_reward_asset_name': stakingRewardAssetName,
+      'staking_reward_asset_symbol': stakingRewardAssetSymbol,
+      'staking_reward_asset_decimals': stakingRewardAssetDecimals,
+      'staking_reward_asset_image': stakingRewardAssetImage,
       'staking_wallet_hash': stakingWalletHash,
       'staking_wallet_address': stakingWalletAddress,
       'staking_referral_code': stakingReferralCode,
+      'plan_name': planName,
+      'duration': duration
     };
   }
 
@@ -133,58 +137,35 @@ class StakingDto {
     String? stakingWalletHash,
     String? stakingWalletAddress,
     String? stakingReferralCode,
+    String? planName,
+    String? duration
   }) {
     return StakingDto(
       stakingId: stakingId ?? this.stakingId,
       uid: uid ?? this.uid,
       email: email ?? this.email,
-      stakeCreatedAt:
-      stakeCreatedAt ?? this.stakeCreatedAt,
-      stakeUpdatedAt:
-      stakeUpdatedAt ?? this.stakeUpdatedAt,
-      stakedAssetSymbol:
-      stakedAssetSymbol ?? this.stakedAssetSymbol,
-      stakedAssetContract:
-      stakedAssetContract ??
-          this.stakedAssetContract,
-      stackedAssetDecimals:
-      stackedAssetDecimals ??
-          this.stackedAssetDecimals,
-      stakedAssetName:
-      stakedAssetName ?? this.stakedAssetName,
-      stakedAssetImage:
-      stakedAssetImage ?? this.stakedAssetImage,
-      stakedAmountFiat:
-      stakedAmountFiat ?? this.stakedAmountFiat,
-      stakedAmountCrypto:
-      stakedAmountCrypto ??
-          this.stakedAmountCrypto,
-      stakingStatus:
-      stakingStatus ?? this.stakingStatus,
-      stakingRewardContract:
-      stakingRewardContract ??
-          this.stakingRewardContract,
-      stakingRewardChainId:
-      stakingRewardChainId ??
-          this.stakingRewardChainId,
-      stakingRewardChainName:
-      stakingRewardChainName ??
-          this.stakingRewardChainName,
-      stakingRewardAssetName:
-      stakingRewardAssetName ??
-          this.stakingRewardAssetName,
-      stakingRewardAssetSymbol:
-      stakingRewardAssetSymbol ??
-          this.stakingRewardAssetSymbol,
-      stakingRewardAssetDecimals:
-      stakingRewardAssetDecimals ??
-          this.stakingRewardAssetDecimals,
-      stakingRewardAssetImage:
-      stakingRewardAssetImage ??
-          this.stakingRewardAssetImage,
+      stakeCreatedAt: stakeCreatedAt ?? this.stakeCreatedAt,
+      stakeUpdatedAt: stakeUpdatedAt ?? this.stakeUpdatedAt,
+      stakedAssetSymbol: stakedAssetSymbol ?? this.stakedAssetSymbol,
+      stakedAssetContract: stakedAssetContract ?? this.stakedAssetContract,
+      stackedAssetDecimals: stackedAssetDecimals ?? this.stackedAssetDecimals,
+      stakedAssetName: stakedAssetName ?? this.stakedAssetName,
+      stakedAssetImage: stakedAssetImage ?? this.stakedAssetImage,
+      stakedAmountFiat: stakedAmountFiat ?? this.stakedAmountFiat,
+      stakedAmountCrypto: stakedAmountCrypto ?? this.stakedAmountCrypto,
+      stakingStatus: stakingStatus ?? this.stakingStatus,
+      stakingRewardContract: stakingRewardContract ?? this.stakingRewardContract,
+      stakingRewardChainId: stakingRewardChainId ?? this.stakingRewardChainId,
+      stakingRewardChainName: stakingRewardChainName ?? this.stakingRewardChainName,
+      stakingRewardAssetName: stakingRewardAssetName ?? this.stakingRewardAssetName,
+      stakingRewardAssetSymbol: stakingRewardAssetSymbol ?? this.stakingRewardAssetSymbol,
+      stakingRewardAssetDecimals: stakingRewardAssetDecimals ?? this.stakingRewardAssetDecimals,
+      stakingRewardAssetImage: stakingRewardAssetImage ?? this.stakingRewardAssetImage,
       stakingWalletHash: stakingWalletHash ?? this.stakingWalletHash,
       stakingWalletAddress: stakingWalletAddress ?? this.stakingWalletAddress,
       stakingReferralCode: stakingReferralCode ?? this.stakingReferralCode,
+      planName: planName,
+      duration: duration
     );
   }
 }

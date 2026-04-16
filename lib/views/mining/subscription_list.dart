@@ -15,6 +15,7 @@ import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/views/mining/components/horizontal_divider.dart';
 import 'package:quanthex/views/mining/mining_view.dart';
 import 'package:quanthex/views/mining/subscription_package.dart';
+import 'package:quanthex/views/mining/components/stat_item.dart';
 import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/views/mining/subscription_package.dart';
 import 'package:quanthex/widgets/app_button.dart';
@@ -181,11 +182,11 @@ class _SubscriptionListState extends State<SubscriptionList> {
             child: Row(
               children: [
                 Expanded(
-                  child: _StatItem(icon: Icons.lock_clock, label: 'Date created', value: MyDateUtils.dateToSingleFormat(DateTime.fromMillisecondsSinceEpoch(int.parse(mining.mining!.minCreatedAt!))), accentColor: _kAccentPurple),
+                  child: StatItem(icon: Icons.lock_clock, label: 'Date created', value: MyDateUtils.dateToSingleFormat(DateTime.fromMillisecondsSinceEpoch(int.parse(mining.mining!.minCreatedAt!))), accentColor: _kAccentPurple),
                 ),
                 Container(width: 1, height: 36.sp, color: Colors.white24),
                 Expanded(
-                  child: _StatItem(icon: Icons.wallet, label: 'Wallet', value: mining.mining?.miningWalletAddress ?? '', accentColor: _kAccentPurple),
+                  child: StatItem(icon: Icons.wallet, label: 'Wallet', value: mining.mining?.miningWalletAddress ?? '', accentColor: _kAccentPurple),
                 ),
               ],
             ),
@@ -223,39 +224,6 @@ class _SubscriptionListState extends State<SubscriptionList> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _StatItem extends StatelessWidget {
-  const _StatItem({required this.icon, required this.label, required this.value, required this.accentColor});
-
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color accentColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, size: 18.sp, color: accentColor),
-        4.sp.verticalSpace,
-        Text(
-          label,
-          style: TextStyle(color: Colors.white70, fontSize: 10.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-        ),
-        2.sp.verticalSpace,
-        Text(
-          value,
-          style: TextStyle(color: Colors.white, fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
     );
   }
 }

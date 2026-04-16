@@ -90,6 +90,7 @@ class PackageService {
     try {
       String accessToken = AuthService.getInstance().authToken;
       var body = stake.toJson();
+      print(body);
       response = await my_api.post(jsonEncode(body), ApiUrls.stake, {
         "Content-Type": "application/json",
         "Authorization": "Bearer $accessToken",

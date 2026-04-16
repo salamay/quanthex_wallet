@@ -25,19 +25,16 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
-        color: Colors.white,
         child: Consumer<HomeController>(
           builder: (context, homeCtr, child) {
             int currentIndex = homeCtr.index;
-            return SafeArea(
-              child: IndexedStack(
-                  index: homeCtr.index,
-                  children: homeCtr.dashboards
-              ),
+            return IndexedStack(
+                index: homeCtr.index,
+                children: homeCtr.dashboards
             );
           },
         ),

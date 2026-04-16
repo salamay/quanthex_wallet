@@ -16,6 +16,9 @@ import 'package:quanthex/data/utils/overlay_utils.dart';
 import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 import 'dart:math' as math;
 
+import '../../data/utils/network/chain_parse.dart';
+import 'package:uniswap_flutter_v3/uniswap_flutter_v3.dart' as flv3;
+
 /// A reusable bottom sheet widget for displaying token approval information
 class TokenApprovalBottomSheet extends StatefulWidget {
   /// Title of the bottom sheet
@@ -385,7 +388,7 @@ class _TokenApprovalBottomSheetState extends State<TokenApprovalBottomSheet> {
 
                   String txId = "";
                   try {
-                    txId = await SwapService.getInstance().approve(walletAddress: walletAddress, privateKey: privateKey, spender: widget.spenderAddress, spender2: "", token0: widget.token, amountIn: amountIn, fee: widget.networkFee!, isIntermediary: false);
+                     txId = await SwapService.getInstance().approve(walletAddress: walletAddress, privateKey: privateKey, spender: widget.spenderAddress, spender2: "", token0: widget.token, amountIn: amountIn, fee: widget.networkFee!, isIntermediary: false);
                   } catch (e) {
                     logger(e.toString(), "TokenApprovalBottomSheet");
                     showMySnackBar(context: context, message: "An error occurred while approving", type: SnackBarType.error);

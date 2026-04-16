@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:quanthex/core/constants/network_constants.dart';
+import 'package:uniswap_flutter_v3/uniswap/uniswap_v3.dart';
+
+import '../../../core/network/Api_url.dart';
 class ChainParse  {
 
 
@@ -17,6 +21,31 @@ class ChainParse  {
         return 'avalanche';
       default:
         throw Exception('Unsupported chain: $chainSymbol');
+    }
+  }
+
+  static UniswapV3 getChainId(int chainId) {
+    switch (chainId) {
+      case chain_id_bsc:
+        return UniswapV3(
+          rpcUrl: ApiUrls.BSCRpc,
+          chainId: chain_id_bsc,
+          graphApiKey: "7e8b89f52322d9cdf2d03b3c2d135400",
+        );
+      case chain_id_pol:
+        return UniswapV3(
+          rpcUrl: ApiUrls.polygonRpc,
+          chainId: chain_id_pol,
+          graphApiKey: '7e8b89f52322d9cdf2d03b3c2d135400',
+        );
+      case chain_id_eth:
+        return UniswapV3(
+          rpcUrl: ApiUrls.ETHRpc,
+          chainId: chain_id_eth,
+          graphApiKey: '7e8b89f52322d9cdf2d03b3c2d135400',
+        );
+      default:
+        throw Exception('Unsupported chain: $chainId');
     }
   }
 }

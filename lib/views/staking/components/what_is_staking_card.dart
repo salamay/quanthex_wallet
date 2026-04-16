@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quanthex/views/mining/mining_view.dart';
 
 class WhatIsStakingCard extends StatelessWidget {
   final VoidCallback? onLearnMore;
@@ -11,7 +12,7 @@ class WhatIsStakingCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(20.sp),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: greenColor.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
@@ -23,20 +24,20 @@ class WhatIsStakingCard extends StatelessWidget {
               children: [
                 Text(
                   'What is Staking?',
-                  style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                  style: TextStyle(color: Colors.white, fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
                 ),
                 8.verticalSpace,
                 Text(
                   'Staking allows you to generate daily yield on your capital while maintaining full control of your assets. By subscribing to a staking plan, your capital is committed to the staking mechanism for yield accrual. Capital withdrawal remains available at any time, subject to system conditions.',
                   maxLines: 8,
-                  style: TextStyle(color: const Color(0xFF757575), fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.4),
+                  style: TextStyle(color: Colors.white60, fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.4),
                 ),
                 16.verticalSpace,
                 GestureDetector(
                   onTap: onLearnMore,
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20.sp, vertical: 10.sp),
-                    decoration: BoxDecoration(color: const Color(0xFF2D2D2D), borderRadius: BorderRadius.circular(20)),
+                    decoration: BoxDecoration(color: greenColor.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
                     child: Text(
                       'Stake now',
                       style: TextStyle(color: Colors.white, fontSize: 13.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
@@ -51,7 +52,7 @@ class WhatIsStakingCard extends StatelessWidget {
           Container(
             width: 120.sp,
             height: 120.sp,
-            decoration: BoxDecoration(color: const Color(0xFFF9E6FF), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: greenColor.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
             child: Stack(
               children: [
                 // Chart background
@@ -61,7 +62,7 @@ class WhatIsStakingCard extends StatelessWidget {
                   right: 10.sp,
                   bottom: 40.sp,
                   child: Container(
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: greenColor.withOpacity(0.4), borderRadius: BorderRadius.circular(8)),
                     child: CustomPaint(painter: ChartPainter()),
                   ),
                 ),

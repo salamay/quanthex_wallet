@@ -14,6 +14,7 @@ import 'package:quanthex/data/controllers/user/user_controller.dart';
 import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/data/utils/my_currency_utils.dart';
 import 'package:quanthex/data/utils/navigator.dart';
+import 'package:quanthex/data/utils/sub/indirect_earning_calc.dart';
 import 'package:quanthex/data/utils/sub/product_utils.dart';
 import 'package:quanthex/data/utils/share/share_utils.dart';
 import 'package:quanthex/data/utils/sub/sub_utils.dart';
@@ -90,11 +91,7 @@ class _MiningViewState extends State<MiningView> {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              image: DecorationImage(
-                colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken),
-                image: AssetImage('assets/images/green_astro_bg.jpg'),
-                fit: BoxFit.cover,
-              ),
+              image: DecorationImage(colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken), image: AssetImage('assets/images/green_astro_bg.jpg'), fit: BoxFit.cover),
             ),
             padding: EdgeInsets.all(16.sp),
             child: SafeArea(
@@ -107,11 +104,7 @@ class _MiningViewState extends State<MiningView> {
                       return Skeletonizer(
                         ignoreContainers: false,
                         enabled: loading,
-                        effect: ShimmerEffect(
-                          duration: Duration(milliseconds: 1000),
-                          baseColor: Colors.grey.withOpacity(0.4),
-                          highlightColor: Colors.white54,
-                        ),
+                        effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
                         child: Builder(
                           builder: (context) {
                             MiningDto mining = widget.mining;
@@ -125,7 +118,24 @@ class _MiningViewState extends State<MiningView> {
                             String packageName = mining.subscription!.subPackageName ?? "";
                             double hashRate = ProductUtils.getHashRate(noOfReferrals: totalDirectReferrals, packageName: packageName);
                             double amountEarned = SubUtils.calcAmountEarned(packageName: packageName, noOfReferrals: totalDirectReferrals);
-                            double indirectAmountEarned = SubUtils.calcAmountEarned(packageName: packageName, noOfReferrals: totalIndirectReferrals);
+                            double indirectAmountEarned = 0;
+                            for (ReferralDto referral in indirectReferrals) {
+                              List<dynamic> path = referral.info?.referralPath ?? [];
+                              logger("Referral path: $path", runtimeType.toString());
+                              //Get position of the sub id, the path may cosist of previouse sub id, so we need to count from your relative position
+                              int indexOfSubId = path.indexOf(miningSubscriptionId);
+                              logger("Index of sub id: $indexOfSubId", runtimeType.toString());
+                              //Contruct new path from the main path
+                              List<dynamic> newPath = path.sublist(indexOfSubId);
+                              logger("New path: $newPath", runtimeType.toString());
+                              int position = newPath.length - 1;
+                              position++; //since the position is 0 based, we need to add 1
+                              if (position > 0) {
+                                logger("Path Position: $position", runtimeType.toString());
+                                indirectAmountEarned += IndirectEarningCalc.calcAmountEarned(packageName: packageName, noOfPath: position);
+                              }
+                            }
+
                             double progressPercent = (totalDirectReferrals / ProductUtils.LEVEL_THREE_REFERRALS).clamp(0.0, 1.0);
                             return !isError
                                 ? SingleChildScrollView(
@@ -134,13 +144,7 @@ class _MiningViewState extends State<MiningView> {
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
                                         // Main summary card
-                                        SummaryCard(
-                                          mining: mining,
-                                          hashRate: hashRate,
-                                          amountEarned: amountEarned,
-                                          progressPercent: progressPercent,
-                                          totalReferrals: totalDirectReferrals,
-                                        ),
+                                        SummaryCard(mining: mining, hashRate: hashRate, amountEarned: amountEarned, progressPercent: progressPercent, totalReferrals: totalDirectReferrals),
                                         20.sp.verticalSpace,
                                         // Referral link card (dark)
                                         ReferralCard(miningTag: mining.mining!.miningTag ?? ""),
@@ -148,19 +152,23 @@ class _MiningViewState extends State<MiningView> {
                                         // Stat cards (dark)
                                         Row(
                                           children: [
-                                            Expanded(child: StatCard(label: 'Direct Members', value: totalDirectReferrals.toString())),
+                                            Expanded(
+                                              child: StatCard(label: 'Direct Members', value: totalDirectReferrals.toString()),
+                                            ),
                                             12.horizontalSpace,
-                                            Expanded(child: StatCard(label: 'Indirect members', value: indirectReferrals.length.toString())),
+                                            Expanded(
+                                              child: StatCard(label: 'Indirect members', value: indirectReferrals.length.toString()),
+                                            ),
                                           ],
                                         ),
                                         12.sp.verticalSpace,
-                                         Row(
+                                        Row(
                                           children: [
-                                           Expanded(
+                                            Expanded(
                                               child: StatCard(label: 'Package', value: packageName),
                                             ),
                                             12.horizontalSpace,
-                                           Expanded(
+                                            Expanded(
                                               child: StatCard(label: 'Mining Speed', value: "$hashRate Hex MH/s", fontSize: 13.sp),
                                             ),
                                           ],
@@ -177,11 +185,7 @@ class _MiningViewState extends State<MiningView> {
                                                     enabled: balanceCtr.isLoadingPriceQuotes,
                                                     effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
                                                     ignoreContainers: false,
-                                                    child: StatCard(
-                                                      label: "Direct earnings",
-                                                      value: MyCurrencyUtils.format(amountInCrypto, 4),
-                                                      fontSize: 14.sp,
-                                                    ),
+                                                    child: StatCard(label: "Direct earnings", value: "${MyCurrencyUtils.format(amountInCrypto, 4)} ${mining.subscription!.subRewardAssetSymbol ?? ""}", fontSize: 14.sp),
                                                   );
                                                 },
                                               ),
@@ -197,12 +201,31 @@ class _MiningViewState extends State<MiningView> {
                                                     enabled: balanceCtr.isLoadingPriceQuotes,
                                                     effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
                                                     ignoreContainers: false,
-                                                    child: StatCard(label: "Under your structure earnings", value: totalIndirectReferrals<6?"N/A": "${MyCurrencyUtils.format(amountInCrypto, 4)} ${mining.subscription!.subRewardAssetSymbol ?? ""}",infoText: totalIndirectReferrals < 6 ? "Refer 6 direct members to reveal this earnings":null,fontSize: 14.sp),
+                                                    child: StatCard(label: "Under your structure earnings", value: "${MyCurrencyUtils.format(amountInCrypto, 4)} ${mining.subscription!.subRewardAssetSymbol ?? ""}", infoText: null, fontSize: 14.sp),
                                                   );
                                                 },
                                               ),
                                             ),
-                                           
+                                          ],
+                                        ),
+                                        12.sp.verticalSpace,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Consumer<BalanceController>(
+                                                builder: (context, balanceCtr, child) {
+                                                  logger("Indirect amount earned: $indirectAmountEarned", runtimeType.toString());
+                                                  double rewardPriceQuotes = balanceCtr.priceQuotes[mining.subscription!.subRewardAssetSymbol ?? ""] ?? 0;
+                                                  double amountInCrypto = rewardPriceQuotes > 0 ? (amountEarned + indirectAmountEarned) / rewardPriceQuotes : 0;
+                                                  return Skeletonizer(
+                                                    enabled: balanceCtr.isLoadingPriceQuotes,
+                                                    effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                                                    ignoreContainers: false,
+                                                    child: StatCard(label: "Total earnings", value: "${MyCurrencyUtils.format(amountInCrypto, 4)} ${mining.subscription!.subRewardAssetSymbol ?? ""}", infoText: null, fontSize: 14.sp),
+                                                  );
+                                                },
+                                              ),
+                                            ),
                                           ],
                                         ),
                                         12.sp.verticalSpace,
@@ -216,21 +239,16 @@ class _MiningViewState extends State<MiningView> {
                                         12.sp.verticalSpace,
                                         Row(
                                           children: [
-                                           
                                             Expanded(
-                                              child: HashCard(
-                                                label: "Tera Hash",
-                                                value: "$hashRate Hex MH/s",
-                                                isInProgress: !(totalDirectReferrals >= ProductUtils.LEVEL_TWO_REFERRALS),
-                                              ),
+                                              child: HashCard(label: "Tera Hash", value: "$hashRate Hex MH/s", isInProgress: !(totalDirectReferrals >= ProductUtils.LEVEL_TWO_REFERRALS)),
                                             ),
                                             12.horizontalSpace,
-                                             Expanded(
+                                            Expanded(
                                               child: HashCard(label: "Peta Hash", value: "$hashRate Hex MH/s", isInProgress: !(totalDirectReferrals >= ProductUtils.LEVEL_THREE_REFERRALS)),
                                             ),
                                           ],
                                         ),
-                                        
+
                                         40.sp.verticalSpace,
                                       ],
                                     ),
@@ -257,6 +275,4 @@ class _MiningViewState extends State<MiningView> {
       ),
     );
   }
-
 }
-

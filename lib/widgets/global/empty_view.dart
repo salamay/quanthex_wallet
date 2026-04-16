@@ -3,8 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EmptyView extends StatelessWidget {
   final String message;
+  Color? textColor;
 
-  const EmptyView({super.key, required this.message});
+  EmptyView({super.key, required this.message, this.textColor});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +15,7 @@ class EmptyView extends StatelessWidget {
         child: Text(
           message,
           textAlign: TextAlign.center,
-          style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.5),
+          style: TextStyle(color: textColor?? Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.5),
         ),
       ),
     );

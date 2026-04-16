@@ -21,6 +21,8 @@ class MiningController extends ChangeNotifier {
   Map<String, List<StakingDto>> stakings = {};
   List<WithdrawalDto> withdrawals = [];
   Map<String, List<StakingReferralDto>> stakingReferrals = {};
+
+  
   Future<void> fetchMinings(String walletAddress) async {
     try {
      fetchingMinings = true;

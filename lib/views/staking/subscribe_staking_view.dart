@@ -18,12 +18,17 @@ import 'package:quanthex/data/services/mining/mining_service.dart';
 import 'package:quanthex/data/utils/date_utils.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/data/utils/overlay_utils.dart';
+import 'package:quanthex/data/utils/staking/staking_utils.dart';
 import 'package:quanthex/data/utils/sub/sub_utils.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/views/mining/components/subscription_success_modal.dart';
+import 'package:quanthex/views/mining/mining_view.dart';
+import 'package:quanthex/views/staking/components/staking_amount_item.dart';
+import 'package:quanthex/views/staking/components/staking_card.dart';
 import 'package:quanthex/views/staking/components/staking_success_modal.dart';
 import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/widgets/app_textfield.dart';
+import 'package:quanthex/widgets/arrow_back.dart';
 import 'package:quanthex/widgets/confirm_pin_modal.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -63,7 +68,7 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
   late MiningController miningController;
   late AssetController assetController;
   late WalletController walletController;
-  int _selectedDurationMonths = 1; // Default to 1 month
+  int _selectedDurationMonths = 6; // Default to 1 month
   final TextEditingController referralCode = TextEditingController();
 
   @override
@@ -107,334 +112,357 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
   @override
   Widget build(BuildContext context) {
     final canPay = rewardCoin != null;
-    
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Consumer<BalanceController>(
-              builder: (context, bCtr, _) {
-                SupportedCoin pToken = widget.paymentToken;
-                double? priceQuotes = bCtr.priceQuotes[pToken.symbol];
-                CoinBalance? balance = pToken.coinType == CoinType.TOKEN ? bCtr.balances[pToken.contractAddress!] : bCtr.balances[pToken.symbol];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    20.sp.verticalSpace,
-                    // Header
-                    Row(
+      backgroundColor: Colors.black,
+      resizeToAvoidBottomInset: true,
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        leading: ArrowBack(iconColor: Colors.white),
+        centerTitle: true,
+      ),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        padding: EdgeInsets.all(8.sp),
+        decoration: BoxDecoration(
+          image: DecorationImage(colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken), image: AssetImage('assets/images/green_astro_bg.jpg'), fit: BoxFit.cover),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Consumer<BalanceController>(
+                builder: (context, bCtr, _) {
+                  SupportedCoin pToken = widget.paymentToken;
+                  double? priceQuotes = bCtr.priceQuotes[pToken.symbol];
+                  CoinBalance? balance = pToken.coinType == CoinType.TOKEN ? bCtr.balances[pToken.contractAddress!] : bCtr.balances[pToken.symbol];
+                  return SafeArea(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigate.back(context);
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.arrow_back, size: 20.sp),
-                              5.horizontalSpace,
-                              Text(
-                                'Back',
-                                style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Spacer(),
+                        // Header
                         Text(
-                          'Stake',
-                          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                          'Yield Token',
+                          style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                         ),
-                        Spacer(),
-                        // IconButton(
-                        //   icon: Container(
-                        //     width: 41,
-                        //     height: 41,
-                        //     padding: const EdgeInsets.symmetric(
-                        //       horizontal: 2,
-                        //       vertical: 9,
-                        //     ),
-                        //     decoration: ShapeDecoration(
-                        //       color: const Color(0x7CDADADA),
-                        //       shape: RoundedRectangleBorder(
-                        //         borderRadius: BorderRadius.circular(20.50),
-                        //       ),
-                        //     ),
-                        //     child: Image.asset(
-                        //       'assets/images/history.png',
-                        //       width: 19.sp,
-                        //       height: 19.sp,
-                        //     ),
-                        //   ),
-                        //   onPressed: () {
-                        //     Navigate.toNamed(
-                        //       context,
-                        //       name: '/transactionhistoryview',
-                        //     );
-                        //   },
-                        // ),
-                      ],
-                    ),
-                    30.sp.verticalSpace,
-                    Text(
-                      'Yield Token',
-                      style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                    ),
-                    10.sp.verticalSpace,
-                    GestureDetector(
-                      onTap: () async {
-                        // SupportedCoin? result = await AssetUtils.selectRewardAssets(context: context);
-                        // if(result!=null){
-                        //   logger("Selected Coin: ${result.name}", runtimeType.toString());
-                        //   setState(() {
-                        //     rewardCoin=result;
-                        //   });
-                        // }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(16.sp),
-                        decoration: BoxDecoration(
-                          color: rewardCoin == null ? const Color(0xFFF5F5F5) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(35),
-                          border: Border.all(color: rewardCoin == null ? const Color(0xFFE0E0E0) : const Color(0xFF792A90), width: 1),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 32.sp,
-                                    height: 32.sp,
-                                    decoration: BoxDecoration(color: const Color(0xFF792A90).withOpacity(0.2), shape: BoxShape.circle),
-                                    child: Icon(Icons.bolt, size: 20.sp, color: const Color(0xFF792A90)),
-                                  ),
-                                  10.horizontalSpace,
-                                  Expanded(
-                                    child: Text(
-                                      rewardCoin == null ? 'Yield Token N/A' : "${rewardCoin!.symbol} - (${rewardCoin!.networkModel!.chainSymbol.toUpperCase()})",
-                                      style: TextStyle(color: rewardCoin == null ? const Color(0xFF9E9E9E) : const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Icon(
-                            //   Icons.keyboard_arrow_down,
-                            //   size: 24.sp,
-                            //   color: const Color(0xFF757575),
-                            // ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    20.sp.verticalSpace,
-                    // Duration Selection
-                    Text(
-                      'Duration',
-                      style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                    ),
-                    10.sp.verticalSpace,
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 4.sp),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFE0E0E0)),
-                        borderRadius: BorderRadius.circular(35),
-                      ),
-                      child: DropdownButton<int>(
-                        value: _selectedDurationMonths,
-                        isExpanded: true,
-                        dropdownColor: Colors.white,
-                        underline: const SizedBox(),
-
-                        icon: Icon(Icons.keyboard_arrow_down, size: 24.sp, color: const Color(0xFF757575)),
-                        style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                        items: [1, 6, 12].map((int months) {
-                          return DropdownMenuItem<int>(value: months, child: Text('$months ${months == 1 ? 'Month' : 'Months'}'));
-                        }).toList(),
-                        onChanged: (int? newValue) {
-                          if (newValue != null) {
-                            setState(() {
-                              _selectedDurationMonths = newValue;
-                            });
-                          }
-                        },
-                      ),
-                    ),
-                    10.sp.verticalSpace,
-                    // Display End Date
-                    Container(
-                      padding: EdgeInsets.all(16.sp),
-                      decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Staking End Date',
-                            style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                          ),
-                          Text(
-                            MyDateUtils.dateToSingleFormatWithTime(_getEndDate(), false),
-                            style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                    ),
-                    20.sp.verticalSpace,
-
-                    // From Section
-                    Container(
-                      padding: EdgeInsets.all(16.sp),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xfffeaeaea)),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Payment Token',
-                                style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                              ),
-                              balance != null
-                                  ? Text(
-                                      'Balance: ${!bCtr.hideBalance
-                                          ? balance.balanceInCrypto != 0
-                                                ? "${MyCurrencyUtils.formatCurrency2(balance.balanceInCrypto)} ${pToken.symbol}"
-                                                : "0 ${pToken.symbol}"
-                                          : "****"}',
-                                      style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                                    )
-                                  : const SizedBox(),
-                            ],
-                          ),
-                          10.sp.verticalSpace,
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () async {
-                                  // SupportedCoin? coin = await AssetUtils.selectAssets(context: context);
-                                  // if(coin!=null){
-                                  //   logger("Selected Coin: ${coin.name}", runtimeType.toString());
-                                  //
-                                  // }
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 3, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Color(0xffEAEAEA)),
-                                    borderRadius: BorderRadius.circular(40),
-                                  ),
+                        10.sp.verticalSpace,
+                        GestureDetector(
+                          onTap: () async {
+                            // SupportedCoin? result = await AssetUtils.selectRewardAssets(context: context);
+                            // if(result!=null){
+                            //   logger("Selected Coin: ${result.name}", runtimeType.toString());
+                            //   setState(() {
+                            //     rewardCoin=result;
+                            //   });
+                            // }
+                          },
+                          child: StakingCard(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
                                   child: Row(
                                     children: [
-                                      CoinImage(imageUrl: widget.paymentToken.image, width: 32.sp, height: 32.sp),
+                                      Container(
+                                        width: 32.sp,
+                                        height: 32.sp,
+                                        decoration: BoxDecoration(color: greenColor.withOpacity(0.2), shape: BoxShape.circle),
+                                        child: Icon(Icons.bolt, size: 20.sp, color: greenColor.withOpacity(0.3)),
+                                      ),
                                       10.horizontalSpace,
-                                      Text(
-                                        widget.paymentToken.symbol,
-                                        style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                                      Expanded(
+                                        child: Text(
+                                          rewardCoin == null ? 'Yield Token N/A' : "${rewardCoin!.symbol} - (${rewardCoin!.networkModel!.chainSymbol.toUpperCase()})",
+                                          style: TextStyle(color: rewardCoin == null ? const Color(0xFF9E9E9E) : Colors.white, fontSize: 16, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                                        ),
                                       ),
-                                      2.horizontalSpace,
-                                      Text(
-                                        "(${widget.paymentToken.networkModel!.chainSymbol})",
-                                        style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 10.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                                      ),
-                                      Icon(Icons.keyboard_arrow_down, size: 24.sp, color: const Color(0xFF757575)),
                                     ],
                                   ),
                                 ),
-                              ),
-                              Spacer(),
-                              Text(
-                                '$_paymentAmount ${widget.paymentToken!.symbol}',
-                                style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    10.sp.verticalSpace,
-                    Text(
-                      'Referral Code',
-                      style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                    ),
-                    5.sp.verticalSpace,
-                    AppTextfield(
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffEAEAEA)),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      hintText: 'Enter referral code',
-                      controller: referralCode,
-                    ),
-                    30.sp.verticalSpace,
-                    // Package Details
-                    Container(
-                      padding: EdgeInsets.all(8.sp),
-                      decoration: BoxDecoration(color: const Color(0xFFFAE9FF), borderRadius: BorderRadius.circular(16)),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 48.sp,
-                            height: 48.sp,
-                            decoration: BoxDecoration(color: Color(0xffF7DBFF), borderRadius: BorderRadius.circular(12)),
-                            child: Center(
-                              child: Container(
-                                width: 24.sp,
-                                height: 24.sp,
-                                decoration: BoxDecoration(color: const Color(0xFF792A90), shape: BoxShape.circle),
-                                child: Icon(Icons.bolt, color: Colors.white, size: 20.sp),
-                              ),
-                            ),
-                          ),
-                          8.horizontalSpace,
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Staking Package',
-                                  style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                                ),
-                                2.sp.verticalSpace,
-                                Text(
-                                  'Can be withdrawn anytime',
-                                  style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                                ),
+                                // Icon(
+                                //   Icons.keyboard_arrow_down,
+                                //   size: 24.sp,
+                                //   color: const Color(0xFF757575),
+                                // ),
                               ],
                             ),
                           ),
-                          Text(
-                            '100 USDT minimum',
-                            style: TextStyle(color: const Color(0xFF792A90), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                        ),
+                        20.sp.verticalSpace,
+                        // Duration Selection
+                        Text(
+                          'Duration',
+                          style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                        ),
+                        10.sp.verticalSpace,
+                        StakingCard(
+                          child: DropdownButton<int>(
+                            padding: EdgeInsets.zero,
+                            value: _selectedDurationMonths,
+                            isExpanded: true,
+                            dropdownColor: Colors.black,
+                            underline: const SizedBox(),
+          
+                            icon: Icon(Icons.keyboard_arrow_down, size: 24.sp, color: const Color(0xFF757575)),
+                            style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                            items: [6, 12, 24].map((int months) {
+                              return DropdownMenuItem<int>(
+                                value: months,
+                                child: Text(
+                                  '$months ${months == 1 ? 'Month' : 'Months'}',
+                                  style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (int? newValue) {
+                              if (newValue != null) {
+                                setState(() {
+                                  _selectedDurationMonths = newValue;
+                                });
+                              }
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                        10.sp.verticalSpace,
+                        // Display End Date
+                        StakingCard(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Staking End Date',
+                                style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                              ),
+                              Text(
+                                MyDateUtils.dateToSingleFormatWithTime(_getEndDate(), false),
+                                style: TextStyle(color: Colors.white60, fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        ),
+                        10.verticalSpace,
+                        Text(
+                          'Select amount',
+                          style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                        ),
+                        10.verticalSpace,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                _paymentAmount = 100;
+                                setState(() {});
+                              },
+                              child: StakingAmountItem(content: "\$100", borderColor: greenColor, bgColor:_paymentAmount==100?greenColor.withOpacity(0.7): greenColor.withOpacity(0.2), textColor: Colors.white),
+                            ),
+                             GestureDetector(
+                              onTap: () {
+                                _paymentAmount = 200;
+                                setState(() {});
+                              },
+                              child: StakingAmountItem(content: "\$200", borderColor: greenColor, bgColor: _paymentAmount == 200 ? greenColor.withOpacity(0.7) : greenColor.withOpacity(0.2), textColor: Colors.white),
+                            ),
+                             GestureDetector(
+                              onTap: () {
+                                _paymentAmount = 500;
+                                setState(() {});
+                              },
+                              child: StakingAmountItem(content: "\$500", borderColor: greenColor, bgColor: _paymentAmount == 500 ? greenColor.withOpacity(0.7) : greenColor.withOpacity(0.2), textColor: Colors.white),
+                            ),
+                             GestureDetector(
+                              onTap: () {
+                                _paymentAmount = 1000;
+                                setState(() {});
+                              },
+                              child: StakingAmountItem(content: "\$1000", borderColor: greenColor, bgColor: _paymentAmount == 1000 ? greenColor.withOpacity(0.7) : greenColor.withOpacity(0.2), textColor: Colors.white),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                _paymentAmount = 1500;
+                                setState(() {});
+                              },
+                              child: StakingAmountItem(content: "\$1500", borderColor: greenColor, bgColor: _paymentAmount == 1500 ? greenColor.withOpacity(0.7) : greenColor.withOpacity(0.2), textColor: Colors.white),
+                            ),                        ],
+                        ),
+                        10.verticalSpace,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                             GestureDetector(
+                              onTap: () {
+                                _paymentAmount = 2000;
+                                setState(() {});
+                              },
+                              child: StakingAmountItem(content: "\$2000", borderColor: greenColor, bgColor: _paymentAmount == 2000 ? greenColor.withOpacity(0.7) : greenColor.withOpacity(0.2), textColor: Colors.white),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                _paymentAmount = 3000;
+                                setState(() {});
+                              },
+                              child: StakingAmountItem(content: "\$3000", borderColor: greenColor, bgColor: _paymentAmount == 3000 ? greenColor.withOpacity(0.7) : greenColor.withOpacity(0.2), textColor: Colors.white),
+                            ),
+                             GestureDetector(
+                              onTap: () {
+                                _paymentAmount = 5000;
+                                setState(() {});
+                              },
+                              child: StakingAmountItem(content: "\$5000", borderColor: greenColor, bgColor: _paymentAmount == 5000 ? greenColor.withOpacity(0.7) : greenColor.withOpacity(0.2), textColor: Colors.white),
+                            ),
+                          ],
+                        ),
+                        15.verticalSpace,
+                        // From Section
+                        StakingCard(
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Payment Token',
+                                    style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                                  ),
+                                  balance != null
+                                      ? Text(
+                                          'Balance: ${!bCtr.hideBalance
+                                              ? balance.balanceInCrypto != 0
+                                                    ? "${MyCurrencyUtils.formatCurrency2(balance.balanceInCrypto)} ${pToken.symbol}"
+                                                    : "0 ${pToken.symbol}"
+                                              : "****"}',
+                                          style: TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                                        )
+                                      : const SizedBox(),
+                                ],
+                              ),
+                              10.verticalSpace,
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      // SupportedCoin? coin = await AssetUtils.selectAssets(context: context);
+                                      // if(coin!=null){
+                                      //   logger("Selected Coin: ${coin.name}", runtimeType.toString());
+                                      //
+                                      // }
+                                    },
+                                    child: StakingCard(
+                                      child: Row(
+                                        children: [
+                                          CoinImage(imageUrl: widget.paymentToken.image, width: 32, height: 32.sp),
+                                          10.horizontalSpace,
+                                          Text(
+                                            widget.paymentToken.symbol,
+                                            style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                                          ),
+                                          2.horizontalSpace,
+                                          Text(
+                                            "(${widget.paymentToken.networkModel!.chainSymbol})",
+                                            style: TextStyle(color: Colors.white60, fontSize: 10, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                          ),
+                                          // Icon(Icons.keyboard_arrow_down, size: 24.sp, color: const Color(0xFF757575)),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Spacer(),
+                                  Text(
+                                    '$_paymentAmount ${widget.paymentToken!.symbol}',
+                                    style: TextStyle(color: Colors.white60, fontSize: 20, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        10.sp.verticalSpace,
+                        Text(
+                          'Referral Code',
+                          style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                        ),
+                        5.sp.verticalSpace,
+                        AppTextfield(
+                          filledColor: greenColor.withOpacity(0.1),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                          hintText: 'Enter referral code',
+                          controller: referralCode,
+                        ),
+                        15.sp.verticalSpace,
+                        // Package Details
+                        Container(
+                          padding: EdgeInsets.all(8.sp),
+                          decoration: BoxDecoration(color: greenColor.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 48.sp,
+                                height: 48.sp,
+                                decoration: BoxDecoration(color: greenColor.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                                child: Center(
+                                  child: Container(
+                                    width: 24.sp,
+                                    height: 24.sp,
+                                    decoration: BoxDecoration(color: greenColor.withOpacity(0.3), shape: BoxShape.circle),
+                                    child: Icon(Icons.bolt, color: Colors.white, size: 20.sp),
+                                  ),
+                                ),
+                              ),
+                              8.horizontalSpace,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Staking Package',
+                                      style: TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                                    ),
+                                    2.sp.verticalSpace,
+                                    Text(
+                                      'Can be withdrawn anytime',
+                                      style: TextStyle(color: Colors.white60, fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                '100 USDT minimum',
+                                style: TextStyle(color: Colors.white, fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Total Reward Potential
+                        20.sp.verticalSpace,
+                        GestureDetector(
+                          onTap: () async {
+                            if (canPay) {
+                              bool result = await SecurityUtils.showPinDialog(context: context);
+                              if (result) {
+                                pay(balance, rewardCoin!);
+                              }
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 14.sp),
+                            decoration: BoxDecoration(color: greenColor.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+                            child: Center(
+                              child: Text(
+                                'Stake',
+                                style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    // Total Reward Potential
-                    40.sp.verticalSpace,
-                    AppButton(
-                      text: 'Stake Now',
-                      textColor: Colors.white,
-                      color: canPay ? const Color(0xFF792A90) : const Color(0xFFB5B5B5),
-                      onTap: () async {
-                        if (canPay) {
-                          bool result = await SecurityUtils.showPinDialog(context: context);
-                          if (result) {
-                            pay(balance, rewardCoin!);
-                          }
-                        }
-                      },
-                    ),
-                    20.sp.verticalSpace,
-                  ],
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -443,13 +471,13 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
   }
 
   Future<void> pay(CoinBalance? balance, SupportedCoin rewardToken) async {
-   try{
-     NetworkFee? fee;
-     String refCode = referralCode.text.trim();
-     if (refCode.isEmpty) {
-       showMySnackBar(context: context, message: "Referral code is required", type: SnackBarType.error);
-       return;
-     }
+    try {
+      NetworkFee? fee;
+      String refCode = referralCode.text.trim();
+      if (refCode.isEmpty) {
+        showMySnackBar(context: context, message: "Referral code is required", type: SnackBarType.error);
+        return;
+      }
       if (balance == null) {
         showMySnackBar(context: context, message: "Balance not available, Please try again later", type: SnackBarType.error);
         return;
@@ -459,6 +487,7 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
         showMySnackBar(context: context, message: "Insufficient balance", type: SnackBarType.error);
         return;
       }
+      String planName = StakingUtils().mapMonthsToPlanName(_paymentAmount);
       showOverlay(context);
       SupportedCoin asset = widget.paymentToken;
       double? priceQuote = balanceController.priceQuotes[asset.symbol] ?? 0;
@@ -484,49 +513,50 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
       int decimal = asset.decimal!;
       bool isGas = GasFeeCheck.gasFeeCheck(bCtr: balanceController, feeInCrypto: fee.feeInCrypto, chainCurrency: network.chainCurrency);
       if (isGas) {
-      double totalAmount = ((_paymentAmount) * math.pow(10, decimal));
-      logger("Total amount: $totalAmount", runtimeType.toString());
-      Transaction tx = await TransactionService().getTransferTx(context, sendPayload);
-      String rpc = network.rpcUrl;
-      int chainId = network.chainId;
-      Web3Client webClient = await ClientResolver.resolveClient(rpcUrl: rpc);
-      String privateKey = asset.privateKey!;
-      final credentials = await TokenFactory().getCredentials(privateKey);
-      Uint8List signedTransaction;
-      String txSigned;
-      try {
-        signedTransaction = await webClient.signTransaction(credentials, tx, chainId: chainId, fetchChainIdFromNetworkId: false);
-        txSigned = bytesToHex(signedTransaction, include0x: true);
-      } catch (e) {
-        logger(e.toString(), runtimeType.toString());
-        showMySnackBar(context: context, message: "An error occurred when signing transaction, Please check the address and make sure you have good internet or enough gas fee", type: SnackBarType.error);
+        double totalAmount = ((_paymentAmount) * math.pow(10, decimal));
+        logger("Total amount: $totalAmount", runtimeType.toString());
+        Transaction tx = await TransactionService().getTransferTx(context, sendPayload);
+        String rpc = network.rpcUrl;
+        int chainId = network.chainId;
+        Web3Client webClient = await ClientResolver.resolveClient(rpcUrl: rpc);
+        String privateKey = asset.privateKey!;
+        final credentials = await TokenFactory().getCredentials(privateKey);
+        Uint8List signedTransaction;
+        String txSigned;
+        try {
+          signedTransaction = await webClient.signTransaction(credentials, tx, chainId: chainId, fetchChainIdFromNetworkId: false);
+          txSigned = bytesToHex(signedTransaction, include0x: true);
+        } catch (e) {
+          logger(e.toString(), runtimeType.toString());
+          showMySnackBar(context: context, message: "An error occurred when signing transaction, Please check the address and make sure you have good internet or enough gas fee", type: SnackBarType.error);
+          hideOverlay(context);
+          return;
+        }
+        StakingPayload stake = payload;
+        stake.stakedAssetSymbol = asset.symbol ?? "";
+        stake.stakedAssetContract = asset.contractAddress ?? "";
+        stake.stackedAssetDecimals = asset.decimal ?? 18;
+        stake.stakedAssetName = asset.name ?? "";
+        stake.stakedAssetImage = asset.image ?? "";
+        stake.stakingRewardContract = rewardToken.contractAddress ?? "";
+        stake.stakingRewardChainId = rewardToken.networkModel!.chainId ?? 56;
+        stake.stakingRewardAssetName = rewardToken.name ?? "";
+        stake.stakedAmountCrypto = _paymentAmount.toString();
+        stake.stakedAmountFiat = _amountInFiat.toString();
+        stake.signedTx = txSigned;
+        stake.rpc = rpc;
+        stake.duration = _selectedDurationMonths.toString();
+        stake.endDate = _getEndDate().millisecondsSinceEpoch.toString();
+        stake.startDate = DateTime.now().millisecondsSinceEpoch.toString();
+        stake.stakingReferralCode = refCode;
+        stake.stakingPlan = planName;
+        StakingDto dto = await PackageService.getInstance().stake(stake: stake);
+        String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+        List<StakingDto> stakings = await MiningService.getInstance().getStakings(walletAddress, active);
+        miningController.setStakings(walletAddress, stakings);
         hideOverlay(context);
-        return;
-      }
-      StakingPayload stake = payload;
-      stake.stakedAssetSymbol = asset.symbol ?? "";
-      stake.stakedAssetContract = asset.contractAddress ?? "";
-      stake.stackedAssetDecimals = asset.decimal ?? 18;
-      stake.stakedAssetName = asset.name ?? "";
-      stake.stakedAssetImage = asset.image ?? "";
-      stake.stakingRewardContract = rewardToken.contractAddress ?? "";
-      stake.stakingRewardChainId = rewardToken.networkModel!.chainId ?? 56;
-      stake.stakingRewardAssetName = rewardToken.name ?? "";
-      stake.stakedAmountCrypto = _paymentAmount.toString();
-      stake.stakedAmountFiat = _amountInFiat.toString();
-      stake.signedTx = txSigned;
-      stake.rpc = rpc;
-      stake.duration = _selectedDurationMonths;
-      stake.endDate = _getEndDate().millisecondsSinceEpoch;
-      stake.startDate = DateTime.now().millisecondsSinceEpoch;
-      stake.stakingReferralCode = refCode;
-      StakingDto dto = await PackageService.getInstance().stake(stake: stake);
-      String walletAddress = walletController.currentWallet!.walletAddress ?? "";
-      List<StakingDto> stakings = await MiningService.getInstance().getStakings(walletAddress, active);
-      miningController.setStakings(walletAddress, stakings);
-      hideOverlay(context);
-      await _showPaymentSuccessModal();
-      Navigate.back(context, args: true);
+        await _showPaymentSuccessModal();
+        Navigate.back(context, args: true);
       } else {
         String nativeCoin = sendPayload.asset!.networkModel!.chainCurrency;
         logger("Insufficient $nativeCoin for gas, top up your balance $nativeCoin to proceed", runtimeType.toString());
@@ -534,11 +564,11 @@ class _SubscribeStakingViewState extends State<SubscribeStakingView> {
         return;
       }
       // Proceed with sending the transaction using the sendPayload
-   }catch(e){
-    logger(e.toString(), runtimeType.toString());
-    hideOverlay(context);
-    return;
-   }
+    } catch (e) {
+      logger(e.toString(), runtimeType.toString());
+      hideOverlay(context);
+      return;
+    }
   }
 
   DateTime _getEndDate() {

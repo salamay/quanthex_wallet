@@ -1301,6 +1301,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  uniswap_flutter_v3:
+    dependency: "direct main"
+    description:
+      name: uniswap_flutter_v3
+      sha256: "9808c778c1e4c0f8e623604fec960b6a65188e9657edf7fab3d64a31c5b905a2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.5"
   url_launcher:
     dependency: "direct main"
     description:

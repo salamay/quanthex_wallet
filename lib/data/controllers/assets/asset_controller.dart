@@ -55,7 +55,18 @@ class AssetController extends ChangeNotifier {
   }
 
   void sortAssetsByBalanceInFiat() {
-    assets.sort((a, b) => b.balanceInFiat?.compareTo(a.balanceInFiat??0) ?? 0);
+    List<SupportedCoin> tempAssets = List.from(assets);
+    List<SupportedCoin> greaterThanZero = tempAssets.where((element) => element.balanceInFiat != null && element.balanceInFiat! > 0).toList();
+    List<SupportedCoin> lessThanZero = tempAssets.where((element) => element.balanceInFiat != null && element.balanceInFiat! <= 0).toList();
+    greaterThanZero.sort((a, b) {
+      logger("a.balanceInFiat: ${a.balanceInFiat}", runtimeType.toString());
+      if (a.balanceInFiat == null || b.balanceInFiat == null) {
+        return 0;
+      }
+      return b.balanceInFiat!.compareTo(a.balanceInFiat!);
+    });
+    tempAssets = greaterThanZero + lessThanZero;
+    assets = tempAssets;
     notifyListeners();
   }
 

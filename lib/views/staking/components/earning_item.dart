@@ -57,7 +57,7 @@ class EarningItem extends StatelessWidget {
                       'Withdrawal ID: ${withdrawal.withdrawalId ?? "N/A"}',
                       maxLines: 2,
                       style: TextStyle(
-                        color: const Color(0xFF2D2D2D),
+                        color: Colors.white,
                         fontSize: 16.sp,
                         fontFamily: 'Satoshi',
                         fontWeight: FontWeight.w700,
@@ -69,8 +69,8 @@ class EarningItem extends StatelessWidget {
                         int.parse(withdrawal.withdrawalCreatedAt ?? "0"),
                       ),
                       style: TextStyle(
-                        color: const Color(0xFF757575),
-                        fontSize: 12.sp,
+                        color: Colors.white60,
+                        fontSize: 12,
                         fontFamily: 'Satoshi',
                         fontWeight: FontWeight.w400,
                       ),
@@ -81,8 +81,8 @@ class EarningItem extends StatelessWidget {
               Text(
                 'Staked ${withdrawal.withdrawalAmountCrypto} ${withdrawal.withdrawalAssetSymbol}',
                 style: TextStyle(
-                  color: const Color(0xFF2D2D2D),
-                  fontSize: 16.sp,
+                  color: Colors.white60,
+                  fontSize: 16,
                   fontFamily: 'Satoshi',
                   fontWeight: FontWeight.w700,
                 ),

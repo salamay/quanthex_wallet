@@ -186,60 +186,60 @@ class _LoginViewState extends State<LoginView> {
 
                   15.sp.verticalSpace,
 
-                  GestureDetector(
-                    onTap: () async {
-                      try { 
-                        if (!context.mounted) return;
+                  // GestureDetector(
+                  //   onTap: () async {
+                  //     try { 
+                  //       if (!context.mounted) return;
 
-                        GoogleSignIn googleSignIn = AuthService.getInstance().googleSignIn;
-                        if (googleSignIn.supportsAuthenticate() && AuthService.getInstance().isGoogleSignInInitialized) {
-                          GoogleSignInAccount account = await googleSignIn.authenticate();
-                          String idToken = await account.authentication.idToken ?? "";
-                          if (idToken.isNotEmpty) {
-                            String email = account.email ?? "";
-                            String deviceId = await DeviceUtils.getDeviceId() ?? "UNKNOWN_DEVICE_ID";
-                            String deviceName = DeviceUtils.getDeviceType();
-                            await AuthService.getInstance().signInWithGoogle(idToken: idToken, email: email, deviceId: deviceId, deviceName: deviceName);
-                          }
-                        }
-                           // Sign in with Google
-                      } catch (e) {
-                        logger(e.toString(), runtimeType.toString());
-                        showMySnackBar(context: context, message: "Unable to sign in with Google", type: SnackBarType.error);
-                      }
-                    },
-                    child: Container(
-                      width: 333.sp,
-                      height: 45.sp,
-                      padding: const EdgeInsets.symmetric(
-                        // horizontal: 131,
-                        // vertical: 18,
-                      ),
-                      decoration: ShapeDecoration(
-                        color: const Color(0xFF323232),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        spacing: 7,
-                        children: [
-                          Container(
-                            width: 17.sp,
-                            height: 17.sp,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(image: AssetImage("assets/images/googleimage.png"), fit: BoxFit.cover),
-                            ),
-                          ),
-                          Text(
-                            'Sign in using Google',
-                            style: TextStyle(color: Colors.white, fontSize: 13.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 1.69, letterSpacing: -0.41),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  //       GoogleSignIn googleSignIn = AuthService.getInstance().googleSignIn;
+                  //       if (googleSignIn.supportsAuthenticate() && AuthService.getInstance().isGoogleSignInInitialized) {
+                  //         GoogleSignInAccount account = await googleSignIn.authenticate();
+                  //         String idToken = await account.authentication.idToken ?? "";
+                  //         if (idToken.isNotEmpty) {
+                  //           String email = account.email ?? "";
+                  //           String deviceId = await DeviceUtils.getDeviceId() ?? "UNKNOWN_DEVICE_ID";
+                  //           String deviceName = DeviceUtils.getDeviceType();
+                  //           await AuthService.getInstance().signInWithGoogle(idToken: idToken, email: email, deviceId: deviceId, deviceName: deviceName);
+                  //         }
+                  //       }
+                  //          // Sign in with Google
+                  //     } catch (e) {
+                  //       logger(e.toString(), runtimeType.toString());
+                  //       showMySnackBar(context: context, message: "Unable to sign in with Google", type: SnackBarType.error);
+                  //     }
+                  //   },
+                  //   child: Container(
+                  //     width: 333.sp,
+                  //     height: 45.sp,
+                  //     padding: const EdgeInsets.symmetric(
+                  //       // horizontal: 131,
+                  //       // vertical: 18,
+                  //     ),
+                  //     decoration: ShapeDecoration(
+                  //       color: const Color(0xFF323232),
+                  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                  //     ),
+                  //     child: Row(
+                  //       mainAxisSize: MainAxisSize.min,
+                  //       mainAxisAlignment: MainAxisAlignment.center,
+                  //       crossAxisAlignment: CrossAxisAlignment.center,
+                  //       spacing: 7,
+                  //       children: [
+                  //         Container(
+                  //           width: 17.sp,
+                  //           height: 17.sp,
+                  //           decoration: BoxDecoration(
+                  //             image: DecorationImage(image: AssetImage("assets/images/googleimage.png"), fit: BoxFit.cover),
+                  //           ),
+                  //         ),
+                  //         Text(
+                  //           'Sign in using Google',
+                  //           style: TextStyle(color: Colors.white, fontSize: 13.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700, height: 1.69, letterSpacing: -0.41),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
 
                   10.sp.verticalSpace,
                   Center(

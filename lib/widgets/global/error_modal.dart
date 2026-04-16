@@ -25,8 +25,9 @@ class ErrorModal extends StatelessWidget {
               MyFadeSlideEffect(
                 child: Text(
                   'An error occurred, check your internet connection and try again. If the problem persists, please contact support.',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: textColor ?? Colors.white70,
+                    color: textColor ?? Colors.black87,
                     fontSize: 14.sp,
                     fontFamily: 'Satoshi',
                     fontWeight: FontWeight.w400,

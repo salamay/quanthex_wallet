@@ -80,6 +80,7 @@ class AssetRepo {
 
   Future<bool> isCacheAssetEmpty(String walletAddress) async {
     List<SupportedCoin> scannedToken = await getScannedAssets(walletAddress);
+   
     log("Cache assets: ${scannedToken.length}");
     if (scannedToken.isNotEmpty) {
       return false;

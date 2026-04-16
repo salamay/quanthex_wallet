@@ -11,6 +11,7 @@ import 'package:quanthex/data/services/notification/fcm_service.dart';
 import 'package:quanthex/data/services/notification/notification_service.dart';
 import 'package:quanthex/routes/app_routes.dart';
 import 'package:quanthex/widgets/loading_overlay/loading.dart';
+import 'package:uniswap_flutter_v3/uniswap/uniswap_v3.dart';
 
 import 'data/controllers/assets/asset_controller.dart';
 import 'data/controllers/balance/balance_controller.dart';
@@ -23,6 +24,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await initHiveForFlutter();
+  await UniswapV3.init();
+
   await NotificationService.getInstance().initNotification();
   FirebaseMessaging.onBackgroundMessage(FcmService.firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(FcmService.firebaseMessagingOnForegroundMessageHandler);

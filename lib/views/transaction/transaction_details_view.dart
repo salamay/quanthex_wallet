@@ -243,8 +243,6 @@ class _TransactionDetailsViewState extends State<TransactionDetailsView> {
                                   _buildInfoRow(label: 'Block Height', value: widget.blockNumber.replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')),
                                   16.sp.verticalSpace,
                                   _buildInfoRow(label: 'Date', value: MyDateUtils.formatDate(DateTime.parse(widget.timestamp).millisecondsSinceEpoch)),
-                                      16.sp.verticalSpace,
-                                  _buildInfoRow(label: 'Time', value: MyDateUtils.hourTime(DateTime.parse(widget.timestamp))),
                                 ],
                               ),
                             ),

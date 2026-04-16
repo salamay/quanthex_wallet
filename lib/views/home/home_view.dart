@@ -55,7 +55,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   late Timer _balanceTimer;
 
   void _startBalanceTimer() {
-    _balanceTimer = Timer.periodic(Duration(seconds: 30), (timer) async {
+    _balanceTimer = Timer.periodic(Duration(seconds: 60), (timer) async {
       refreshData();
     });
   }
@@ -108,7 +108,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   Future<void> reload() async {
     try {
       balanceController.clear();
+      _stopBalanceTimer();
       await getData();
+      _startBalanceTimer();
       // await balanceController.unWatchAddress();
       // watchAddress();
     } catch (e) {
@@ -174,15 +176,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
               // Header
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 20.sp,
-                    backgroundColor: const Color(0xFFF5F5F5),
-                    backgroundImage: AssetImage('assets/images/logo.png'),
-                    // child: Icon(
-                    //   Icons.person,
-                    //   size: 24.sp,
-                    //   color: const Color(0xFF792A90),
-                    // ),
+                  QuanthexImageBanner(
+                    width: 80.sp,
+                    height: 80.sp,
                   ),
                   10.horizontalSpace,
                   Consumer<WalletController>(
@@ -640,6 +636,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     return GestureDetector(
       onTap: () async {
         if (!isSelected) {
+          if(_loadingNotifier.value || balanceLoadingNotifier.value){
+            return;
+          }
           Navigator.pop(context);
           await _switchWallet(wallet);
         }
@@ -699,7 +698,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       assetController.assets = [];
       balanceController.balances = {};
       balanceController.overallBalance = 0;
-      reload();
+      await reload();
       if (mounted) {
         showMySnackBar(context: context, message: 'Wallet switched successfully', type: SnackBarType.success);
       }

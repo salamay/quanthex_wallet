@@ -49,7 +49,7 @@ class TransactionService {
       throw Exception("Unable to get network fee");
     }
   }
-   Future<NetworkFee> calcNetworkFee({required BigInt gas,required BigInt gasPrice,required double currentPrice,required String chainCurrency, required SupportedCoin from}) async {
+   Future<NetworkFee> calcNetworkFee({required BigInt gas,required BigInt gasPrice,required double currentPrice,required String chainCurrency}) async {
     try {
       int maxGas = (gas).toInt();
       BigInt? totalGas = gasPrice * BigInt.from(maxGas);
@@ -263,7 +263,7 @@ class TransactionService {
       
       // Get transaction receipt
       TransactionReceipt? receipt = await webClient.getTransactionReceipt(txHash);
-      
+
       if (receipt == null) {
         // Transaction is still pending
         logger("Transaction $txHash is still pending", runtimeType.toString());
@@ -274,32 +274,41 @@ class TransactionService {
           gasUsed: null,
           txHash: txHash,
         );
+      }else{
+        // Transaction has been mined, check status
+        // Status 1 = success, Status 0 = failed
+        bool isSuccess = receipt.status == true;
+        logger("Transaction $txHash status: ${isSuccess ? 'SUCCESS' : 'FAILED'}", runtimeType.toString());
+        if(receipt.status==true){
+          // Convert BlockNum to int
+          int? blockNum;
+          try {
+            // BlockNum can be converted to string and parsed
+            blockNum = int.tryParse(receipt.blockNumber.toString());
+          } catch (e) {
+            logger("Error parsing block number: $e", runtimeType.toString());
+          }
+          logger("Block number: $blockNum", runtimeType.toString());
+
+          return TransactionStatus(
+            isSuccess: true,
+            isPending: false,
+            blockNumber: blockNum,
+            gasUsed: receipt.gasUsed,
+            txHash: txHash,
+          );
+        }else{
+          logger("Transaction $txHash is false", runtimeType.toString());
+          return TransactionStatus(
+            isSuccess: false,
+            isPending: false,
+            blockNumber: null,
+            gasUsed: null,
+            txHash: txHash,
+          );
+        }
       }
-      
-      // Transaction has been mined, check status
-      // Status 1 = success, Status 0 = failed
-      bool isSuccess = receipt.status == true;
-      
-      // Convert BlockNum to int
-      int? blockNum;
-      try {
-        // BlockNum can be converted to string and parsed
-        blockNum = int.tryParse(receipt.blockNumber.toString());
-      } catch (e) {
-        logger("Error parsing block number: $e", runtimeType.toString());
-      }
-      
-      logger("Transaction $txHash status: ${isSuccess ? 'SUCCESS' : 'FAILED'}", runtimeType.toString());
-      logger("Block number: $blockNum", runtimeType.toString());
-      logger("Gas used: ${receipt.gasUsed}", runtimeType.toString());
-      
-      return TransactionStatus(
-        isSuccess: isSuccess,
-        isPending: false,
-        blockNumber: blockNum,
-        gasUsed: receipt.gasUsed,
-        txHash: txHash,
-      );
+
     } catch (e) {
       logger("Error checking transaction status: $e", runtimeType.toString());
       throw Exception("An error occurred while checking transaction status: $e");

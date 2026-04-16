@@ -38,7 +38,9 @@ import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 import 'package:quanthex/views/swap/token_approval_bottom_sheet.dart';
 import 'package:quanthex/views/swap/transaction_fee_bottom_sheet.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:uniswap_flutter_v3/uniswap_flutter_v3.dart' as flv3;
 import 'dart:math' as math;
+
 
 class SwapTokenView extends StatefulWidget {
   const SwapTokenView({super.key});
@@ -52,7 +54,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
   String _toToken = '';
   bool isLoadingQuotes = false;
   Timer? _quotesRefreshTimer;
-  final Duration _quotesRefreshInterval = Duration(seconds: 10);
+  final Duration _quotesRefreshInterval = Duration(seconds: 30);
 
   late SwapController swapController;
   late AssetController assetController;
@@ -68,8 +70,8 @@ class _SwapTokenViewState extends State<SwapTokenView> {
   ValueNotifier<bool> dataLoadingNotifiers = ValueNotifier(true);
 
   final formKey = GlobalKey<FormState>();
-  TextEditingController fromAmountController = TextEditingController(text: '0');
-  TextEditingController toAmountController = TextEditingController(text: '0');
+  TextEditingController fromAmountController = TextEditingController(text: '');
+  TextEditingController toAmountController = TextEditingController(text: '');
   NetworkModel? selectedChain;
   // Available chains
   List<NetworkModel> get availableChains => [chain_bsc, chain_polygon, chain_eth];
@@ -444,7 +446,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                                                         }
                                                                         try {
                                                                           double amount = double.tryParse(val) ?? 0;
-                                                                          double receiverAmount = pair.token0Price * amount;
+                                                                          double receiverAmount = pair.pool.token0Price! * amount;
                                                                           toAmountController.text = receiverAmount.toString();
                                                                         } catch (e) {
                                                                           toAmountController.text = '';
@@ -604,8 +606,8 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                               builder: (context) {
                                                 String token0Symbol = coinPair.token0.symbol;
                                                 String token1Symbol = coinPair.token1.symbol;
-                                                String token0Price = coinPair.token0Price.toString();
-                                                String token1Price = coinPair.token1Price.toString();
+                                                String token0Price = coinPair.pool.token0Price.toString();
+                                                String token1Price = coinPair.pool.token1Price.toString();
                                                 String swapRate = '1 $token0Symbol = ${MyCurrencyUtils.format(double.parse(token0Price), coinPair.token1.coinType == CoinType.TOKEN ? 6 : 6)} $token1Symbol';
                                                 String estimatedReceive = toAmountController.text.trim().isEmpty ? '0.00' : toAmountController.text.trim();
                                                 return isLoadingQuotes ? Loading(size: 20.sp) : Column(
@@ -677,7 +679,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                                                   String inputAmount = fromAmountController.text.trim();
                                                                   String outputAmount = toAmountController.text.trim();
                                                                   String privateKey = walletController.currentWallet?.privateKey ?? "";
-                                                                  await SwapHelper.startSwap(
+                                                                  String? swapTxId=await SwapHelper().startSwap(
                                                                     context: context,
                                                                     coinPair: coinPair,
                                                                     walletAddress: walletAddress,
@@ -685,12 +687,26 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                                                     inputAmount: inputAmount,
                                                                     outputAmount: outputAmount,
                                                                     selectedChain: selectedChain!,
-                                                                    onDone: () {
-                                                                      clear();
-                                                                    },
                                                                   );
-                                                                  hideOverlay(context);
-                                                                
+                                                                  try{
+                                                                    if(swapTxId!=null){
+                                                                      String rpcUrl=selectedChain!.rpcUrl;
+                                                                      TransactionStatus swapTransactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: swapTxId, rpcUrl: rpcUrl, pollInterval: 4);
+                                                                      if (swapTransactionStatus.isSuccess) {
+                                                                        showMySnackBar(context: context, message: "Transaction successful", type: SnackBarType.success);
+                                                                        hideOverlay(context);
+                                                                        clear();
+                                                                      } else {
+                                                                        hideOverlay(context);
+                                                                        showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
+                                                                      }
+                                                                    }else{
+                                                                      hideOverlay(context);
+                                                                    }
+                                                                  }catch(e){
+                                                                    hideOverlay(context);
+                                                                    showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
+                                                                  }
                                                               }
                                                             },
                                                           )
@@ -755,42 +771,51 @@ class _SwapTokenViewState extends State<SwapTokenView> {
       errorNotifier.value = false;
       SupportedCoin? token0 = fromNotifier.value;
       SupportedCoin? token1 = toNotifier.value;
+      int chainId=selectedChain!.chainId;
       if (token0 == null || token1 == null) {
         return;
       }
-      CoinPair? coinPair;
+      flv3. Pool? pool;
       if (token0.coinType == CoinType.TOKEN && token1.coinType == CoinType.TOKEN) {
-        coinPair = await swapController.getPool(chainSymbol: selectedChain!.chainSymbol, token0: token0, token1: token1);
-        if (coinPair == null) {
+        flv3.Token tokenIn = flv3.Token(contractAddress: token0.contractAddress ?? "", decimals: token0.decimal ?? 18, symbol: token0.symbol, name: token0.name);
+        flv3.Token tokenOut = flv3.Token(contractAddress: token1.contractAddress ?? "", decimals: token1.decimal ?? 18, symbol: token1.symbol, name: token1.name);
+        pool = await SwapHelper().getPool(chainId: chainId, tokenIn: tokenIn, tokenOut: tokenOut);
+        if (pool == null) {
           if (showError) {
             showMySnackBar(context: context, message: 'Pool not found, no route found for this pair', type: SnackBarType.error);
           }
           return;
         }
+        CoinPair coinPair = CoinPair(token0: token0, token1: token1, pool: pool);
+        coinPairNotifier.value = coinPair;
         poolLoadingNotifier.value = false;
       } else if (token0.coinType == CoinType.TOKEN && token1.coinType == CoinType.NATIVE_TOKEN) {
+        flv3.Token tokenIn = flv3.Token(contractAddress: token0.contractAddress ?? "", decimals: token0.decimal ?? 18, symbol: token0.symbol, name: token0.name);
         String wethContractAddress = SwapService.getInstance().getWETHContractAddress(chainId: selectedChain!.chainId);
+        String wethSymbol = SwapService.getInstance().getWETHName(chainId: selectedChain!.chainId);
         logger("Weth contract address: $wethContractAddress", "SwapTokenView");
-        List<SupportedCoin> wethTokens = assetController.assets.where((element) => element.contractAddress?.toLowerCase() == wethContractAddress.toLowerCase()).toList();
-        if (wethTokens.isNotEmpty) {
-          SupportedCoin wethToken = wethTokens.first;
-          coinPair = await swapController.getPool(chainSymbol: selectedChain!.chainSymbol, token0: token0, token1: wethToken);
-          //This is because the token1 is the native token and we need to set it to the coinPair so the UI shows the correct token
-          coinPair?.token1 = token1;
-          coinPair?.weth = wethToken;
-          logger("Weth token: ${coinPair?.weth?.symbol}", "SwapTokenView");
-        } else {
-          coinPair = null;
-        }
+        flv3.Token nativeToken = flv3.Token(contractAddress: wethContractAddress, decimals: 18, symbol: wethSymbol, name: wethSymbol);
+          pool = await SwapHelper().getPool(chainId: chainId, tokenIn: tokenIn, tokenOut: nativeToken);
+          if (pool == null) {
+            if (showError) {
+              showMySnackBar(context: context,
+                  message: 'Pool not found, no route found for this pair',
+                  type: SnackBarType.error);
+            }
+            return;
+          }
+          CoinPair coinPair = CoinPair(token0: token0, token1: token1, pool: pool);
+        coinPairNotifier.value = coinPair;
+
         poolLoadingNotifier.value = false;
       } else if (token0.coinType == CoinType.NATIVE_TOKEN && token1.coinType == CoinType.TOKEN) {
         String wethContractAddress = SwapService.getInstance().getWETHContractAddress(chainId: selectedChain!.chainId);
+        String wethSymbol = SwapService.getInstance().getWETHName(chainId: selectedChain!.chainId);
         logger("Weth contract address: $wethContractAddress", "SwapTokenView");
-        List<SupportedCoin> wethTokens = assetController.assets.where((element) => element.contractAddress?.toLowerCase() == wethContractAddress.toLowerCase()).toList();
-        if (wethTokens.isNotEmpty) {
-          SupportedCoin wethToken = wethTokens.first;
-          coinPair = await swapController.getPool(chainSymbol: selectedChain!.chainSymbol, token0: wethToken, token1: token1);
-          if (coinPair == null) {
+        flv3.Token tokenOut = flv3.Token(contractAddress: token1.contractAddress ?? "", decimals: token1.decimal ?? 18, symbol: token1.symbol, name: token1.name);
+          flv3.Token nativeToken = flv3.Token(contractAddress: wethContractAddress, decimals: 18, symbol: wethSymbol, name: wethSymbol);
+          pool = await SwapHelper().getPool(chainId: chainId, tokenIn: nativeToken, tokenOut: tokenOut);
+          if (pool == null) {
             poolLoadingNotifier.value = false;
             coinPairNotifier.value = null;
             if (showError) {
@@ -798,16 +823,9 @@ class _SwapTokenViewState extends State<SwapTokenView> {
             }
             return;
           }
-          coinPair?.token0 = token0;
-          coinPair?.token1 = token1;
-          coinPair?.weth = wethToken;
-          logger("Weth token: ${coinPair?.weth?.symbol}", "SwapTokenView");
-        } else {
-          coinPair = null;
-        }
-        poolLoadingNotifier.value = false;
-      } else {}
-      coinPairNotifier.value = coinPair;
+          CoinPair coinPair=CoinPair(token0: token0, token1: token1, pool: pool);
+          coinPairNotifier.value=coinPair;
+      }
       poolLoadingNotifier.value = false;
     } catch (e) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -815,7 +833,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
         errorNotifier.value = true;
         coinPairNotifier.value = null;
         if (showError) {
-          showMySnackBar(context: context, message: 'Unable to get route', type: SnackBarType.error);
+          showMySnackBar(context: context, message: 'Unable to get route, please try again', type: SnackBarType.error);
         }
       });
 
@@ -833,7 +851,8 @@ class _SwapTokenViewState extends State<SwapTokenView> {
       double amount = double.parse(fromAmountController.text.trim());
       CoinPair? pair = coinPairNotifier.value;
       if (pair != null) {
-        double receiverAmount = pair.token0Price * amount;
+        flv3.Pool pool=pair.pool;
+        double receiverAmount = pool.token0Price! * amount;
         toAmountController.text = receiverAmount.toString();
       }
 
@@ -844,11 +863,13 @@ class _SwapTokenViewState extends State<SwapTokenView> {
     }
   }
 
-  void swapDirection() {
+  void swapDirection()async {
     SupportedCoin? temp = fromNotifier.value;
     fromNotifier.value = toNotifier.value;
     toNotifier.value = temp;
-    getRoute(context, true);
+    fromAmountController.text = '';
+    toAmountController.text = '';
+    await getRoute(context, true);
     calculate();
   }
 

@@ -5,6 +5,7 @@ class ReferralInfoDto {
   String? referralSubscriptionId;
   String? referralCreatedAt;
   String? referralUpdatedAt;
+  dynamic referralPath;
 
   ReferralInfoDto({
     this.referralId,
@@ -13,6 +14,7 @@ class ReferralInfoDto {
     this.referralSubscriptionId,
     this.referralCreatedAt,
     this.referralUpdatedAt,
+    this.referralPath,
   });
 
   factory ReferralInfoDto.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class ReferralInfoDto {
       referralSubscriptionId: json['referral_subscription_id'],
       referralCreatedAt: json['referral_created_at'],
       referralUpdatedAt: json['referral_updated_at'],
+      referralPath: json['referral_path'],
     );
   }
 
@@ -34,6 +37,7 @@ class ReferralInfoDto {
       'referral_subscription_id': referralSubscriptionId,
       'referral_created_at': referralCreatedAt,
       'referral_updated_at': referralUpdatedAt,
+      'referral_path': referralPath,
     };
   }
 
@@ -44,6 +48,7 @@ class ReferralInfoDto {
     String? referralSubscriptionId,
     String? referralCreatedAt,
     String? referralUpdatedAt,
+    dynamic referralPath,
   }) {
     return ReferralInfoDto(
       referralId: referralId ?? this.referralId,
@@ -54,6 +59,7 @@ class ReferralInfoDto {
       referralCreatedAt ?? this.referralCreatedAt,
       referralUpdatedAt:
       referralUpdatedAt ?? this.referralUpdatedAt,
+      referralPath: referralPath ?? this.referralPath,
     );
   }
 }

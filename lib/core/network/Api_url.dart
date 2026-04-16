@@ -30,14 +30,12 @@ class ApiUrls{
   static String moralisErc20Transfers="https://deep-index.moralis.io/api/v2.2";
   static String moralisNativeTransfers="https://deep-index.moralis.io/api/v2.2/";
 
-  // static String baseUrl="http://161.35.165.60:5790/api";
+  static String baseUrl="https://api.quanthex.io/v1/api";
 
 
   // Router 1
-  static String baseUrl="http://192.168.1.129:5790/api";
-
-  // //Router 2
-  // static String baseUrl="http://192.168.0.175:5790/api";
+  // static String baseUrl="http://192.168.1.135:5790/v1/api";
+ 
 
   static String loginOtp="$baseUrl/auth/loginOtp";
   static String registerOtp="$baseUrl/auth/registerOtp";

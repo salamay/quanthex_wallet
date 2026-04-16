@@ -3,27 +3,21 @@ class Erc20TransferDto {
   String? tokenSymbol;
   String? tokenLogo;
   String? tokenDecimals;
-
   String? fromAddressEntity;
   String? fromAddressEntityLogo;
   String? fromAddress;
   String? fromAddressLabel;
-
   String? toAddressEntity;
   String? toAddressEntityLogo;
   String? toAddress;
   String? toAddressLabel;
-
   String? address;
-
   String? blockHash;
   String? blockNumber;
   String? blockTimestamp;
-
   String? transactionHash;
   String? transactionIndex;
   String? logIndex;
-
   String? value;
   bool? possibleSpam;
   String? valueDecimal;
