@@ -87,10 +87,10 @@ class SwapHelper {
     }
   }
 
-  Future<flv3.Pool?> getPool({required int chainId, required Token tokenIn, required Token tokenOut}) async {
+  Future<flv3.Pool?> getPool({required int chainId, required Token tokenIn, required Token tokenOut,required String rpcUrl}) async {
     flv3.UniswapV3 uniswapV3= ChainParse.getChainId(chainId);
     try {
-      return await uniswapV3.getPool(tokenA: tokenIn, tokenB: tokenOut);
+      return await uniswapV3.getPool(tokenA: tokenIn, tokenB: tokenOut,rpcUrl: rpcUrl);
     } catch (e) {
       logger(e.toString(), "SwapTokenView");
       rethrow;
@@ -158,7 +158,7 @@ class SwapHelper {
       BigInt gasFee = await uniswapV3.getChainNetworkFee(rpcUrl: rpcUrl, chainId: chainId);;
       Token tokenIn = Token(contractAddress: coinPair.token0.contractAddress ?? "", decimals: coinPair.token0.decimal ?? 18, symbol: coinPair.token0.symbol, name: coinPair.token0.name);
       Token tokenOut = Token(contractAddress: coinPair.token1.contractAddress ?? "", decimals: coinPair.token1.decimal ?? 18, symbol: coinPair.token1.symbol, name: coinPair.token1.name);
-      flv3.Pool? pool=await uniswapV3.getPool(tokenA: tokenIn, tokenB: tokenOut);
+      flv3.Pool? pool=await uniswapV3.getPool(tokenA: tokenIn, tokenB: tokenOut,rpcUrl:rpcUrl);
       if(pool==null){
         hideOverlay(context);
         return null;
@@ -240,7 +240,7 @@ class SwapHelper {
       logger("Weth contract address: $wethContractAddress", "SwapTokenView");
       flv3.Token tokenOut = flv3.Token(contractAddress: wethContractAddress, decimals: 18, symbol: wethSymbol, name: wethSymbol);
       print(coinPair.token1.name);
-      flv3.Pool? pool=await uniswapV3.getPool(tokenA: tokenIn, tokenB: tokenOut);
+      flv3.Pool? pool=await uniswapV3.getPool(tokenA: tokenIn, tokenB: tokenOut,rpcUrl:rpcUrl);
       if(pool==null){
         hideOverlay(context);
         showMySnackBar(context: context, message: "Unable to get pool due to rate limit, try again", type: SnackBarType.error);
@@ -346,7 +346,7 @@ class SwapHelper {
       logger("Weth contract address: $wethContractAddress", "SwapTokenView");
       flv3.Token tokenIn = flv3.Token(contractAddress: wethContractAddress, decimals: 18, symbol: wethSymbol, name: wethSymbol);
       Token tokenOut = Token(contractAddress: coinPair.token1.contractAddress ?? "", decimals: coinPair.token1.decimal ?? 18, symbol: coinPair.token1.symbol, name: coinPair.token1.name);
-      flv3.Pool? pool=await uniswapV3.getPool(tokenA: tokenIn, tokenB: tokenOut);
+      flv3.Pool? pool=await uniswapV3.getPool(tokenA: tokenIn, tokenB: tokenOut,rpcUrl:rpcUrl);
       if(pool==null){
         hideOverlay(context);
         return null;

@@ -116,7 +116,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
           logger("Refreshing quotes", "SwapTokenView");
 
           setState(() {});
-          await balanceController.getTokenQuotes(tokens: swapController.tokens);
+          await balanceController.getTokenQuotes(tokens: assetController.assets);
           isLoadingQuotes = false;  setState(() {});
         } else {
           logger("Not in swap view, skipping quotes refresh", "SwapTokenView");
@@ -139,7 +139,6 @@ class _SwapTokenViewState extends State<SwapTokenView> {
     }
     String address = walletController.currentWallet?.walletAddress ?? "";
     String privateKey = walletController.currentWallet?.privateKey ?? "";
-
     if (address.isEmpty || privateKey.isEmpty) {
       return;
     }
@@ -151,10 +150,8 @@ class _SwapTokenViewState extends State<SwapTokenView> {
       await swapController.getTokens(network: selectedChain!, address: address, privateKey: privateKey);
       // Filter tokens from asset controller that match the selected chain
       List<SupportedCoin> chainTokens = assetController.assets.where((asset) => asset.networkModel?.chainId == selectedChain!.chainId).toList();
-
       // Combine swap controller tokens with asset controller tokens
-      List<SupportedCoin> allTokens = [...swapController.tokens];
-
+      List<SupportedCoin> allTokens = [...assetController.assets];
       // Add native token for the chain if not already present
       bool hasNativeToken = allTokens.any((token) => token.coinType == CoinType.NATIVE_TOKEN && token.networkModel?.chainId == selectedChain!.chainId);
 
@@ -179,10 +176,6 @@ class _SwapTokenViewState extends State<SwapTokenView> {
           allTokens.add(token);
         }
       }
-
-      // Update swap controller tokens
-      swapController.tokens = allTokens;
-
       // Set default from/to tokens if available
       if (allTokens.isNotEmpty) {
         fromNotifier.value = allTokens.first;
@@ -214,7 +207,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (context) => SwapTokenSelectorModal(
-        tokens: swapController.tokens,
+        tokens: assetController.assets,
         selectedChain: selectedChain,
         currentFromToken: fromNotifier.value,
         currentToToken: toNotifier.value,
@@ -587,136 +580,89 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                                     return ValueListenableBuilder(
                                       valueListenable: coinPairNotifier,
                                       builder: (context, coinPair, _) {
-                                        if (coinPair == null && poolLoading == false) {
-                                          return Text(
-                                            'No route found, Change the pair',
-                                            style: TextStyle(color: Colors.red, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                                          );
-                                        } else if (coinPair == null && poolLoading == true) {
+                                        if (poolLoading) {
                                           return Loading(size: 20.sp);
                                         } else {
                                           if (coinPair == null) {
-                                            return const SizedBox();
-                                          }
-                                          return Skeletonizer(
-                                            ignoreContainers: false,
-                                            enabled: poolLoading,
-                                            effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
-                                            child: Builder(
-                                              builder: (context) {
-                                                String token0Symbol = coinPair.token0.symbol;
-                                                String token1Symbol = coinPair.token1.symbol;
-                                                String token0Price = coinPair.pool.token0Price.toString();
-                                                String token1Price = coinPair.pool.token1Price.toString();
-                                                String swapRate = '1 $token0Symbol = ${MyCurrencyUtils.format(double.parse(token0Price), coinPair.token1.coinType == CoinType.TOKEN ? 6 : 6)} $token1Symbol';
-                                                String estimatedReceive = toAmountController.text.trim().isEmpty ? '0.00' : toAmountController.text.trim();
-                                                return isLoadingQuotes ? Loading(size: 20.sp) : Column(
-                                                  children: [
-                                                    SwapDetails(label: 'Swap Rate', value: swapRate),
-                                                    // Divider(height: 20.sp),
-                                                    15.sp.verticalSpace,
-                                                    SwapDetails(label: 'Min Receive', value: '${MyCurrencyUtils.format(double.parse(estimatedReceive), coinPair.token1.coinType == CoinType.TOKEN ? 2 : 6)} $token1Symbol'),
-                                                    // Divider(height: 20.sp),
-                                                    15.sp.verticalSpace,
-                                                    // Row(
-                                                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    //   children: [
-                                                    //     Text(
-                                                    //       'Route',
-                                                    //       style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                                                    //     ),
-                                                    //     Row(
-                                                    //       children: [
-                                                    //         // Container(
-                                                    //         //   width: 24.sp,
-                                                    //         //   height: 24.sp,
-                                                    //         //   decoration: BoxDecoration(
-                                                    //         //     color: Colors.blue,
-                                                    //         //     shape: BoxShape.circle,
-                                                    //         //   ),
-                                                    //         //   child: Center(
-                                                    //         //     child: Text(
-                                                    //         //       'T',
-                                                    //         //       style: TextStyle(
-                                                    //         //         color: Colors.white,
-                                                    //         //         fontSize: 12.sp,
-                                                    //         //         fontFamily: 'Satoshi',
-                                                    //         //         fontWeight: FontWeight.w700,
-                                                    //         //       ),
-                                                    //         //     ),
-                                                    //         //   ),
-                                                    //         // ),
-                                                    //         Container(
-                                                    //           width: 21.sp,
-                                                    //           height: 21.sp,
-                                                    //           decoration: ShapeDecoration(
-                                                    //             image: DecorationImage(image: AssetImage("assets/images/transit_icon.png"), fit: BoxFit.cover),
-                                                    //             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-                                                    //           ),
-                                                    //         ),
-                                                    //         8.horizontalSpace,
-                                                    //         Text(
-                                                    //           'Transit',
-                                                    //           style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
-                                                    //         ),
-                                                    //       ],
-                                                    //     ),
-                                                    //   ],
-                                                    // ),
-                                                    30.sp.verticalSpace,
-                                                    !poolLoading
-                                                        ? AppButton(
-                                                            text: 'Swap',
-                                                            textColor: Colors.white,
-                                                            color: const Color(0xFF792A90),
-                                                            onTap: () async {
-                                                              if (formKey.currentState!.validate()) {
-                                                                  if (toAmountController.text.trim().isEmpty) {
-                                                                    showMySnackBar(context: context, message: 'Please enter an amount', type: SnackBarType.error);
-                                                                    return;
-                                                                  }
-                                                                  String walletAddress = walletController.currentWallet?.walletAddress ?? "";
-                                                                  String inputAmount = fromAmountController.text.trim();
-                                                                  String outputAmount = toAmountController.text.trim();
-                                                                  String privateKey = walletController.currentWallet?.privateKey ?? "";
-                                                                  String? swapTxId=await SwapHelper().startSwap(
-                                                                    context: context,
-                                                                    coinPair: coinPair,
-                                                                    walletAddress: walletAddress,
-                                                                    privateKey: privateKey,
-                                                                    inputAmount: inputAmount,
-                                                                    outputAmount: outputAmount,
-                                                                    selectedChain: selectedChain!,
-                                                                  );
-                                                                  try{
-                                                                    if(swapTxId!=null){
-                                                                      String rpcUrl=selectedChain!.rpcUrl;
-                                                                      TransactionStatus swapTransactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: swapTxId, rpcUrl: rpcUrl, pollInterval: 4);
-                                                                      if (swapTransactionStatus.isSuccess) {
-                                                                        showMySnackBar(context: context, message: "Transaction successful", type: SnackBarType.success);
-                                                                        hideOverlay(context);
-                                                                        clear();
-                                                                      } else {
-                                                                        hideOverlay(context);
-                                                                        showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
-                                                                      }
-                                                                    }else{
-                                                                      hideOverlay(context);
-                                                                    }
-                                                                  }catch(e){
-                                                                    hideOverlay(context);
-                                                                    showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
-                                                                  }
+                                            return Text(
+                                              'No route found, try to change the pair',
+                                              style: TextStyle(color: Colors.red, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                            );
+                                          }else{
+                                            return Skeletonizer(
+                                              ignoreContainers: false,
+                                              enabled: poolLoading,
+                                              effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                                              child: Builder(
+                                                builder: (context) {
+                                                  String token0Symbol = coinPair.token0.symbol;
+                                                  String token1Symbol = coinPair.token1.symbol;
+                                                  String token0Price = coinPair.pool.token0Price.toString();
+                                                  String token1Price = coinPair.pool.token1Price.toString();
+                                                  String swapRate = '1 $token0Symbol = ${MyCurrencyUtils.format(double.parse(token0Price), coinPair.token1.coinType == CoinType.TOKEN ? 6 : 6)} $token1Symbol';
+                                                  String estimatedReceive = toAmountController.text.trim().isEmpty ? '0.00' : toAmountController.text.trim();
+                                                  return isLoadingQuotes ? Loading(size: 20.sp) : Column(
+                                                    children: [
+                                                      SwapDetails(label: 'Swap Rate', value: swapRate),
+                                                      // Divider(height: 20.sp),
+                                                      15.sp.verticalSpace,
+                                                      SwapDetails(label: 'Min Receive', value: '${MyCurrencyUtils.format(double.parse(estimatedReceive), coinPair.token1.coinType == CoinType.TOKEN ? 2 : 6)} $token1Symbol'),
+                                                      // Divider(height: 20.sp),
+                                                      30.sp.verticalSpace,
+                                                      !poolLoading
+                                                          ? AppButton(
+                                                        text: 'Swap',
+                                                        textColor: Colors.white,
+                                                        color: const Color(0xFF792A90),
+                                                        onTap: () async {
+                                                          if (formKey.currentState!.validate()) {
+                                                            if (toAmountController.text.trim().isEmpty) {
+                                                              showMySnackBar(context: context, message: 'Please enter an amount', type: SnackBarType.error);
+                                                              return;
+                                                            }
+                                                            String walletAddress = walletController.currentWallet?.walletAddress ?? "";
+                                                            String inputAmount = fromAmountController.text.trim();
+                                                            String outputAmount = toAmountController.text.trim();
+                                                            String privateKey = walletController.currentWallet?.privateKey ?? "";
+                                                            String? swapTxId=await SwapHelper().startSwap(
+                                                              context: context,
+                                                              coinPair: coinPair,
+                                                              walletAddress: walletAddress,
+                                                              privateKey: privateKey,
+                                                              inputAmount: inputAmount,
+                                                              outputAmount: outputAmount,
+                                                              selectedChain: selectedChain!,
+                                                            );
+                                                            try{
+                                                              if(swapTxId!=null){
+                                                                String rpcUrl=selectedChain!.rpcUrl;
+                                                                TransactionStatus swapTransactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: swapTxId, rpcUrl: rpcUrl, pollInterval: 4);
+                                                                if (swapTransactionStatus.isSuccess) {
+                                                                  showMySnackBar(context: context, message: "Transaction successful", type: SnackBarType.success);
+                                                                  hideOverlay(context);
+                                                                  clear();
+                                                                } else {
+                                                                  hideOverlay(context);
+                                                                  showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
+                                                                }
+                                                              }else{
+                                                                hideOverlay(context);
                                                               }
-                                                            },
-                                                          )
-                                                        : const SizedBox(),
-                                                    20.sp.verticalSpace,
-                                                  ],
-                                                );
-                                              },
-                                            ),
-                                          );
+                                                            }catch(e){
+                                                              hideOverlay(context);
+                                                              showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
+                                                            }
+                                                          }
+                                                        },
+                                                      )
+                                                          : const SizedBox(),
+                                                      20.sp.verticalSpace,
+                                                    ],
+                                                  );
+                                                },
+                                              ),
+                                            );
+                                          }
                                         }
                                       },
                                     );
@@ -775,11 +721,12 @@ class _SwapTokenViewState extends State<SwapTokenView> {
       if (token0 == null || token1 == null) {
         return;
       }
+      String rpcUrl=token0.networkModel!.rpcUrl;
       flv3. Pool? pool;
       if (token0.coinType == CoinType.TOKEN && token1.coinType == CoinType.TOKEN) {
         flv3.Token tokenIn = flv3.Token(contractAddress: token0.contractAddress ?? "", decimals: token0.decimal ?? 18, symbol: token0.symbol, name: token0.name);
         flv3.Token tokenOut = flv3.Token(contractAddress: token1.contractAddress ?? "", decimals: token1.decimal ?? 18, symbol: token1.symbol, name: token1.name);
-        pool = await SwapHelper().getPool(chainId: chainId, tokenIn: tokenIn, tokenOut: tokenOut);
+        pool = await SwapHelper().getPool(chainId: chainId, tokenIn: tokenIn, tokenOut: tokenOut,rpcUrl:rpcUrl);
         if (pool == null) {
           if (showError) {
             showMySnackBar(context: context, message: 'Pool not found, no route found for this pair', type: SnackBarType.error);
@@ -795,7 +742,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
         String wethSymbol = SwapService.getInstance().getWETHName(chainId: selectedChain!.chainId);
         logger("Weth contract address: $wethContractAddress", "SwapTokenView");
         flv3.Token nativeToken = flv3.Token(contractAddress: wethContractAddress, decimals: 18, symbol: wethSymbol, name: wethSymbol);
-          pool = await SwapHelper().getPool(chainId: chainId, tokenIn: tokenIn, tokenOut: nativeToken);
+          pool = await SwapHelper().getPool(chainId: chainId, tokenIn: tokenIn, tokenOut: nativeToken,rpcUrl:rpcUrl);
           if (pool == null) {
             if (showError) {
               showMySnackBar(context: context,
@@ -814,10 +761,11 @@ class _SwapTokenViewState extends State<SwapTokenView> {
         logger("Weth contract address: $wethContractAddress", "SwapTokenView");
         flv3.Token tokenOut = flv3.Token(contractAddress: token1.contractAddress ?? "", decimals: token1.decimal ?? 18, symbol: token1.symbol, name: token1.name);
           flv3.Token nativeToken = flv3.Token(contractAddress: wethContractAddress, decimals: 18, symbol: wethSymbol, name: wethSymbol);
-          pool = await SwapHelper().getPool(chainId: chainId, tokenIn: nativeToken, tokenOut: tokenOut);
+          pool = await SwapHelper().getPool(chainId: chainId, tokenIn: nativeToken, tokenOut: tokenOut,rpcUrl:rpcUrl);
           if (pool == null) {
             poolLoadingNotifier.value = false;
             coinPairNotifier.value = null;
+
             if (showError) {
               showMySnackBar(context: context, message: 'Pool not found, no route found for this pair', type: SnackBarType.error);
             }

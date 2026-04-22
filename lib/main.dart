@@ -23,8 +23,7 @@ import 'data/controllers/wallet_controller.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await initHiveForFlutter();
-  await UniswapV3.init();
+  // await initHiveForFlutter();
 
   await NotificationService.getInstance().initNotification();
   FirebaseMessaging.onBackgroundMessage(FcmService.firebaseMessagingBackgroundHandler);
@@ -61,7 +60,6 @@ class MyApp extends StatelessWidget {
         child: GlobalLoaderOverlay(
           overlayColor: Colors.transparent,
           overlayWholeScreen: true,
-
           overlayWidgetBuilder: (context) =>
               Center(child: Loading(size: 30.sp)),
           child: MaterialApp.router(
