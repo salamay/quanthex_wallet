@@ -67,6 +67,12 @@ class _WalletsViewState extends State<WalletsView> {
       backgroundColor: Colors.transparent,
       builder: (modalContext) => WalletMenuModal(
         wallet: wallet,
+        onRenameWallet: () async {
+          Navigator.pop(modalContext);
+          await Future.delayed(Duration(milliseconds: 100));
+          if (!mounted) return;
+          _showRenameDialog(wallet);
+        },
         onShowSecretPhrase: () async {
           Navigator.pop(modalContext);
           // Wait for modal to fully close
@@ -143,6 +149,79 @@ class _WalletsViewState extends State<WalletsView> {
             }
           }
         },
+      ),
+    );
+  }
+
+  void _showRenameDialog(WalletModel wallet) {
+    final walletController = Provider.of<WalletController>(context, listen: false);
+    final TextEditingController nameController = TextEditingController(
+      text: wallet.name ?? '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          'Rename Wallet',
+          style: TextStyle(fontFamily: 'Satoshi', fontWeight: FontWeight.w700, fontSize: 18.sp),
+        ),
+        content: TextField(
+          controller: nameController,
+          maxLength: 9,
+          autofocus: true,
+          style: TextStyle(fontFamily: 'Satoshi', fontSize: 16.sp),
+          decoration: InputDecoration(
+            hintText: 'Enter wallet name',
+            hintStyle: TextStyle(fontFamily: 'Satoshi', color: const Color(0xFF9E9E9E)),
+            counterText: '',
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: const Color(0xFFEEEEEE)),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: const Color(0xFF792A90)),
+            ),
+            suffixText: '${nameController.text.length}/9',
+            suffixStyle: TextStyle(fontFamily: 'Satoshi', fontSize: 12.sp, color: const Color(0xFF9E9E9E)),
+          ),
+          onChanged: (value) {
+            (dialogContext as Element).markNeedsBuild();
+          },
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(
+              'Cancel',
+              style: TextStyle(fontFamily: 'Satoshi', color: const Color(0xFF757575)),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              String newName = nameController.text.trim();
+              if (newName.isEmpty) {
+                showMySnackBar(context: context, message: 'Wallet name cannot be empty', type: SnackBarType.error);
+                return;
+              }
+              Navigator.pop(dialogContext);
+              try {
+                await walletController.renameWallet(wallet, newName);
+                if (mounted) {
+                  showMySnackBar(context: context, message: 'Wallet renamed successfully', type: SnackBarType.success);
+                }
+              } catch (e) {
+                if (mounted) {
+                  showMySnackBar(context: context, message: 'Failed to rename wallet', type: SnackBarType.error);
+                }
+              }
+            },
+            child: Text(
+              'Save',
+              style: TextStyle(fontFamily: 'Satoshi', color: const Color(0xFF792A90), fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -288,10 +367,11 @@ class _WalletsViewState extends State<WalletsView> {
 // Wallet Menu Modal
 class WalletMenuModal extends StatelessWidget {
   final WalletModel wallet;
+  final VoidCallback onRenameWallet;
   final VoidCallback onShowSecretPhrase;
   final VoidCallback onDeleteWallet;
 
-  const WalletMenuModal({super.key, required this.wallet, required this.onShowSecretPhrase, required this.onDeleteWallet});
+  const WalletMenuModal({super.key, required this.wallet, required this.onRenameWallet, required this.onShowSecretPhrase, required this.onDeleteWallet});
 
   @override
   Widget build(BuildContext context) {
@@ -309,13 +389,13 @@ class WalletMenuModal extends StatelessWidget {
             margin: EdgeInsets.only(top: 10.sp, bottom: 20.sp),
             decoration: BoxDecoration(color: const Color(0xFFE0E0E0), borderRadius: BorderRadius.circular(2)),
           ),
+          _buildMenuItem(icon: Icons.edit_outlined, title: 'Rename Wallet', onTap: onRenameWallet),
+          12.sp.verticalSpace,
+          Container(height: 1, margin: EdgeInsets.symmetric(horizontal: 20.sp), color: const Color(0xFFEEEEEE)),
+          12.sp.verticalSpace,
           _buildMenuItem(icon: Icons.visibility, title: 'Show Secret Phrase', onTap: onShowSecretPhrase),
           12.sp.verticalSpace,
-          Container(
-            height: 1,
-            margin: EdgeInsets.symmetric(horizontal: 20.sp),
-            color: const Color(0xFFEEEEEE),
-          ),
+          Container(height: 1, margin: EdgeInsets.symmetric(horizontal: 20.sp), color: const Color(0xFFEEEEEE)),
           12.sp.verticalSpace,
           _buildMenuItem(icon: Icons.delete_outline, title: 'Delete Wallet', onTap: onDeleteWallet, titleColor: Colors.red),
           20.sp.verticalSpace,

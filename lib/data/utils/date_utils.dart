@@ -50,8 +50,8 @@ class MyDateUtils{
     final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     final now = DateTime.now();
 
-    if (isSameDay(date, now)) return "Today";
-    if (isSameDay(date, now.subtract(Duration(days: 1)))) return "Yesterday";
+    if (isSameDay(date, now)) return "Today ${DateFormat('h:mm a').format(date)}";
+    if (isSameDay(date, now.subtract(Duration(days: 1)))) return "Yesterday ${DateFormat('h:mm a').format(date)}";
 
     return DateFormat('E, d MMM h:mm a').format(date);
   }

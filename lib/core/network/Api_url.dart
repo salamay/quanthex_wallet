@@ -29,8 +29,7 @@ class ApiUrls{
   static String moralisTokenMetadata="https://deep-index.moralis.io/api/v2.2/erc20/metadata";
   static String moralisErc20Transfers="https://deep-index.moralis.io/api/v2.2";
   static String moralisNativeTransfers="https://deep-index.moralis.io/api/v2.2/";
-  static String coinGeckoMarkets="https://pro-api.coingecko.com/api/v3/coins/markets";
-  static String coinGeckoCoinDetail="https://pro-api.coingecko.com/api/v3/coins";
+  static String cmcListings="https://pro-api.coinmarketcap.com/v3/cryptocurrency/listings/latest";
 
   static String baseUrl="https://api.quanthex.io/v1/api";
 
@@ -55,6 +54,7 @@ class ApiUrls{
   static String profile="$baseUrl/users/profile";
   static String withdraw="$baseUrl/products/withdraw";
   static String withdrawals="$baseUrl/products/withdrawals";
+  static String miningPayments="$baseUrl/products/mining-payments";
   static String notifications="$baseUrl/notification/notifications";
   static String markAsRead="$baseUrl/notification/seen";
   static String unreadCount="$baseUrl/notification/notifications/unread/count";

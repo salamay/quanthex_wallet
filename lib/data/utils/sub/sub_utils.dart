@@ -36,6 +36,8 @@ class SubUtils{
       } else if (packageName == advance) {
         return baseDefault * 6;
       } else if (packageName == pro) {
+        return baseDefault * 7;
+      } else if (packageName == mega) {
         return baseDefault * 8;
       } else {
         return 0.0;
@@ -51,7 +53,10 @@ class SubUtils{
       double totalReward= ADVANCE_AMOUNT_MAX;
       return calPrice(noOfReferrals: noOfReferrals, totalReward: totalReward, packageName: packageName);
     }else if(packageName==pro){
-      double totalReward= ADVANCE_AMOUNT_MAX;
+      double totalReward= PRO_AMOUNT_MAX;
+      return calPrice(noOfReferrals: noOfReferrals, totalReward: totalReward, packageName: packageName);
+    }else if(packageName==mega){
+      double totalReward= MEGA_AMOUNT_MAX;
       return calPrice(noOfReferrals: noOfReferrals, totalReward: totalReward, packageName: packageName);
     }else{
       return 0.0;

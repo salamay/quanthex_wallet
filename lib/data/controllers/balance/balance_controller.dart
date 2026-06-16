@@ -23,6 +23,9 @@ class BalanceController extends ChangeNotifier {
   bool isLoadingPriceQuotes = false;
   bool hideBalance = false;
   double overallBalance = 0;
+  bool balanceLoading = true;
+  bool balanceLoadingError=false;
+
 
   void calculateTotalBalance(Map<String, CoinBalance> results) {
     for (var e in results.values) {
@@ -100,7 +103,9 @@ class BalanceController extends ChangeNotifier {
             final data = Map<String, dynamic>.from(response.data).map((key, value) => MapEntry(key.toLowerCase(), value));
             var priceData = data[e.contractAddress?.toLowerCase()];
             if (priceData != null) {
-              priceQuotes[e.symbol] = double.parse(priceData['usd'].toString());
+              if(priceData['usd']!=null){
+                priceQuotes[e.symbol] = double.parse(priceData['usd'].toString());
+              }
             }
           }).toList();
           isLoadingPriceQuotes = false;
@@ -189,8 +194,13 @@ class BalanceController extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, CoinBalance>> getTokenBalance(List<SupportedCoin> assets) async {
+  Future<Map<String, CoinBalance>> getTokenBalance(List<SupportedCoin> assets,bool shouldIndicate) async {
     try {
+      if(shouldIndicate){
+        balanceLoading = true;
+        balanceLoadingError=false;
+        notifyListeners();
+      }
       if (assets.isEmpty) {
         logger("No token to get balance for", runtimeType.toString());
         return {};
@@ -226,11 +236,19 @@ class BalanceController extends ChangeNotifier {
           br.add(coinBalance);
         }
       }
+      if(shouldIndicate){
+        balanceLoading = false;
+        notifyListeners();
+      }
       return data;
       // log("Getting ${asset.name} balance for ${walletAddress.toString()}");
     } catch (e) {
       logger("Error getting token balance: $e", runtimeType.toString());
-      
+      if(shouldIndicate){
+        balanceLoading = false;
+        balanceLoadingError=true;
+        notifyListeners();
+      }
       throw Exception(e);
     }
   }

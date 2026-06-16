@@ -8,6 +8,7 @@ class MyApi{
 
   static const coinGecko="CG-STpUPhRiZgxoyPFkerdkScpM";
   static const ethScanKey="N8N1CQHKPX5YY1Q219XNX2EJRWDRUIGY2W";
+  static const cmcKey="4f24b8e5372747a59d47f996e05d196b"; // TODO: Replace with your actual CMC API key
   static const moralisKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjJjZDlkYTRlLWVkZmUtNDJmNC1iOGRmLTIwMTk4OTE2YmJlNiIsIm9yZ0lkIjoiNDk4OTgzIiwidXNlcklkIjoiNTEzNDY1IiwidHlwZUlkIjoiYjdkNmZkNjUtODk2OC00NjI0LTk2YmItMTkwMDEwZmIxNjFhIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3NzA0MjY4NDcsImV4cCI6NDkyNjE4Njg0N30.h46nVUkFn9XpCi0FpRWHLsTlaC-_xSd5Ie3BizSaBCo";
   Dio dio = Dio();
   

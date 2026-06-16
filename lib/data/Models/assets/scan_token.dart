@@ -29,6 +29,7 @@ class ScannedToken {
   List<String>? categories;
   Links? links;
   int? securityScore;
+  String? marketCap;
 
   ScannedToken({
     this.address,
@@ -50,6 +51,7 @@ class ScannedToken {
     this.categories,
     this.links,
     this.securityScore,
+    this.marketCap
   });
 
   factory ScannedToken.fromJson(Map<String, dynamic> json) => ScannedToken(
@@ -72,6 +74,7 @@ class ScannedToken {
     categories: json["categories"] == null ? [] : List<String>.from(json["categories"]!.map((x) => x)),
     links: json["links"] == null ? null : Links.fromJson(json["links"]),
     securityScore: json["security_score"],
+    marketCap: json["market_cap"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -94,6 +97,7 @@ class ScannedToken {
     "categories": categories == null ? [] : List<dynamic>.from(categories!.map((x) => x)),
     "links": links?.toJson(),
     "security_score": securityScore,
+    "market_cap": marketCap,
   };
 }
 

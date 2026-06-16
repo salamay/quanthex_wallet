@@ -16,6 +16,7 @@ import 'package:quanthex/data/repository/secure_storage.dart';
 import 'package:quanthex/data/utils/assets/token_factory.dart';
 import 'package:quanthex/data/utils/home_nav_resolver.dart';
 import 'package:quanthex/data/utils/logger.dart';
+import 'package:uniswap_flutter_v3/uniswap/utils/constants/constants.dart';
 import 'package:wallet/wallet.dart';
 import 'package:web3dart/web3dart.dart';
 import 'dart:math' as math;
@@ -34,9 +35,9 @@ import '../../Models/network/network_model.dart';
 import '../../repository/assets/asset_repository.dart';
 
 Map<int, List<String>> defaultTokens = {
-  1: [eth_usdc_contract, eth_usdt_contract, eth_weth_contract],
-  56: [bsc_usdc_contract, bsc_doge_contract, bsc_usdt_contract, bsc_trx_contract, bsc_wbnb_contract],
-  137: [polygon_bnb_contract, polygon_dai_contract, polygon_usdt_contract, polygon_usdc_contract, polygon_orio_contract, polygon_fib_contract, polygon_weth_contract, polygon_wpol_contract],
+  1: ethTokenAddresses,
+  56: bscTokenAddresses,
+  137: polygonTokenAddresses,
 };
 class AssetService{
   final my_api = MyApi();
@@ -108,32 +109,13 @@ class AssetService{
         coinType: CoinType.NATIVE_TOKEN,
         decimal: 18,
         contractAddress: "",
+        marketCap: double.infinity
       );
       return nativeToken;
     }catch(e){
       logger("Error getting native token: $e",runtimeType.toString());
       throw Exception("Error getting native token: $e");
     }
-  }
-
-  //Get custom tokens that the user has added
-  Future<List<SupportedCoin>> getCustomTokens({required NetworkModel selectedChain,required String walletAddress,required String privateKey})async{
-    List<CustomToken> customs=await SecureStorage.getInstance().getCustomTokens(chain: selectedChain.chainSymbol);
-    logger("Custom Token: ${customs.length}",runtimeType.toString());
-    List<SupportedCoin> customTokens=customs.map((e) {
-      return SupportedCoin(
-          name: e.name!,
-          symbol: e.symbol!.toUpperCase(),
-          image: e.image??selectedChain.imageUrl,
-          walletAddress: walletAddress,
-          privateKey: privateKey,
-          networkModel: selectedChain,
-          coinType: CoinType.TOKEN,
-          decimal: e.decimal,
-          contractAddress: e.contractAddress!.toLowerCase()
-      );
-    }).toList();
-    return customTokens;
   }
 
 
@@ -184,6 +166,7 @@ class AssetService{
             coinType: CoinType.TOKEN,
             decimal: int.parse(e.decimals!),
             contractAddress: e.address!.toLowerCase(),
+            marketCap: double.parse(e.marketCap??"0"),
           );
         }).toList();
         return assets;
@@ -197,113 +180,6 @@ class AssetService{
     }
   }
 
-  Future<List<SupportedCoin>> getAllAssets({required bool isNew,required  String walletAddress, required String privateKey})async{
-    logger("Getting default assets",runtimeType.toString());
-    try{
-      List<SupportedCoin> coins=[];
-
-      if(isNew){
-        await Future.wait(defaultTokens.keys.map((key)async {
-          NetworkModel network;
-          logger("Default tokens for chainId $key",runtimeType.toString());
-          int chainId=key;
-          if(chainId==chain_id_eth){
-            List<String> addresses=defaultTokens[chainId]!;
-            network=chain_eth;
-            List<SupportedCoin> scT= await scanTokens(addresses: addresses, chainSymbol: network.chainSymbol.toUpperCase(),network: network, walletAddress: walletAddress, privateKey: privateKey);
-            logger("Eth  tokens: ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          }else if(chainId==chain_id_bsc){
-            List<String> addresses=defaultTokens[chainId]!;
-            network=chain_bsc;
-            List<SupportedCoin> scT= await scanTokens(addresses: addresses, chainSymbol: network.chainSymbol.toUpperCase(), network: network, walletAddress: walletAddress, privateKey: privateKey);
-            logger("Bsc  tokens: ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          }else if(chainId==chain_id_pol){
-            List<String> addresses=defaultTokens[chainId]!;
-            network=chain_polygon;
-            List<SupportedCoin> scT= await scanTokens(addresses: addresses, chainSymbol: network.chainSymbol.toUpperCase(), network: network,walletAddress: walletAddress, privateKey: privateKey);
-            logger("Polygon  tokens: ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          }else if(chainId==chain_id_arb){
-            List<String> addresses=defaultTokens[chainId]!;
-            network=chain_arbitrum;
-            List<SupportedCoin> scT= await scanTokens(addresses: addresses, chainSymbol: network.chainSymbol.toUpperCase(), network: network,walletAddress: walletAddress, privateKey: privateKey);
-            logger("Arbitrum  tokens: ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          }else if(chainId==chain_id_avax){
-            List<String> addresses=defaultTokens[chainId]!;
-            network=chain_avalanche;
-            List<SupportedCoin> scT= await scanTokens(addresses: addresses, chainSymbol: network.chainSymbol.toUpperCase(), network: network,walletAddress: walletAddress, privateKey: privateKey);
-            logger("Arbitrum  tokens: ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          }else{
-            network=chain_eth;
-            logger("Chain not supported",runtimeType.toString());
-          }
-          if(isNew){
-            print(network.chainSymbol);
-            SupportedCoin nativeToken=SupportedCoin(name: network.chainName, symbol: network.chainCurrency.toUpperCase(), image: network.imageUrl, walletAddress: walletAddress, privateKey: privateKey, networkModel: network, coinType: CoinType.NATIVE_TOKEN, decimal: 18, contractAddress: "",);
-            coins.insert(0, nativeToken);
-          }
-          List<SupportedCoin> tokens=await getCustomTokens(selectedChain: network, walletAddress: walletAddress, privateKey: privateKey);
-          tokens.map((e){
-            //Check if the token is already in the supported coin list,i.e the token is not a duplicate
-            if(coins.where((element) => element.contractAddress!.toLowerCase()==e.contractAddress!.toLowerCase()).isEmpty){
-              coins.add(e);
-            }
-          }).toList();
-        }));
-      }else{
-        await Future.wait(defaultTokens.keys.map((key)async {
-          logger("Default tokens for chainId $key",runtimeType.toString());
-          NetworkModel network;
-          int chainId=key;
-          if(chainId==chain_id_eth) {
-            network = chain_eth;
-            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets(walletAddress);
-            logger("Cached token ($eth): ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          } else if(chainId==chain_id_bsc){
-            network=chain_bsc;
-            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets(walletAddress);
-            logger("Cached token ($bsc): ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          }else if(chainId==chain_id_pol){
-            network=chain_polygon;
-            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets(walletAddress);
-            logger("Cached token ($polygon): ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          }else if(chainId==chain_id_arb){
-            network=chain_arbitrum;
-            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets(walletAddress);
-            logger("Cached token ($arb): ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          }else if(chainId==chain_id_avax){
-            network=chain_avalanche;
-            List<SupportedCoin> scT=await AssetRepo.getInstance().getScannedAssets(walletAddress);
-            logger("Cached token ($avax): ${scT.length}",runtimeType.toString());
-            coins.addAll(scT);
-          }else{
-            network=chain_eth;
-            logger("Chain not supported",runtimeType.toString());
-          }
-          List<SupportedCoin> tokens=await getCustomTokens(selectedChain: network, walletAddress: walletAddress, privateKey: privateKey);
-          tokens.map((e){
-            //Check if the token is already in the supported coin list,i.e the token is not a duplicate
-            if(coins.where((element) => element.contractAddress!.toLowerCase()==e.contractAddress!.toLowerCase()).isEmpty){
-              coins.add(e);
-            }
-          }).toList();
-        }));
-      }
-
-      return coins;
-    }catch(e){
-      logger(e.toString(),runtimeType.toString());
-      return [];
-    }
-  }
 
 
   Future<Map<String,dynamic>> getErc20Transfers({required String address, required String chainSymbol,required String cursor,required int limit,required List<String> contractAddresses}) async {

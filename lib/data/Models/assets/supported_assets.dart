@@ -29,6 +29,7 @@ class SupportedCoin {
   String? implementationContractAddress;
   double? balanceInFiat;
   double? balanceInCrypto;
+  double marketCap;
 
   SupportedCoin({
     required this.symbol,
@@ -44,6 +45,7 @@ class SupportedCoin {
     this.implementationContractAddress,
     this.balanceInFiat,
     this.balanceInCrypto,
+    required this.marketCap
   });
 
   /// -----------------------------
@@ -69,6 +71,7 @@ class SupportedCoin {
     json["implementation_contract_address"],
     balanceInFiat: json["balance_in_fiat"],
     balanceInCrypto: json["balance_in_crypto"],
+    marketCap: json["market_cap"],
   );
 
   /// -----------------------------
@@ -88,5 +91,6 @@ class SupportedCoin {
     "implementation_contract_address": implementationContractAddress,
     "balance_in_fiat": balanceInFiat,
     "balance_in_crypto": balanceInCrypto,
+    "market_cap": marketCap,
   };
 }

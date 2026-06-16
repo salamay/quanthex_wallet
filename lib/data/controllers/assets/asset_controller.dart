@@ -24,6 +24,8 @@ class AssetController extends ChangeNotifier {
   Map<String, coingecko_coin.Coin> tokenMetadatas = {};
   Map<String, List<Erc20TransferDto>> erc20Transfers = {};
   Map<String, List<NativeTxDto>> nativeTransfers = {};
+  bool assetLoading=false;
+  bool assetLoadingError=false;
 
   void populateAssetsByBalanceInFiat(Map<String, CoinBalance> results) {
     results.forEach((key, value) {
@@ -74,9 +76,14 @@ class AssetController extends ChangeNotifier {
     await assetService.getQuotes(balanceController: balanceController, assets: assets);
   }
 
-  Future<List<SupportedCoin>> getAllAssets({required bool isNew, required AssetService assetService, required WalletController walletController, required SwapController swapController}) async {
+  Future<List<SupportedCoin>> getAllAssets({required bool isNew, required AssetService assetService, required WalletController walletController, required SwapController swapController,bool shouldIndicate=true}) async {
     logger("Getting default assets", runtimeType.toString());
     try {
+      if(shouldIndicate){
+        assetLoading = true;
+        assetLoadingError=false;
+        notifyListeners();
+      }
       String walletAddress = walletController.currentWallet?.walletAddress ?? "";
       String privateKey = walletController.currentWallet?.privateKey ?? "";
       List<SupportedCoin> coins = [];
@@ -93,13 +100,11 @@ class AssetController extends ChangeNotifier {
               logger("Eth  tokens: ${scT.length}", runtimeType.toString());
               coins.addAll(scT);
             } else if (chainId == chain_id_bsc) {
-              List<String> addresses = defaultTokens[chainId]!;
               network = chain_bsc;
-              List<SupportedCoin> scT = await swapController.getTokens(network: network, address: walletAddress, privateKey: privateKey);
+               List<SupportedCoin> scT = await swapController.getTokens(network: network, address: walletAddress, privateKey: privateKey);
               logger("Bsc  tokens: ${scT.length}", runtimeType.toString());
               coins.addAll(scT);
             } else if (chainId == chain_id_pol) {
-              // List<String> addresses = defaultTokens[chainId]!;
               network = chain_polygon;
               List<SupportedCoin> scT = await swapController.getTokens(network: network, address: walletAddress, privateKey: privateKey);
               logger("Polygon  tokens: ${scT.length}", runtimeType.toString());
@@ -109,7 +114,7 @@ class AssetController extends ChangeNotifier {
               logger("Chain not supported", runtimeType.toString());
             }
             print(network.chainSymbol);
-            SupportedCoin nativeToken = SupportedCoin(name: network.chainName, symbol: network.chainCurrency.toUpperCase(), image: network.imageUrl, walletAddress: walletAddress, privateKey: privateKey, networkModel: network, coinType: CoinType.NATIVE_TOKEN, decimal: 18, contractAddress: "");
+            SupportedCoin nativeToken = SupportedCoin(name: network.chainName, symbol: network.chainCurrency.toUpperCase(), image: network.imageUrl, walletAddress: walletAddress, privateKey: privateKey, networkModel: network, coinType: CoinType.NATIVE_TOKEN, decimal: 18, contractAddress: "",marketCap: double.infinity);
             coins.insert(0, nativeToken);
           }).toList(),
         );
@@ -117,12 +122,25 @@ class AssetController extends ChangeNotifier {
         List<SupportedCoin> cachedAssets = await AssetRepo.getInstance().getScannedAssets(walletAddress);
         coins.addAll(cachedAssets);
       }
+      //Sort by market cap descending
+      coins.sort((a, b) {
+        return b.marketCap!.compareTo(a.marketCap!);
+      });
       assets = coins;
+
       // assets = await assetService.getAllAssets(isNew: isNew, walletAddress: walletAddress, privateKey: privateKey);
-      notifyListeners();
+      if(shouldIndicate){
+        assetLoading=false;
+        notifyListeners();
+      }
       return assets;
     } catch (e) {
       logger("Error getting all assets: " + e.toString(), runtimeType.toString());
+      if(shouldIndicate){
+        assetLoading=false;
+        assetLoadingError=true;
+        notifyListeners();
+      }
       throw Exception(e);
     }
   }

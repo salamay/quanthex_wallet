@@ -18,6 +18,7 @@ import 'package:quanthex/data/utils/sub/indirect_earning_calc.dart';
 import 'package:quanthex/data/utils/sub/product_utils.dart';
 import 'package:quanthex/data/utils/share/share_utils.dart';
 import 'package:quanthex/data/utils/sub/sub_utils.dart';
+import 'package:quanthex/routes/app_routes.dart';
 import 'package:quanthex/views/mining/components/hash_card.dart';
 import 'package:quanthex/views/mining/components/horizontal_divider.dart';
 import 'package:quanthex/views/mining/components/mining_simulation_widget.dart';
@@ -62,7 +63,11 @@ class _MiningViewState extends State<MiningView> {
       _loadingNotifier.value = true;
       _errorNotifier.value = false;
       String miningSubscriptionId = widget.mining.subscription!.subId ?? "";
-      await miningController.getSubscriptionReferrals(miningSubscriptionId);
+      String minId = widget.mining.mining?.minId ?? "";
+      await Future.wait([
+        miningController.getSubscriptionReferrals(miningSubscriptionId),
+        miningController.fetchMiningPayments(minId, refresh: true),
+      ]);
       _loadingNotifier.value = false;
       _errorNotifier.value = false;
     } catch (e) {
@@ -229,6 +234,28 @@ class _MiningViewState extends State<MiningView> {
                                           ],
                                         ),
                                         12.sp.verticalSpace,
+                                        // Total Amount Paid card
+                                        Consumer<MiningController>(
+                                          builder: (context, miningCtr, _) {
+                                            String minId = mining.mining?.minId ?? "";
+                                            double totalPaid = miningCtr.miningTotalAmountPaid[minId] ?? 0;
+                                            int paymentCount = miningCtr.miningPaymentsTotals[minId] ?? 0;
+                                            String rewardSymbol = mining.subscription!.subRewardAssetSymbol ?? "";
+                                            return Row(
+                                              children: [
+                                                Expanded(
+                                                  child: StatCard(
+                                                    label: 'Total Paid',
+                                                    value: "${MyCurrencyUtils.format(totalPaid, 4)} $rewardSymbol",
+                                                    fontSize: 14.sp,
+                                                    infoText: "$paymentCount payment${paymentCount == 1 ? '' : 's'} received",
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                        12.sp.verticalSpace,
                                         Row(
                                           children: [
                                             Expanded(
@@ -249,6 +276,32 @@ class _MiningViewState extends State<MiningView> {
                                           ],
                                         ),
 
+                                        20.sp.verticalSpace,
+                                        // Payment History button
+                                        SizedBox(
+                                          width: double.infinity,
+                                          height: 48.sp,
+                                          child: OutlinedButton.icon(
+                                            onPressed: () {
+                                              Navigate.toNamed(context, name: AppRoutes.miningPaymentsView, args: mining);
+                                            },
+                                            icon: Icon(Icons.receipt_long_outlined, size: 18.sp, color: const Color(0xffA8EBCF)),
+                                            label: Text(
+                                              'Payment History',
+                                              style: TextStyle(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w600,
+                                                color: const Color(0xffA8EBCF),
+                                              ),
+                                            ),
+                                            style: OutlinedButton.styleFrom(
+                                              side: BorderSide(color: const Color(0xffA8EBCF).withOpacity(0.5), width: 1),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                         40.sp.verticalSpace,
                                       ],
                                     ),

@@ -146,7 +146,7 @@ class SwapHelper {
 
   Future<String?> tokenToTokenFlow({required BuildContext context, required NetworkModel selectedChain, required CoinPair coinPair, required walletAddress, required String privateKey, required String inputAmount,})async{
     try{
-      logger("Token to Token Swap", "SwapTokenView");
+      logger("Token to Token Swap ${coinPair.token0.decimal} ${coinPair.token1.decimal}", "SwapTokenView");
       showOverlay(context);
       BalanceController balanceController = Provider.of<BalanceController>(context, listen: false);
       String rpcUrl = selectedChain.rpcUrl ?? "";
@@ -205,7 +205,7 @@ class SwapHelper {
         }
         if (result == true) {
           showOverlay(context);
-          String swapTxId =  await  uniswapV3.swapTokenToToken(privateKey: privateKey, pool: pool, amountIn: double.parse(inputAmount), maxGas: swapFee.maxGas);
+          String swapTxId =  await  uniswapV3.swapTokenToToken(privateKey: privateKey, pool: pool, amountIn: double.parse(inputAmount), maxGas: swapFee.maxGas,slippagePercent: 5);
           return swapTxId;
         }else{
           hideOverlay(context);

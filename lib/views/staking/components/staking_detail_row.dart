@@ -17,7 +17,7 @@ class StakingDetailRow extends StatelessWidget {
           children: [
             Text(
               label,
-              style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+              style: TextStyle(color: Colors.white54, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
             ),
             if (tooltip != null) ...[
               10.horizontalSpace,
@@ -31,7 +31,7 @@ class StakingDetailRow extends StatelessWidget {
         ),
         Text(
           value,
-          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+          style: TextStyle(color: Colors.white, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
         ),
       ],
     );

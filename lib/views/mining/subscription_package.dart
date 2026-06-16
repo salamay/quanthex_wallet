@@ -19,6 +19,7 @@ import '../../core/constants/sub_constants.dart';
 import '../../data/Models/mining/mining_dto.dart';
 import '../../data/Models/mining/subscription_payload.dart';
 import '../../data/controllers/mining/mining_controller.dart';
+import '../../data/utils/my_currency_utils.dart';
 import '../../data/utils/navigator.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/global/error_modal.dart';
@@ -190,15 +191,15 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
         String amountInCrypto = (price / rewardPriceQuotes).toStringAsFixed(0);
          String description = "";
         if (name == starter) {
-          description = "Offering up to $amountInCrypto DOGE in mining outputs. Advance through the required stages to unlock the full outputs.";
+          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Advance through the required stages to unlock the full outputs.";
         } else if (name == growth) {
-          description = "Offering up to $amountInCrypto DOGE in mining outputs. Move through all stages to claim the maximum outputs.";
+          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Move through all stages to claim the maximum outputs.";
         } else if (name == advance) {
-          description = "Offering up to $amountInCrypto DOGE in mining outputs. Progress through the necessary stages to access the full mining outputs.";
+          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Progress through the necessary stages to access the full mining outputs.";
         } else if (name == pro) {
-          description = "Offering up to $amountInCrypto DOGE in mining outputs. Complete all progression levels to receive the entire mining outputs.";
+          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Complete all progression levels to receive the entire mining outputs.";
         } else if (name == mega) {
-          description = "Offering up to $amountInCrypto DOGE in mining outputs. Complete all progression levels to receive the entire mining outputs.";
+          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Complete all progression levels to receive the entire mining outputs.";
         }
         return Container(
           padding: EdgeInsets.all(16.sp),

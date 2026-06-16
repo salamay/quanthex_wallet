@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:quanthex/data/Models/mining/mining_dto.dart';
+import 'package:quanthex/data/Models/mining/mining_payment_dto.dart';
 import 'package:quanthex/data/Models/staking/staking_dto.dart';
 import 'package:quanthex/data/Models/staking/staking_referral_dto.dart';
 import 'package:quanthex/data/Models/staking/withdrawal.dart';
@@ -22,7 +23,78 @@ class MiningController extends ChangeNotifier {
   List<WithdrawalDto> withdrawals = [];
   Map<String, List<StakingReferralDto>> stakingReferrals = {};
 
-  
+  // Mining payments state
+  Map<String, List<MiningPaymentDto>> miningPayments = {};
+  Map<String, int> miningPaymentsTotals = {};
+  Map<String, double> miningTotalAmountPaid = {};
+  Map<String, int> miningPaymentsPages = {};
+  Map<String, int> miningPaymentsTotalPages = {};
+  bool fetchingMiningPayments = false;
+  bool fetchingMiningPaymentsError = false;
+  bool loadingMoreMiningPayments = false;
+
+  Future<void> fetchMiningPayments(String minId, {bool refresh = false}) async {
+    try {
+      if (refresh) {
+        miningPayments[minId] = [];
+        miningPaymentsPages[minId] = 1;
+      }
+      fetchingMiningPayments = true;
+      fetchingMiningPaymentsError = false;
+      notifyListeners();
+
+      int page = refresh ? 1 : (miningPaymentsPages[minId] ?? 1);
+      Map<String, dynamic> result = await miningService.getMiningPayments(minId: minId, page: page);
+      List<MiningPaymentDto> payments = result['payments'];
+
+      if (refresh) {
+        miningPayments[minId] = payments;
+      } else {
+        miningPayments[minId] = [...(miningPayments[minId] ?? []), ...payments];
+      }
+      miningPaymentsTotals[minId] = result['total'];
+      miningTotalAmountPaid[minId] = result['totalAmountPaid'] ?? 0.0;
+      miningPaymentsPages[minId] = result['page'];
+      miningPaymentsTotalPages[minId] = result['totalPages'];
+
+      fetchingMiningPayments = false;
+      fetchingMiningPaymentsError = false;
+      notifyListeners();
+    } catch (e) {
+      logger("Error fetching mining payments: $e", runtimeType.toString());
+      fetchingMiningPayments = false;
+      fetchingMiningPaymentsError = true;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadMoreMiningPayments(String minId) async {
+    int currentPage = miningPaymentsPages[minId] ?? 1;
+    int totalPages = miningPaymentsTotalPages[minId] ?? 1;
+    if (loadingMoreMiningPayments || currentPage >= totalPages) return;
+
+    try {
+      loadingMoreMiningPayments = true;
+      notifyListeners();
+
+      int nextPage = currentPage + 1;
+      Map<String, dynamic> result = await miningService.getMiningPayments(minId: minId, page: nextPage);
+      List<MiningPaymentDto> payments = result['payments'];
+
+      miningPayments[minId] = [...(miningPayments[minId] ?? []), ...payments];
+      miningPaymentsPages[minId] = result['page'];
+      miningPaymentsTotalPages[minId] = result['totalPages'];
+      miningPaymentsTotals[minId] = result['total'];
+
+      loadingMoreMiningPayments = false;
+      notifyListeners();
+    } catch (e) {
+      logger("Error loading more mining payments: $e", runtimeType.toString());
+      loadingMoreMiningPayments = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchMinings(String walletAddress) async {
     try {
      fetchingMinings = true;

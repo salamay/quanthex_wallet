@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -23,6 +24,7 @@ import 'package:quanthex/data/utils/logger.dart';
 import 'package:quanthex/data/utils/my_currency_utils.dart';
 import 'package:quanthex/data/utils/navigator.dart';
 import 'package:quanthex/data/utils/overlay_utils.dart';
+import 'package:quanthex/views/check_modal.dart';
 import 'package:quanthex/views/home/components/coin_image.dart';
 import 'package:quanthex/views/swap/components/confirm_swap_modal.dart';
 import 'package:quanthex/views/swap/components/swap_details.dart';
@@ -38,6 +40,7 @@ import 'package:quanthex/widgets/snackbar/my_snackbar.dart';
 import 'package:quanthex/views/swap/token_approval_bottom_sheet.dart';
 import 'package:quanthex/views/swap/transaction_fee_bottom_sheet.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:uniswap_flutter_v3/uniswap/utils/constants/constants.dart';
 import 'package:uniswap_flutter_v3/uniswap_flutter_v3.dart' as flv3;
 import 'dart:math' as math;
 
@@ -166,6 +169,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
           coinType: CoinType.NATIVE_TOKEN,
           decimal: 18,
           contractAddress: "",
+          marketCap: double.infinity
         );
         allTokens.insert(0, nativeToken);
       }
@@ -253,16 +257,16 @@ class _SwapTokenViewState extends State<SwapTokenView> {
       onTap: () {
         fromFocusNode.unfocus();
       },
-      child: Container(
-        height: MediaQuery.sizeOf(context).height,
-        width: MediaQuery.sizeOf(context).width,
-        padding: EdgeInsets.all(8.sp),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            getData(true);
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Container(
+          height: MediaQuery.sizeOf(context).height,
+          width: MediaQuery.sizeOf(context).width,
+          padding: EdgeInsets.all(8.sp),
+          child: RefreshIndicator(
+            onRefresh: () async {
+              getData(true);
+            },
             child: ValueListenableBuilder(
               valueListenable: dataLoadingNotifiers,
               builder: (context, dataLoading, _) {
@@ -271,409 +275,411 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                   enabled: dataLoading,
                   effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
 
-                  child: Column(
-                    children: [
-                      // Header
-                      Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Swap',
-                                style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                              ),
-                              const Spacer(),
-                              QuanthexImageBanner(width: 110.sp, height: 60.sp),
-                            ],
-                          ),
-                          // Chain Selector
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: ChainSelectorModal(
-                              networks: availableChains,
-                              selectedNetwork: selectedChain,
-                              onChainSelected: (network) {
-                                setState(() {
-                                  selectedChain = network;
-                                  // Reset token selections when chain changes
-                                  fromNotifier.value = null;
-                                  toNotifier.value = null;
-                                  fromAmountController.clear();
-                                  toAmountController.clear();
-                                });
-                                // Reload tokens for the new chain
-                                getData(true);
-                              },
-                              title: 'Select Chain',
-                              showSearch: true,
-                            ),
-                          ),
-                          10.sp.verticalSpace,
-                        ],
-                      ),
-                      // Quanthex Image Banner
-                      Form(
-                        key: formKey,
-                        onChanged: () {
-                          if (formKey.currentState!.validate()) {
-                            // calculate();
-                          }
-                        },
-                        child: Column(
+                  child: CheckModal(
+                    textColor: Colors.black45,
+                    child: Column(
+                      children: [
+                        // Header
+                        Column(
                           children: [
-                            // From Section
-                            Stack(
-                              alignment: AlignmentGeometry.center,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.sizeOf(context).width,
-                                      height: 260.h,
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            flex: 5,
-                                            child: ValueListenableBuilder(
-                                              valueListenable: fromNotifier,
-                                              builder: (context, from, _) {
-                                                return Consumer<BalanceController>(
-                                                  builder: (context, bCtr, child) {
-                                                    double? priceQuotes;
-                                                    CoinBalance? fromBalance;
-                                                    if (from != null) {
-                                                      priceQuotes = bCtr.priceQuotes[from.symbol];
-                                                      fromBalance = from.coinType == CoinType.TOKEN ? bCtr.balances[from.contractAddress!] : bCtr.balances[from.symbol];
-                                                    } else {
-                                                      fromBalance = null;
-                                                      priceQuotes = null;
-                                                    }
-                                                    return Container(
-                                                      padding: EdgeInsets.all(16.sp),
-                                                      decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                'From',
-                                                                style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                                                              ),
-                                                              Spacer(),
-                                                              Text(
-                                                                '${fromBalance != null
-                                                                    ? fromBalance.balanceInCrypto != 0
-                                                                          ? MyCurrencyUtils.format(fromBalance.balanceInCrypto, from != null
-                                                                                ? from.coinType == CoinType.TOKEN
-                                                                                      ? 2
-                                                                                      : 6
-                                                                                : 6)
-                                                                          : "0"
-                                                                    : ""} ${from != null ? from.symbol : ""}',
-                                                                style: TextStyle(color: const Color(0xFF757575), fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                                                              ),
-                                                              8.horizontalSpace,
-                                                              GestureDetector(
-                                                                onTap: () {
-                                                                  if (fromBalance == null) {
-                                                                    return;
-                                                                  }
-                                                                  if (fromBalance.balanceInCrypto > 0) {
-                                                                    fromAmountController.text = fromBalance.balanceInCrypto.toString().trim();
-                                                                    String value = fromAmountController.text.trim();
-                                                                    checkForError(value, fromBalance);
-                                                                    calculate();
-                                                                  }
-                                                                },
-                                                                child: Text(
-                                                                  'Max',
-                                                                  style: TextStyle(color: Color(0xFF792A90), fontSize: 13.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          10.sp.verticalSpace,
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              _showTokenSelector(isFrom: true);
-                                                            },
-                                                            child: Row(
+                                Text(
+                                  'Swap',
+                                  style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                                ),
+                                const Spacer(),
+                                QuanthexImageBanner(width: 110.sp, height: 60.sp),
+                              ],
+                            ),
+                            // Chain Selector
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: ChainSelectorModal(
+                                networks: availableChains,
+                                selectedNetwork: selectedChain,
+                                onChainSelected: (network) {
+                                  setState(() {
+                                    selectedChain = network;
+                                    // Reset token selections when chain changes
+                                    fromNotifier.value = null;
+                                    toNotifier.value = null;
+                                    fromAmountController.clear();
+                                    toAmountController.clear();
+                                  });
+                                  // Reload tokens for the new chain
+                                  getData(true);
+                                },
+                                title: 'Select Chain',
+                                showSearch: true,
+                              ),
+                            ),
+                            10.sp.verticalSpace,
+                          ],
+                        ),
+                        // Quanthex Image Banner
+                        Form(
+                          key: formKey,
+                          onChanged: () {
+                            if (formKey.currentState!.validate()) {
+                              // calculate();
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              // From Section
+                              Stack(
+                                alignment: AlignmentGeometry.center,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: MediaQuery.sizeOf(context).width,
+                                        height: 260.h,
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              flex: 5,
+                                              child: ValueListenableBuilder(
+                                                valueListenable: fromNotifier,
+                                                builder: (context, from, _) {
+                                                  return Consumer<BalanceController>(
+                                                    builder: (context, bCtr, child) {
+                                                      double? priceQuotes;
+                                                      CoinBalance? fromBalance;
+                                                      if (from != null) {
+                                                        priceQuotes = bCtr.priceQuotes[from.symbol];
+                                                        fromBalance = from.coinType == CoinType.TOKEN ? bCtr.balances[from.contractAddress!] : bCtr.balances[from.symbol];
+                                                      } else {
+                                                        fromBalance = null;
+                                                        priceQuotes = null;
+                                                      }
+                                                      return Container(
+                                                        padding: EdgeInsets.all(16.sp),
+                                                        decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Row(
                                                               children: [
-                                                                from != null ? CoinImage(imageUrl: from.image, height: 32.sp, width: 32.sp) : Container(height: 32.sp, width: 32.sp),
-                                                                8.horizontalSpace,
                                                                 Text(
-                                                                  from != null ? from.symbol : "",
-                                                                  style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                                                                  'From',
+                                                                  style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                                                                 ),
-                                                                Icon(Icons.keyboard_arrow_down, size: 20.sp, color: const Color.fromRGBO(117, 117, 117, 1)),
                                                                 Spacer(),
-                                                                Container(
-                                                                  width: 100.w,
-                                                                  child: AppTextfield(
-                                                                    focusNode: fromFocusNode,
-                                                                    textAlign: TextAlign.right,
-                                                                    controller: fromAmountController,
-                                                                    hintText: '0',
-                                                                    maxLines: 1,
-                                                                    errorMaxLines: 1,
-                                                                    hintStyle: TextStyle(color: const Color.fromRGBO(117, 117, 117, 1)),
-                                                                    contentPadding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 0),
-                                                                    border: InputBorder.none,
-                                                                    keyboardType: TextInputType.number,
-                                                                    onChanged: (val) {
-                                                                      checkForError(val, fromBalance);
-                                                                      CoinPair? pair = coinPairNotifier.value;
-                                                                      if (pair != null) {
-                                                                        if (val.isEmpty) {
-                                                                          toAmountController.text = '';
-                                                                          return;
-                                                                        }
-                                                                        try {
-                                                                          double amount = double.tryParse(val) ?? 0;
-                                                                          double receiverAmount = pair.pool.token0Price! * amount;
-                                                                          toAmountController.text = receiverAmount.toString();
-                                                                        } catch (e) {
-                                                                          toAmountController.text = '';
-                                                                        }
-                                                                      }
-                                                                    },
-                                                                    onEditingComplete: () {
+                                                                Text(
+                                                                  '${fromBalance != null
+                                                                      ? fromBalance.balanceInCrypto != 0
+                                                                            ? MyCurrencyUtils.format(fromBalance.balanceInCrypto, from != null
+                                                                                  ? from.coinType == CoinType.TOKEN
+                                                                                        ? 2
+                                                                                        : 6
+                                                                                  : 6)
+                                                                            : "0"
+                                                                      : ""} ${from != null ? from.symbol : ""}',
+                                                                  style: TextStyle(color: const Color(0xFF757575), fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                                                ),
+                                                                8.horizontalSpace,
+                                                                GestureDetector(
+                                                                  onTap: () {
+                                                                    if (fromBalance == null) {
+                                                                      return;
+                                                                    }
+                                                                    if (fromBalance.balanceInCrypto > 0) {
+                                                                      fromAmountController.text = fromBalance.balanceInCrypto.toString().trim();
+                                                                      String value = fromAmountController.text.trim();
+                                                                      checkForError(value, fromBalance);
                                                                       calculate();
-                                                                      fromFocusNode.unfocus();
-                                                                    },
-                                                                    onFieldSubmitted: (value) {
-                                                                      calculate();
-                                                                      fromFocusNode.unfocus();
-                                                                    },
+                                                                    }
+                                                                  },
+                                                                  child: Text(
+                                                                    'Max',
+                                                                    style: TextStyle(color: Color(0xFF792A90), fontSize: 13.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
                                                                   ),
                                                                 ),
                                                               ],
                                                             ),
-                                                          ),
-                                                          Align(
-                                                            alignment: Alignment.centerRight,
-                                                            child: Text(
-                                                              _errorText,
-                                                              style: TextStyle(color: Colors.red, fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                                            10.sp.verticalSpace,
+                                                            GestureDetector(
+                                                              onTap: () {
+                                                                _showTokenSelector(isFrom: true);
+                                                              },
+                                                              child: Row(
+                                                                children: [
+                                                                  from != null ? CoinImage(imageUrl: from.image, height: 32.sp, width: 32.sp) : Container(height: 32.sp, width: 32.sp),
+                                                                  8.horizontalSpace,
+                                                                  Text(
+                                                                    from != null ? from.symbol : "",
+                                                                    style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                                                                  ),
+                                                                  Icon(Icons.keyboard_arrow_down, size: 20.sp, color: const Color.fromRGBO(117, 117, 117, 1)),
+                                                                  Spacer(),
+                                                                  Container(
+                                                                    width: 100.w,
+                                                                    child: AppTextfield(
+                                                                      focusNode: fromFocusNode,
+                                                                      textAlign: TextAlign.right,
+                                                                      controller: fromAmountController,
+                                                                      hintText: '0',
+                                                                      maxLines: 1,
+                                                                      errorMaxLines: 1,
+                                                                      hintStyle: TextStyle(color: const Color.fromRGBO(117, 117, 117, 1)),
+                                                                      contentPadding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 0),
+                                                                      border: InputBorder.none,
+                                                                      keyboardType: TextInputType.number,
+                                                                      onChanged: (val) {
+                                                                        checkForError(val, fromBalance);
+                                                                        CoinPair? pair = coinPairNotifier.value;
+                                                                        if (pair != null) {
+                                                                          if (val.isEmpty) {
+                                                                            toAmountController.text = '';
+                                                                            return;
+                                                                          }
+                                                                          calculate();
+                                                                        }
+                                                                      },
+                                                                      onEditingComplete: () {
+                                                                        calculate();
+                                                                        fromFocusNode.unfocus();
+                                                                      },
+                                                                      onFieldSubmitted: (value) {
+                                                                        calculate();
+                                                                        fromFocusNode.unfocus();
+                                                                      },
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          10.sp.verticalSpace,
-                                          Expanded(
-                                            flex: 5,
-                                            child: ValueListenableBuilder(
-                                              valueListenable: toNotifier,
-                                              builder: (context, to, _) {
-                                                return Container(
-                                                  padding: EdgeInsets.all(16.sp),
-                                                  decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      Row(
-                                                        children: [
-                                                          Text(
-                                                            'To',
-                                                            style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
-                                                          ),
-                                                          Spacer(),
-                                                        ],
-                                                      ),
-                                                      10.sp.verticalSpace,
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          _showTokenSelector(isFrom: false);
-                                                        },
-                                                        child: Row(
-                                                          children: [
-                                                            to != null ? CoinImage(imageUrl: to.image, height: 32.sp, width: 32.sp) : Container(height: 32.sp, width: 32.sp),
-                                                            8.horizontalSpace,
-                                                            Text(
-                                                              to != null ? to.symbol : "",
-                                                              style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
-                                                            ),
-                                                            Icon(Icons.keyboard_arrow_down, size: 20.sp, color: const Color.fromRGBO(117, 117, 117, 1)),
-                                                            Spacer(),
-                                                            Container(
-                                                              width: 100.w,
-                                                              child: AppTextfield(
-                                                                enable: false,
-                                                                textAlign: TextAlign.right,
-                                                                controller: toAmountController,
-                                                                hintText: '',
-                                                                maxLines: 1,
-                                                                errorMaxLines: 1,
-                                                                hintStyle: TextStyle(color: const Color.fromRGBO(117, 117, 117, 1)),
-                                                                contentPadding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 0),
-                                                                border: InputBorder.none,
+                                                            Align(
+                                                              alignment: Alignment.centerRight,
+                                                              child: Text(
+                                                                _errorText,
+                                                                style: TextStyle(color: Colors.red, fontSize: 12.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
                                                               ),
                                                             ),
                                                           ],
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                // Swap Direction Button
-                                GestureDetector(
-                                  onTap: () {
-                                    swapDirection();
-                                  },
-                                  child: Container(
-                                    width: 40.w,
-                                    height: 40.h,
-                                    padding: const EdgeInsets.all(3),
-                                    decoration: ShapeDecoration(
-                                      color: const Color(0xFFD9D9D9),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
-                                    ),
-                                    child: Icon(Icons.swap_vert, size: 24.sp, color: const Color(0xFF2D2D2D)),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            10.sp.verticalSpace,
-                            // Swap Details
-                            ValueListenableBuilder(
-                              valueListenable: errorNotifier,
-                              builder: (context, isError, _) {
-                                if (isError) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      getRoute(context, true);
-                                    },
-                                    child: Text(
-                                      'Unable to find a route, click to try again',
-                                      style: TextStyle(color: Colors.red, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                                    ),
-                                  );
-                                }
-                                return ValueListenableBuilder(
-                                  valueListenable: poolLoadingNotifier,
-                                  builder: (context, poolLoading, _) {
-                                    return ValueListenableBuilder(
-                                      valueListenable: coinPairNotifier,
-                                      builder: (context, coinPair, _) {
-                                        if (poolLoading) {
-                                          return Loading(size: 20.sp);
-                                        } else {
-                                          if (coinPair == null) {
-                                            return Text(
-                                              'No route found, try to change the pair',
-                                              style: TextStyle(color: Colors.red, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
-                                            );
-                                          }else{
-                                            return Skeletonizer(
-                                              ignoreContainers: false,
-                                              enabled: poolLoading,
-                                              effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
-                                              child: Builder(
-                                                builder: (context) {
-                                                  String token0Symbol = coinPair.token0.symbol;
-                                                  String token1Symbol = coinPair.token1.symbol;
-                                                  String token0Price = coinPair.pool.token0Price.toString();
-                                                  String token1Price = coinPair.pool.token1Price.toString();
-                                                  String swapRate = '1 $token0Symbol = ${MyCurrencyUtils.format(double.parse(token0Price), coinPair.token1.coinType == CoinType.TOKEN ? 6 : 6)} $token1Symbol';
-                                                  String estimatedReceive = toAmountController.text.trim().isEmpty ? '0.00' : toAmountController.text.trim();
-                                                  return isLoadingQuotes ? Loading(size: 20.sp) : Column(
-                                                    children: [
-                                                      SwapDetails(label: 'Swap Rate', value: swapRate),
-                                                      // Divider(height: 20.sp),
-                                                      15.sp.verticalSpace,
-                                                      SwapDetails(label: 'Min Receive', value: '${MyCurrencyUtils.format(double.parse(estimatedReceive), coinPair.token1.coinType == CoinType.TOKEN ? 2 : 6)} $token1Symbol'),
-                                                      // Divider(height: 20.sp),
-                                                      30.sp.verticalSpace,
-                                                      !poolLoading
-                                                          ? AppButton(
-                                                        text: 'Swap',
-                                                        textColor: Colors.white,
-                                                        color: const Color(0xFF792A90),
-                                                        onTap: () async {
-                                                          if (formKey.currentState!.validate()) {
-                                                            if (toAmountController.text.trim().isEmpty) {
-                                                              showMySnackBar(context: context, message: 'Please enter an amount', type: SnackBarType.error);
-                                                              return;
-                                                            }
-                                                            String walletAddress = walletController.currentWallet?.walletAddress ?? "";
-                                                            String inputAmount = fromAmountController.text.trim();
-                                                            String outputAmount = toAmountController.text.trim();
-                                                            String privateKey = walletController.currentWallet?.privateKey ?? "";
-                                                            String? swapTxId=await SwapHelper().startSwap(
-                                                              context: context,
-                                                              coinPair: coinPair,
-                                                              walletAddress: walletAddress,
-                                                              privateKey: privateKey,
-                                                              inputAmount: inputAmount,
-                                                              outputAmount: outputAmount,
-                                                              selectedChain: selectedChain!,
-                                                            );
-                                                            try{
-                                                              if(swapTxId!=null){
-                                                                String rpcUrl=selectedChain!.rpcUrl;
-                                                                TransactionStatus swapTransactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: swapTxId, rpcUrl: rpcUrl, pollInterval: 4);
-                                                                if (swapTransactionStatus.isSuccess) {
-                                                                  showMySnackBar(context: context, message: "Transaction successful", type: SnackBarType.success);
-                                                                  hideOverlay(context);
-                                                                  clear();
-                                                                } else {
-                                                                  hideOverlay(context);
-                                                                  showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
-                                                                }
-                                                              }else{
-                                                                hideOverlay(context);
-                                                              }
-                                                            }catch(e){
-                                                              hideOverlay(context);
-                                                              showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
-                                                            }
-                                                          }
-                                                        },
-                                                      )
-                                                          : const SizedBox(),
-                                                      20.sp.verticalSpace,
-                                                    ],
+                                                      );
+                                                    },
                                                   );
                                                 },
                                               ),
-                                            );
-                                          }
-                                        }
+                                            ),
+                                            10.sp.verticalSpace,
+                                            Expanded(
+                                              flex: 5,
+                                              child: ValueListenableBuilder(
+                                                valueListenable: toNotifier,
+                                                builder: (context, to, _) {
+                                                  return Container(
+                                                    padding: EdgeInsets.all(16.sp),
+                                                    decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(16)),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'To',
+                                                              style: TextStyle(color: const Color(0xFF757575), fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
+                                                            ),
+                                                            Spacer(),
+                                                          ],
+                                                        ),
+                                                        10.sp.verticalSpace,
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            _showTokenSelector(isFrom: false);
+                                                          },
+                                                          child: Row(
+                                                            children: [
+                                                              to != null ? CoinImage(imageUrl: to.image, height: 32.sp, width: 32.sp) : Container(height: 32.sp, width: 32.sp),
+                                                              8.horizontalSpace,
+                                                              Text(
+                                                                to != null ? to.symbol : "",
+                                                                style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 16.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w600),
+                                                              ),
+                                                              Icon(Icons.keyboard_arrow_down, size: 20.sp, color: const Color.fromRGBO(117, 117, 117, 1)),
+                                                              Spacer(),
+                                                              Container(
+                                                                width: 100.w,
+                                                                child: AppTextfield(
+                                                                  enable: false,
+                                                                  textAlign: TextAlign.right,
+                                                                  controller: toAmountController,
+                                                                  hintText: '',
+                                                                  maxLines: 1,
+                                                                  errorMaxLines: 1,
+                                                                  hintStyle: TextStyle(color: const Color.fromRGBO(117, 117, 117, 1)),
+                                                                  contentPadding: EdgeInsets.symmetric(horizontal: 10.sp, vertical: 0),
+                                                                  border: InputBorder.none,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  // Swap Direction Button
+                                  GestureDetector(
+                                    onTap: () {
+                                      swapDirection();
+                                    },
+                                    child: Container(
+                                      width: 40.w,
+                                      height: 40.h,
+                                      padding: const EdgeInsets.all(3),
+                                      decoration: ShapeDecoration(
+                                        color: const Color(0xFFD9D9D9),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+                                      ),
+                                      child: Icon(Icons.swap_vert, size: 24.sp, color: const Color(0xFF2D2D2D)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              10.sp.verticalSpace,
+                              // Swap Details
+                              ValueListenableBuilder(
+                                valueListenable: errorNotifier,
+                                builder: (context, isError, _) {
+                                  if (isError) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        getRoute(context, true);
                                       },
+                                      child: Text(
+                                        'Unable to find a route, click to try again',
+                                        style: TextStyle(color: Colors.red, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                      ),
                                     );
-                                  },
-                                );
-                              },
-                            ),
-                          ],
+                                  }
+                                  return ValueListenableBuilder(
+                                    valueListenable: poolLoadingNotifier,
+                                    builder: (context, poolLoading, _) {
+                                      return ValueListenableBuilder(
+                                        valueListenable: coinPairNotifier,
+                                        builder: (context, coinPair, _) {
+                                          if (poolLoading) {
+                                            return Loading(size: 20.sp);
+                                          } else {
+                                            if (coinPair == null) {
+                                              return Text(
+                                                'No route found, try to change the pair',
+                                                style: TextStyle(color: Colors.red, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400),
+                                              );
+                                            }else{
+                                              return Skeletonizer(
+                                                ignoreContainers: false,
+                                                enabled: poolLoading,
+                                                effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                                                child: Builder(
+                                                  builder: (context) {
+                                                    String token0Symbol = coinPair.token0.symbol;
+                                                    String token1Symbol = coinPair.token1.symbol;
+                                                    String token0Price = coinPair.pool.token0Price.toString();
+                                                    String token1Price = coinPair.pool.token1Price.toString();
+                                                    String swapRate = '';
+                                                    if(!coinPair.pool.isInverse){
+                                                      swapRate = '1 $token0Symbol = ${MyCurrencyUtils.format(double.parse(token0Price), coinPair.token1.coinType == CoinType.TOKEN ? 6 : 6)} $token1Symbol';
+                                                    }else{
+                                                      swapRate = '1 $token0Symbol = ${MyCurrencyUtils.format(double.parse(token1Price), coinPair.token1.coinType == CoinType.TOKEN ? 6 : 6)} $token1Symbol';
+                                                    }
+                                                    String estimatedReceive = toAmountController.text.trim().isEmpty ? '0.00' : toAmountController.text.trim();
+                                                    return isLoadingQuotes ? Loading(size: 20.sp) : Column(
+                                                      children: [
+                                                        SwapDetails(label: 'Swap Rate', value: swapRate),
+                                                        // Divider(height: 20.sp),
+                                                        15.sp.verticalSpace,
+                                                        SwapDetails(label: 'Min Receive', value: '${MyCurrencyUtils.format(double.parse(estimatedReceive), coinPair.token1.coinType == CoinType.TOKEN ? 2 : 6)} $token1Symbol'),
+                                                        // Divider(height: 20.sp),
+                                                        30.sp.verticalSpace,
+                                                        !poolLoading
+                                                            ? AppButton(
+                                                          text: 'Swap',
+                                                          textColor: Colors.white,
+                                                          color: const Color(0xFF792A90),
+                                                          onTap: () async {
+                                                            if (formKey.currentState!.validate()) {
+                                                              if (toAmountController.text.trim().isEmpty) {
+                                                                showMySnackBar(context: context, message: 'Please enter an amount', type: SnackBarType.error);
+                                                                return;
+                                                              }
+                                                              String walletAddress = walletController.currentWallet?.walletAddress ?? "";
+                                                              String inputAmount = fromAmountController.text.trim();
+                                                              String outputAmount = toAmountController.text.trim();
+                                                              String privateKey = walletController.currentWallet?.privateKey ?? "";
+                                                              String? swapTxId=await SwapHelper().startSwap(
+                                                                context: context,
+                                                                coinPair: coinPair,
+                                                                walletAddress: walletAddress,
+                                                                privateKey: privateKey,
+                                                                inputAmount: inputAmount,
+                                                                outputAmount: outputAmount,
+                                                                selectedChain: selectedChain!,
+                                                              );
+                                                              try{
+                                                                if(swapTxId!=null){
+                                                                  String rpcUrl=selectedChain!.rpcUrl;
+                                                                  TransactionStatus swapTransactionStatus = await TransactionService().waitForTransactionConfirmation(txHash: swapTxId, rpcUrl: rpcUrl, pollInterval: 4);
+                                                                  if (swapTransactionStatus.isSuccess) {
+                                                                    showMySnackBar(context: context, message: "Transaction successful", type: SnackBarType.success);
+                                                                    hideOverlay(context);
+                                                                    clear();
+                                                                  } else {
+                                                                    hideOverlay(context);
+                                                                    showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
+                                                                  }
+                                                                }else{
+                                                                  hideOverlay(context);
+                                                                }
+                                                              }catch(e){
+                                                                hideOverlay(context);
+                                                                showMySnackBar(context: context, message: "Transaction failed", type: SnackBarType.error);
+                                                              }
+                                                            }
+                                                          },
+                                                        )
+                                                            : const SizedBox(),
+                                                        20.sp.verticalSpace,
+                                                      ],
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
@@ -800,8 +806,14 @@ class _SwapTokenViewState extends State<SwapTokenView> {
       CoinPair? pair = coinPairNotifier.value;
       if (pair != null) {
         flv3.Pool pool=pair.pool;
-        double receiverAmount = pool.token0Price! * amount;
-        toAmountController.text = receiverAmount.toString();
+        if(!pool.isInverse){
+          double receiverAmount = pool.token0Price! * amount;
+          toAmountController.text = receiverAmount.toString();
+        }else{
+          double receiverAmount = pool.token1Price! * amount;
+          toAmountController.text = receiverAmount.toString();
+        }
+
       }
 
       poolLoadingNotifier.value = false;

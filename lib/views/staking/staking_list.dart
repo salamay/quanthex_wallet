@@ -15,7 +15,11 @@ import 'package:quanthex/views/mining/mining_view.dart';
 import 'package:quanthex/widgets/app_button.dart';
 import 'package:quanthex/widgets/global/empty_view.dart';
 import 'package:quanthex/widgets/global/error_modal.dart';
+import 'package:quanthex/widgets/loading_overlay/loading.dart';
 import 'package:quanthex/widgets/quanthex_image_banner.dart';
+
+import '../../data/controllers/balance/balance_controller.dart';
+import '../../widgets/global/MyFadeSlideEffect.dart';
 
 class StakingList extends StatefulWidget {
   const StakingList({super.key});
@@ -73,15 +77,21 @@ class _StakingListState extends State<StakingList> {
           SizedBox(
             width: 80.w,
             height: 30.h,
-            child: AppButton(
-              text: 'Create',
-              padding: EdgeInsets.symmetric(horizontal: 8,vertical: 4),
-              borderRadius: 10,
-              textColor: Colors.white,
-              color: greenColor.withOpacity(0.35),
-              onTap: () {
-                Navigate.toNamed(context, name: AppRoutes.stakingview);
-              },
+            child: Consumer<MiningController>(
+                builder: (context, miningCtr, child) {
+                  String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+                  List<StakingDto> stakings = miningCtr.stakings[walletAddress] ?? [];
+                return stakings.isEmpty?AppButton(
+                  text: 'Create',
+                  padding: EdgeInsets.symmetric(horizontal: 8,vertical: 4),
+                  borderRadius: 10,
+                  textColor: Colors.white,
+                  color: greenColor.withOpacity(0.35),
+                  onTap: () {
+                    Navigate.toNamed(context, name: AppRoutes.stakingview);
+                  },
+                ):const SizedBox();
+              }
             ),
           ),
         ],
@@ -100,16 +110,46 @@ class _StakingListState extends State<StakingList> {
               image: DecorationImage(colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken), image: AssetImage('assets/images/green_astro_bg.jpg'), fit: BoxFit.cover),
             ),
             child: SafeArea(
-              child: Consumer<MiningController>(
-                builder: (context, miningCtr, child) {
-                  String walletAddress = walletController.currentWallet!.walletAddress ?? "";
-                  print(walletAddress);
-                  List<StakingDto> stakings = miningCtr.stakings[walletAddress] ?? [];
-                  return !miningController.fetchingStakingsError
-                      ? Column(
-                          mainAxisAlignment: stakings.isNotEmpty?MainAxisAlignment.start:MainAxisAlignment.center,
-                          children: [
-                            stakings.isNotEmpty? Column(
+              child: Consumer<AssetController>(
+                builder: (context, assetCtr, child) {
+                  return Consumer<BalanceController>(
+                      builder: (context, balanceCtr, child) {
+                        return Consumer<MiningController>(
+                          builder: (context, miningCtr, child) {
+                            String walletAddress = walletController.currentWallet!.walletAddress ?? "";
+                            print(walletAddress);
+                            List<StakingDto> stakings = miningCtr.stakings[walletAddress] ?? [];
+                            if(assetCtr.assetLoading||balanceCtr.balanceLoading){
+                              return Center(
+                                child: Loading(
+                                  size: 30.sp,
+                                ),
+                              );
+                            }else if(assetCtr.assetLoadingError||balanceCtr.balanceLoadingError){
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  MyFadeSlideEffect(
+                                    child: Text(
+                                      'Unable to load your assets, go to your wallet section to refresh',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white60,
+                                        fontSize: 14.sp,
+                                        fontFamily: 'Satoshi',
+                                        fontWeight: FontWeight.w400,
+                                        height: 1.5,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }else if(!assetCtr.assetLoading&&!assetCtr.assetLoadingError&&!balanceCtr.balanceLoading&&!balanceCtr.balanceLoadingError){
+                              return !miningController.fetchingStakingsError ? Column(
+                                mainAxisAlignment: stakings.isNotEmpty?MainAxisAlignment.start:MainAxisAlignment.center,
+                                children: [
+                                  stakings.isNotEmpty? Column(
                                     children: stakings.map((e) {
                                       return Container(
                                         padding: EdgeInsets.symmetric(horizontal: 8),
@@ -138,26 +178,33 @@ class _StakingListState extends State<StakingList> {
                                             "${e.duration.toString()} Months",
                                             style: TextStyle(color: Colors.white60, fontSize: 14, fontFamily: 'Satoshi', fontWeight: FontWeight.w500),
                                           ),
-                                          ),
+                                        ),
                                       );
                                     }).toList(),
                                   )
-                                : EmptyView(
-                                  message: "Stake your tokens to earn rewards. Create a staking position to get started.",
-                                  textColor: Colors.white60,
+                                      : EmptyView(
+                                    message: "Stake your tokens to earn rewards. Create a staking position to get started.",
+                                    textColor: Colors.white60,
                                   ),
-                          ],
-                        ) : Center(
-                          child: ErrorModal(
-                            textColor: Colors.white60,
-                            buttonColor: greenColor.withOpacity(0.35),
-                            callBack: () {
-                              fetchData();
-                            },
-                          ),
+                                ],
+                              ) : Center(
+                                child: ErrorModal(
+                                  textColor: Colors.white60,
+                                  buttonColor: greenColor.withOpacity(0.35),
+                                  callBack: () {
+                                    fetchData();
+                                  },
+                                ),
+                              );
+                            }else{
+                              return SizedBox();
+                            }
+                          },
                         );
-                },
-              ),
+                }
+              );
+  },
+),
             ),
           ),
         ),

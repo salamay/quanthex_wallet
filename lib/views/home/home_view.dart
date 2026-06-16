@@ -41,9 +41,9 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
+
   ValueNotifier<bool> _loadingNotifier = ValueNotifier(true);
   ValueNotifier<bool> _errorNotifier = ValueNotifier(false);
-  ValueNotifier<bool> balanceLoadingNotifier = ValueNotifier(true);
   late AssetController assetController;
   late WalletController walletController;
   late MiningController miningController;
@@ -71,7 +71,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       }
       await notificationController.getUnreadCount();
       _loadingNotifier.value = true;
-      balanceLoadingNotifier.value = true;
       String walletAddress = walletController.currentWallet?.walletAddress ?? "";
       bool isCacheEmpty = await AssetRepo.getInstance().isCacheAssetEmpty(walletAddress);
       bool isNew = isCacheEmpty ? true : false;
@@ -79,20 +78,18 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       List<SupportedCoin> assets = await assetController.getAllAssets(isNew: isNew, assetService: assetService, walletController: walletController, swapController: swapController);
       logger("Assets ${assets.length}", runtimeType.toString());
       await assetController.getAssetsQuotes(balanceController: balanceController, assets: assets);
-      await getTokenBalances(context: context);
+      await getTokenBalances(context: context,shouldIndicate: true);
       if (isNew) {
         await AssetRepo.getInstance().saveAssets(walletAddress: walletAddress, newTokens: assets);
       }
       userController.getProfile();
       _loadingNotifier.value = false;
-      balanceLoadingNotifier.value = false;
       _errorNotifier.value = false;
       _startBalanceTimer();
     } catch (e) {
       logger(e.toString(), runtimeType.toString());
       _errorNotifier.value = true;
       _loadingNotifier.value = false;
-      balanceLoadingNotifier.value = false;
     }
   }
 
@@ -102,7 +99,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     List<SupportedCoin> assets = await assetController.assets;
     logger("Assets ${assets.length}", runtimeType.toString());
     await assetController.getAssetsQuotes(balanceController: balanceController, assets: assets);
-    await getTokenBalances(context: context);
+    await getTokenBalances(context: context,shouldIndicate: false);
   }
 
   Future<void> reload() async {
@@ -118,7 +115,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       logger("Error getting data: $e", runtimeType.toString());
       _errorNotifier.value = true;
       _loadingNotifier.value = false;
-      balanceLoadingNotifier.value = false;
       return;
     }
   }
@@ -176,10 +172,18 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
               // Header
               Row(
                 children: [
-                  QuanthexImageBanner(
-                    width: 80.sp,
-                    height: 80.sp,
+                  Image.asset(
+                    "assets/images/logo.png",
+                    height: 50.h,
+                    width: 50.w,
                   ),
+                  2.horizontalSpace,
+                  Image.asset(
+                    "assets/images/quanthex_2.png",
+                    height: 80.h,
+                    width: 80.w,
+                  ),
+
                   10.horizontalSpace,
                   Consumer<WalletController>(
                     builder: (context, walletCtr, child) {
@@ -300,23 +304,18 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                 ],
               ),
               10.sp.verticalSpace,
-              ValueListenableBuilder(
-                valueListenable: balanceLoadingNotifier,
-                builder: (context, balanceLoading, _) {
-                  return Consumer<BalanceController>(
-                    builder: (context, balanceCtr, child) {
-                      return Skeletonizer(
-                        ignoreContainers: false,
-                        enabled: balanceLoading,
-                        effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
-                        child: AutoSizeText(
-                          balanceCtr.hideBalance ? '****' : MyCurrencyUtils.formatCurrency(balanceCtr.overallBalance),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 32.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
-                          maxLines: 1,
-                        ),
-                      );
-                    },
+              Consumer<BalanceController>(
+                builder: (context, balanceCtr, child) {
+                  return Skeletonizer(
+                    ignoreContainers: false,
+                    enabled: balanceCtr.balanceLoading,
+                    effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
+                    child: AutoSizeText(
+                      balanceCtr.hideBalance ? '****' : MyCurrencyUtils.formatCurrency(balanceCtr.overallBalance),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 32.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
+                      maxLines: 1,
+                    ),
                   );
                 },
               ),
@@ -485,11 +484,11 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     );
   }
 
-  Future<void> getTokenBalances({required BuildContext context}) async {
+  Future<void> getTokenBalances({required BuildContext context,required bool shouldIndicate}) async {
     List<SupportedCoin> assets = assetController.assets;
     List<SupportedCoin> tokens = assets.where((element) => element.coinType == CoinType.TOKEN).toList();
     List<SupportedCoin> nativeTokens = assets.where((element) => element.coinType == CoinType.NATIVE_TOKEN || element.coinType == CoinType.WRAPPED_TOKEN).toList();
-    Map<String, CoinBalance> results = await balanceController.getTokenBalance(tokens);
+    Map<String, CoinBalance> results = await balanceController.getTokenBalance(tokens, shouldIndicate);
     assetController.populateAssetsByBalanceInFiat(results);
     await Future.wait(
       nativeTokens.map((e) async {
@@ -636,7 +635,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     return GestureDetector(
       onTap: () async {
         if (!isSelected) {
-          if(_loadingNotifier.value || balanceLoadingNotifier.value){
+          if(_loadingNotifier.value || balanceController.balanceLoading){
             return;
           }
           Navigator.pop(context);

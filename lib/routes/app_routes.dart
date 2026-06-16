@@ -42,7 +42,10 @@ import 'package:quanthex/views/wallets/wallets_view.dart';
 import 'package:quanthex/views/withdrawals_view.dart';
 
 import '../data/Models/assets/supported_assets.dart';
+import '../data/Models/mining/mining_payment_dto.dart';
 import '../data/Models/mining/subscription_payload.dart';
+import '../views/mining/mining_payment_detail_view.dart';
+import '../views/mining/mining_payments_view.dart';
 import '../views/mining/mining_view.dart';
 import '../views/splash/splash_screen.dart';
 import '../views/transaction/transaction_details_view.dart';
@@ -85,6 +88,8 @@ class AppRoutes {
   static String securityprivacyview = '/securityprivacyview';
   static String referearnview = '/referearnview';
   static String withdrawalsview = '/withdrawalsview';
+  static String miningPaymentsView = '/miningpaymentsview';
+  static String miningPaymentDetailView = '/miningpaymentdetailview';
   static String verifycurrentpinview = '/verifycurrentpinview';
   static String setnewpinview = '/setnewpinview';
 
@@ -227,6 +232,20 @@ class AppRoutes {
       GoRoute(path: setnewpinview, builder: (context, state) => SetNewPinView()),
       GoRoute(path: referearnview, builder: (context, state) => ReferEarnView()),
       GoRoute(path: withdrawalsview, builder: (context, state) => WithdrawalsView()),
+      GoRoute(
+        path: miningPaymentsView,
+        builder: (context, state) {
+          final args = state.extra as MiningDto;
+          return MiningPaymentsView(mining: args);
+        },
+      ),
+      GoRoute(
+        path: miningPaymentDetailView,
+        builder: (context, state) {
+          final args = state.extra as MiningPaymentDto;
+          return MiningPaymentDetailView(payment: args);
+        },
+      ),
     ],
   );
 }

@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:quanthex/core/network/Api_url.dart';
 import 'package:quanthex/data/Models/mining/mining_dto.dart';
+import 'package:quanthex/data/Models/mining/mining_payment_dto.dart';
 import 'package:quanthex/data/Models/staking/staking_dto.dart';
 import 'package:quanthex/data/Models/staking/staking_referral_dto.dart';
 import 'package:quanthex/data/Models/users/referral_dto.dart';
@@ -114,6 +115,44 @@ class MiningService {
       if (response.statusCode! >= 200 && response.statusCode! < 300) {
         final data = response.data["data"];
         return List.from(data).map((e) => ReferralDto.fromJson(e)).toList();
+      } else {
+        var data = response.data;
+        throw Exception(data["message"]);
+      }
+    } else {
+      throw Exception("Unable to establish connection");
+    }
+  }
+
+  Future<Map<String, dynamic>> getMiningPayments({required String minId, int page = 1, int limit = 20}) async {
+    logger("Getting mining payments for minId=$minId, page=$page", runtimeType.toString());
+    Response? response;
+    try {
+      String accessToken = AuthService.getInstance().authToken;
+      response = await my_api.get(
+        "${ApiUrls.miningPayments}?minId=$minId&page=$page&limit=$limit",
+        {"Content-Type": "application/json", "Authorization": "Bearer $accessToken"},
+      );
+    } catch (e) {
+      logger(e.toString(), runtimeType.toString());
+      throw Exception("Unable to establish connection");
+    }
+    if (response != null) {
+      logger("Getting mining payments: Response code ${response.statusCode}", runtimeType.toString());
+      if (response.statusCode! >= 200 && response.statusCode! < 300) {
+        final responseData = response.data;
+        // The consumer backend returns { status, message, timestamp, data: { payments, total, page, limit, totalPages } }
+        final payload = responseData["data"];
+        final List<MiningPaymentDto> payments = List.from(payload["payments"]).map((e) => MiningPaymentDto.fromJson(e)).toList();
+        return {
+          'payments': payments,
+          'total': payload['total'] ?? 0,
+          'totalAmountPaid': (payload['totalAmountPaid'] is num)
+              ? (payload['totalAmountPaid'] as num).toDouble()
+              : double.tryParse(payload['totalAmountPaid']?.toString() ?? '0') ?? 0.0,
+          'page': payload['page'] ?? 1,
+          'totalPages': payload['totalPages'] ?? 1,
+        };
       } else {
         var data = response.data;
         throw Exception(data["message"]);
