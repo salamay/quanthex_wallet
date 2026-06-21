@@ -101,7 +101,7 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
                     ),
                     15.sp.verticalSpace,
                     Text(
-                      'Activate any mining package and begin generating rewards instantly. The higher your package and network growth, the more you earn.',
+                      'Activate any mining plan and begin generating rewards instantly. The higher your plan and network growth, the more you earn.',
                       style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w400, height: 1.5),
                     ),
                     10.sp.verticalSpace,
@@ -111,7 +111,7 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
                       style: TextStyle(color: Colors.white, fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
                     ),
                     15.sp.verticalSpace,
-                    HowItWorksItem(text: 'Choose a package', onInfoTap: () {}),
+                    HowItWorksItem(text: 'Choose a plan', onInfoTap: () {}),
                     10.sp.verticalSpace,
                     HowItWorksItem(text: 'Get your HexaPower referral link', onInfoTap: () {}),
                     10.sp.verticalSpace,
@@ -191,15 +191,15 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
         String amountInCrypto = (price / rewardPriceQuotes).toStringAsFixed(0);
          String description = "";
         if (name == starter) {
-          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Advance through the required stages to unlock the full outputs.";
+          description = "QUANTHEX offers potential mining rewards of over ${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE. Activate and complete each mining hash to unlock the maximum reward potential available.";
         } else if (name == growth) {
-          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Move through all stages to claim the maximum outputs.";
+          description = "QUANTHEX offers potential mining rewards of over ${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE. Activate and complete each mining hash to unlock the maximum reward potential available.";
         } else if (name == advance) {
-          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Progress through the necessary stages to access the full mining outputs.";
+          description = "QUANTHEX offers potential mining rewards of over ${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE. Activate and complete each mining hash to unlock the maximum reward potential available.";
         } else if (name == pro) {
-          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Complete all progression levels to receive the entire mining outputs.";
+          description = "QUANTHEX offers potential mining rewards of over ${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE. Activate and complete each mining hash to unlock the maximum reward potential available.";
         } else if (name == mega) {
-          description = "Offering up to +${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE in mining outputs. Complete all progression levels to receive the entire mining outputs.";
+          description = "QUANTHEX offers potential mining rewards of over ${MyCurrencyUtils.format(double.parse(amountInCrypto),0)} DOGE. Activate and complete each mining hash to unlock the maximum reward potential available.";
         }
         return Container(
           padding: EdgeInsets.all(16.sp),
@@ -218,7 +218,7 @@ class _SubscriptionPackageState extends State<SubscriptionPackage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '\$$price $name',
+                    '\$$price ${name.replaceAll("Package", "")}',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18.sp,

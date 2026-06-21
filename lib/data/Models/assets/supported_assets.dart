@@ -71,7 +71,7 @@ class SupportedCoin {
     json["implementation_contract_address"],
     balanceInFiat: json["balance_in_fiat"],
     balanceInCrypto: json["balance_in_crypto"],
-    marketCap: json["market_cap"],
+    marketCap: json["market_cap"]!=double.infinity?double.parse(json["market_cap"].toString()):0.0,
   );
 
   /// -----------------------------
@@ -91,6 +91,6 @@ class SupportedCoin {
     "implementation_contract_address": implementationContractAddress,
     "balance_in_fiat": balanceInFiat,
     "balance_in_crypto": balanceInCrypto,
-    "market_cap": marketCap,
+    "market_cap": marketCap!=double.infinity?marketCap:0.0,
   };
 }

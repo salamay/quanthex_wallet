@@ -287,7 +287,7 @@ class _SwapTokenViewState extends State<SwapTokenView> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Swap',
+                                  'Trade',
                                   style: TextStyle(color: const Color(0xFF2D2D2D), fontSize: 20.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
                                 ),
                                 const Spacer(),

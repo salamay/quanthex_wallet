@@ -39,7 +39,7 @@ class SummaryCard extends StatelessWidget {
                   8.sp.horizontalSpace,
                   Expanded(
                     child: Text(
-                      sub.subPackageName ?? 'Starter Package',
+                      sub.subPackageName?.replaceAll("Package", "") ?? 'Starter',
                       style: TextStyle(color: Colors.white, fontSize: 18.sp, fontFamily: 'Satoshi', fontWeight: FontWeight.w700),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

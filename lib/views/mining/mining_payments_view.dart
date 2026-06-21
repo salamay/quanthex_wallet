@@ -256,7 +256,7 @@ class _MiningPaymentsViewState extends State<MiningPaymentsView> {
                 ),
                 SizedBox(width: 8.sp),
                 Text(
-                  '${payment.mpAmount.toStringAsFixed(4)} ${payment.mpRewardSymbol ?? payment.subRewardAssetSymbol ?? ''}',
+                  '${payment.mpAmount} ${payment.mpRewardSymbol}',
                   style: TextStyle(
                     fontSize: 15.sp,
                     fontWeight: FontWeight.w700,

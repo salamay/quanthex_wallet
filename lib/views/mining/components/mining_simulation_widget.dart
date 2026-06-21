@@ -38,7 +38,6 @@ class _MiningSimulationWidgetState extends State<MiningSimulationWidget>
   void initState() {
     super.initState();
     _progress = (widget.totalReferrals / ProductUtils.LEVEL_THREE_REFERRALS) + (_random.nextDouble()*0.1); // Start between 85-95%
-    print("progress: $_progress");
     _controller = AnimationController(
       duration: widget.animationSpeed,
       vsync: this,
@@ -90,6 +89,7 @@ class _MiningSimulationWidgetState extends State<MiningSimulationWidget>
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       child: Row(
         mainAxisSize: MainAxisSize.min,

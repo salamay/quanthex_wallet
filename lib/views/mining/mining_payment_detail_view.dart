@@ -177,7 +177,7 @@ class MiningPaymentDetailView extends StatelessWidget {
           ),
           SizedBox(height: 6.sp),
           Text(
-            '${payment.mpAmount.toStringAsFixed(4)} $rewardSymbol',
+            '${payment.mpAmount} $rewardSymbol',
             style: TextStyle(
               fontSize: 26.sp,
               fontWeight: FontWeight.w800,

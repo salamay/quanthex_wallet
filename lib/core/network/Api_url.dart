@@ -31,11 +31,11 @@ class ApiUrls{
   static String moralisNativeTransfers="https://deep-index.moralis.io/api/v2.2/";
   static String cmcListings="https://pro-api.coinmarketcap.com/v3/cryptocurrency/listings/latest";
 
-  static String baseUrl="https://api.quanthex.io/v1/api";
+  // static String baseUrl="https://api.quanthex.io/v1/api";
 
 
   // Router 1
-  // static String baseUrl="http://192.168.1.135:5790/v1/api";
+  static String baseUrl="http://192.168.1.135:5790/v1/api";
  
 
   static String loginOtp="$baseUrl/auth/loginOtp";

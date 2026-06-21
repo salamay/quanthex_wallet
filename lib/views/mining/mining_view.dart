@@ -166,18 +166,7 @@ class _MiningViewState extends State<MiningView> {
                                             ),
                                           ],
                                         ),
-                                        12.sp.verticalSpace,
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: StatCard(label: 'Package', value: packageName),
-                                            ),
-                                            12.horizontalSpace,
-                                            Expanded(
-                                              child: StatCard(label: 'Mining Speed', value: "$hashRate Hex MH/s", fontSize: 13.sp),
-                                            ),
-                                          ],
-                                        ),
+
                                         12.sp.verticalSpace,
                                         Row(
                                           children: [
@@ -190,7 +179,7 @@ class _MiningViewState extends State<MiningView> {
                                                     enabled: balanceCtr.isLoadingPriceQuotes,
                                                     effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
                                                     ignoreContainers: false,
-                                                    child: StatCard(label: "Direct earnings", value: "${MyCurrencyUtils.format(amountInCrypto, 4)} ${mining.subscription!.subRewardAssetSymbol ?? ""}", fontSize: 14.sp),
+                                                    child: StatCard(label: "Direct earnings", value: "${MyCurrencyUtils.format(amountInCrypto, 2)} ${mining.subscription!.subRewardAssetSymbol ?? ""}", fontSize: 14.sp),
                                                   );
                                                 },
                                               ),
@@ -206,7 +195,7 @@ class _MiningViewState extends State<MiningView> {
                                                     enabled: balanceCtr.isLoadingPriceQuotes,
                                                     effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
                                                     ignoreContainers: false,
-                                                    child: StatCard(label: "Under your structure earnings", value: "${MyCurrencyUtils.format(amountInCrypto, 4)} ${mining.subscription!.subRewardAssetSymbol ?? ""}", infoText: null, fontSize: 14.sp),
+                                                    child: StatCard(label: "Under your structure earnings", value: "${MyCurrencyUtils.format(amountInCrypto, 2)} ${mining.subscription!.subRewardAssetSymbol ?? ""}", infoText: null, fontSize: 14.sp),
                                                   );
                                                 },
                                               ),
@@ -226,10 +215,14 @@ class _MiningViewState extends State<MiningView> {
                                                     enabled: balanceCtr.isLoadingPriceQuotes,
                                                     effect: ShimmerEffect(duration: Duration(milliseconds: 1000), baseColor: Colors.grey.withOpacity(0.4), highlightColor: Colors.white54),
                                                     ignoreContainers: false,
-                                                    child: StatCard(label: "Total earnings", value: "${MyCurrencyUtils.format(amountInCrypto, 4)} ${mining.subscription!.subRewardAssetSymbol ?? ""}", infoText: null, fontSize: 14.sp),
+                                                    child: StatCard(label: "Total earnings", value: "${MyCurrencyUtils.format(amountInCrypto, 2)} ${mining.subscription!.subRewardAssetSymbol ?? ""}", infoText: null, fontSize: 14.sp),
                                                   );
                                                 },
                                               ),
+                                            ),
+                                            12.horizontalSpace,
+                                            Expanded(
+                                              child: StatCard(label: 'Mining Speed', value: "$hashRate Hex MH/s", fontSize: 13.sp),
                                             ),
                                           ],
                                         ),
@@ -246,7 +239,7 @@ class _MiningViewState extends State<MiningView> {
                                                 Expanded(
                                                   child: StatCard(
                                                     label: 'Total Paid',
-                                                    value: "${MyCurrencyUtils.format(totalPaid, 4)} $rewardSymbol",
+                                                    value: "${MyCurrencyUtils.format(totalPaid, 2)} $rewardSymbol",
                                                     fontSize: 14.sp,
                                                     infoText: "$paymentCount payment${paymentCount == 1 ? '' : 's'} received",
                                                   ),
@@ -287,7 +280,7 @@ class _MiningViewState extends State<MiningView> {
                                             },
                                             icon: Icon(Icons.receipt_long_outlined, size: 18.sp, color: const Color(0xffA8EBCF)),
                                             label: Text(
-                                              'Payment History',
+                                              'Payout History',
                                               style: TextStyle(
                                                 fontSize: 14.sp,
                                                 fontWeight: FontWeight.w600,

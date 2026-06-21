@@ -54,7 +54,7 @@ class MiningPaymentDto {
   bool get isFailed => mpStatus.toLowerCase() == 'failed';
   bool get isManual => mpIsManual == 1;
 
-  String get tierLabel => isManual ? 'Manual' : 'Payment #$mpPaymentTier';
+  String get tierLabel => isManual ? 'Accepted' : 'Payment #$mpPaymentTier';
 
   factory MiningPaymentDto.fromJson(Map<String, dynamic> json) {
     return MiningPaymentDto(

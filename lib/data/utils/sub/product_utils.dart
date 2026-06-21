@@ -13,18 +13,18 @@ class ProductUtils {
   static const int LEVEL_THREE_REFERRALS = 216;
 
 
-  static const starterFactor = 1.00;
-    static const growthFactor = 2.00;
-    static const advanceFactor = 3.00;
-    static const proFactor = 4.00;
-    static const megaFactor = 5.00;
+  static const starterFactor = 0.2;
+    static const growthFactor = 0.3;
+    static const advanceFactor = 0.4;
+    static const proFactor = 0.5;
+    static const megaFactor = 0.6;
 
   /// Calculate hashrate based on number of referrals
   ///
   /// [noOfReferrals] - The number of referrals
   /// Returns the calculated hashrate
   static double getHashRate({required int noOfReferrals,required String packageName}){
-    double factor = 1.0;
+    double factor = 1.2;
     if (packageName == starter) {
       factor = starterFactor;
     } else if (packageName == growth) {
@@ -37,18 +37,20 @@ class ProductUtils {
       factor = megaFactor;
     }
         if(noOfReferrals==0){
+          //Only apply factor if no referrals is zero because we want the hash rate to increase lil bit for zero referrals
             return LEVEL_ZERO_HASHRATE*factor;
         }else if(noOfReferrals>0 && noOfReferrals<=6){
-            return LEVEL_ONE_HASHRATE * factor;
+            return LEVEL_ONE_HASHRATE ;
         }else if(noOfReferrals>6 && noOfReferrals<=36){
-            return LEVEL_TWO_HASHRATE * factor;
+            return LEVEL_TWO_HASHRATE ;
         } else if(noOfReferrals>36 && noOfReferrals<=216){
-            return LEVEL_THREE_HASHRATE * factor;
+            return LEVEL_THREE_HASHRATE ;
         }
         else if(noOfReferrals>216 && noOfReferrals<=324){
-            return LEVEL_FOUR_HASHRATE * factor;
+            return LEVEL_FOUR_HASHRATE ;
         }else{
             return LEVEL_ZERO_HASHRATE;
         }
+
     }
 }

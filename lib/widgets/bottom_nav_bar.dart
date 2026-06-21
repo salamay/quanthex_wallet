@@ -43,7 +43,7 @@ class BottomNavBar extends StatelessWidget {
                 Provider.of<HomeController>(context,listen: false).changeIndex(1);
               },
               icon: 'assets/images/swap_nav.png', // Icons.swap_horiz,
-              label: 'Swap',
+              label: 'Trade',
               index: 1,
               isActive: currentIndex == 1,
             ),
